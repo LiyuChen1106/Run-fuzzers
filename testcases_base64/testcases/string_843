@@ -1,0 +1,1 @@
+0 <= strtol_base && strtol_base <= 36

@@ -1,0 +1,1 @@
+strtol_error xstrtoumax(const char *, char **, int, uintmax_t *, const char *)
