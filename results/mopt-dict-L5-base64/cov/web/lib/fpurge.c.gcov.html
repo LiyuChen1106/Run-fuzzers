@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/fpurge.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - fpurge.c<span style="font-size: 80%;"> (source / <a href="fpurge.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:41:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Flushing buffers of a FILE stream.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2007-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Specification.  */
+<span class="lineNum">      20 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #if HAVE___FPURGE                   /* glibc &gt;= 2.2, Haiku, Solaris &gt;= 7 */
+<span class="lineNum">      23 </span>            : # include &lt;stdio_ext.h&gt;
+<span class="lineNum">      24 </span>            : #endif
+<span class="lineNum">      25 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;stdio-impl.h&quot;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : int
+<span class="lineNum">      30 </span>            : fpurge (FILE *fp)
+<span class="lineNum">      31 </span>            : {
+<span class="lineNum">      32 </span>            : #if HAVE___FPURGE                   /* glibc &gt;= 2.2, Haiku, Solaris &gt;= 7, musl libc */
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :   __fpurge (fp);</span>
+<span class="lineNum">      35 </span>            :   /* The __fpurge function does not have a return value.  */
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #elif HAVE_FPURGE                   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin 1.7 */
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :   /* Call the system's fpurge function.  */
+<span class="lineNum">      41 </span>            : # undef fpurge
+<span class="lineNum">      42 </span>            : # if !HAVE_DECL_FPURGE
+<span class="lineNum">      43 </span>            :   extern int fpurge (FILE *);
+<span class="lineNum">      44 </span>            : # endif
+<span class="lineNum">      45 </span>            :   int result = fpurge (fp);
+<span class="lineNum">      46 </span>            : # if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">      47 </span>            :   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">      48 </span>            :   if (result == 0)
+<span class="lineNum">      49 </span>            :     /* Correct the invariants that fpurge broke.
+<span class="lineNum">      50 </span>            :        &lt;stdio.h&gt; on BSD systems says:
+<span class="lineNum">      51 </span>            :          &quot;The following always hold: if _flags &amp; __SRD, _w is 0.&quot;
+<span class="lineNum">      52 </span>            :        If this invariant is not fulfilled and the stream is read-write but
+<span class="lineNum">      53 </span>            :        currently reading, subsequent putc or fputc calls will write directly
+<span class="lineNum">      54 </span>            :        into the buffer, although they shouldn't be allowed to.  */
+<span class="lineNum">      55 </span>            :     if ((fp_-&gt;_flags &amp; __SRD) != 0)
+<span class="lineNum">      56 </span>            :       fp_-&gt;_w = 0;
+<span class="lineNum">      57 </span>            : # endif
+<span class="lineNum">      58 </span>            :   return result;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : #else
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :   /* Most systems provide FILE as a struct and the necessary bitmask in
+<span class="lineNum">      63 </span>            :      &lt;stdio.h&gt;, because they need it for implementing getc() and putc() as
+<span class="lineNum">      64 </span>            :      fast macros.  */
+<span class="lineNum">      65 </span>            : # if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+<span class="lineNum">      66 </span>            :   fp-&gt;_IO_read_end = fp-&gt;_IO_read_ptr;
+<span class="lineNum">      67 </span>            :   fp-&gt;_IO_write_ptr = fp-&gt;_IO_write_base;
+<span class="lineNum">      68 </span>            :   /* Avoid memory leak when there is an active ungetc buffer.  */
+<span class="lineNum">      69 </span>            :   if (fp-&gt;_IO_save_base != NULL)
+<span class="lineNum">      70 </span>            :     {
+<span class="lineNum">      71 </span>            :       free (fp-&gt;_IO_save_base);
+<span class="lineNum">      72 </span>            :       fp-&gt;_IO_save_base = NULL;
+<span class="lineNum">      73 </span>            :     }
+<span class="lineNum">      74 </span>            :   return 0;
+<span class="lineNum">      75 </span>            : # elif defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">      76 </span>            :   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">      77 </span>            :   fp_-&gt;_p = fp_-&gt;_bf._base;
+<span class="lineNum">      78 </span>            :   fp_-&gt;_r = 0;
+<span class="lineNum">      79 </span>            :   fp_-&gt;_w = ((fp_-&gt;_flags &amp; (__SLBF | __SNBF | __SRD)) == 0 /* fully buffered and not currently reading? */
+<span class="lineNum">      80 </span>            :              ? fp_-&gt;_bf._size
+<span class="lineNum">      81 </span>            :              : 0);
+<span class="lineNum">      82 </span>            :   /* Avoid memory leak when there is an active ungetc buffer.  */
+<span class="lineNum">      83 </span>            :   if (fp_ub._base != NULL)
+<span class="lineNum">      84 </span>            :     {
+<span class="lineNum">      85 </span>            :       if (fp_ub._base != fp_-&gt;_ubuf)
+<span class="lineNum">      86 </span>            :         free (fp_ub._base);
+<span class="lineNum">      87 </span>            :       fp_ub._base = NULL;
+<span class="lineNum">      88 </span>            :     }
+<span class="lineNum">      89 </span>            :   return 0;
+<span class="lineNum">      90 </span>            : # elif defined __EMX__              /* emx+gcc */
+<span class="lineNum">      91 </span>            :   fp-&gt;_ptr = fp-&gt;_buffer;
+<span class="lineNum">      92 </span>            :   fp-&gt;_rcount = 0;
+<span class="lineNum">      93 </span>            :   fp-&gt;_wcount = 0;
+<span class="lineNum">      94 </span>            :   fp-&gt;_ungetc_count = 0;
+<span class="lineNum">      95 </span>            :   return 0;
+<span class="lineNum">      96 </span>            : # elif defined __minix              /* Minix */
+<span class="lineNum">      97 </span>            :   fp-&gt;_ptr = fp-&gt;_buf;
+<span class="lineNum">      98 </span>            :   if (fp-&gt;_ptr != NULL)
+<span class="lineNum">      99 </span>            :     fp-&gt;_count = 0;
+<span class="lineNum">     100 </span>            :   return 0;
+<span class="lineNum">     101 </span>            : # elif defined _IOERR               /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
+<span class="lineNum">     102 </span>            :   fp-&gt;_ptr = fp-&gt;_base;
+<span class="lineNum">     103 </span>            :   if (fp-&gt;_ptr != NULL)
+<span class="lineNum">     104 </span>            :     fp-&gt;_cnt = 0;
+<span class="lineNum">     105 </span>            :   return 0;
+<span class="lineNum">     106 </span>            : # elif defined __UCLIBC__           /* uClibc */
+<span class="lineNum">     107 </span>            : #  ifdef __STDIO_BUFFERS
+<span class="lineNum">     108 </span>            :   if (fp-&gt;__modeflags &amp; __FLAG_WRITING)
+<span class="lineNum">     109 </span>            :     fp-&gt;__bufpos = fp-&gt;__bufstart;
+<span class="lineNum">     110 </span>            :   else if (fp-&gt;__modeflags &amp; (__FLAG_READONLY | __FLAG_READING))
+<span class="lineNum">     111 </span>            :     fp-&gt;__bufpos = fp-&gt;__bufread;
+<span class="lineNum">     112 </span>            : #  endif
+<span class="lineNum">     113 </span>            :   return 0;
+<span class="lineNum">     114 </span>            : # elif defined __QNX__              /* QNX */
+<span class="lineNum">     115 </span>            :   fp-&gt;_Rback = fp-&gt;_Back + sizeof (fp-&gt;_Back);
+<span class="lineNum">     116 </span>            :   fp-&gt;_Rsave = NULL;
+<span class="lineNum">     117 </span>            :   if (fp-&gt;_Mode &amp; 0x2000 /* _MWRITE */)
+<span class="lineNum">     118 </span>            :     /* fp-&gt;_Buf &lt;= fp-&gt;_Next &lt;= fp-&gt;_Wend */
+<span class="lineNum">     119 </span>            :     fp-&gt;_Next = fp-&gt;_Buf;
+<span class="lineNum">     120 </span>            :   else
+<span class="lineNum">     121 </span>            :     /* fp-&gt;_Buf &lt;= fp-&gt;_Next &lt;= fp-&gt;_Rend */
+<span class="lineNum">     122 </span>            :     fp-&gt;_Rend = fp-&gt;_Next;
+<span class="lineNum">     123 </span>            :   return 0;
+<span class="lineNum">     124 </span>            : # elif defined __MINT__             /* Atari FreeMiNT */
+<span class="lineNum">     125 </span>            :   if (fp-&gt;__pushed_back)
+<span class="lineNum">     126 </span>            :     {
+<span class="lineNum">     127 </span>            :       fp-&gt;__bufp = fp-&gt;__pushback_bufp;
+<span class="lineNum">     128 </span>            :       fp-&gt;__pushed_back = 0;
+<span class="lineNum">     129 </span>            :     }
+<span class="lineNum">     130 </span>            :   /* Preserve the current file position.  */
+<span class="lineNum">     131 </span>            :   if (fp-&gt;__target != -1)
+<span class="lineNum">     132 </span>            :     fp-&gt;__target += fp-&gt;__bufp - fp-&gt;__buffer;
+<span class="lineNum">     133 </span>            :   fp-&gt;__bufp = fp-&gt;__buffer;
+<span class="lineNum">     134 </span>            :   /* Nothing in the buffer, next getc is nontrivial.  */
+<span class="lineNum">     135 </span>            :   fp-&gt;__get_limit = fp-&gt;__bufp;
+<span class="lineNum">     136 </span>            :   /* Nothing in the buffer, next putc is nontrivial.  */
+<span class="lineNum">     137 </span>            :   fp-&gt;__put_limit = fp-&gt;__buffer;
+<span class="lineNum">     138 </span>            :   return 0;
+<span class="lineNum">     139 </span>            : # elif defined EPLAN9               /* Plan9 */
+<span class="lineNum">     140 </span>            :   fp-&gt;rp = fp-&gt;wp = fp-&gt;lp = fp-&gt;buf;
+<span class="lineNum">     141 </span>            :   return 0;
+<span class="lineNum">     142 </span>            : # else
+<span class="lineNum">     143 </span>            : #  error &quot;Please port gnulib fpurge.c to your platform! Look at the definitions of fflush, setvbuf and ungetc on your system, then report this to bug-gnulib.&quot;
+<span class="lineNum">     144 </span>            : # endif
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : #endif
+<span class="lineNum">     147 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

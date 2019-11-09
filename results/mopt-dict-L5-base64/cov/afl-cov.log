@@ -1,0 +1,1188 @@
+    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --initial --directory .. --output-file ../../mopt_dict_0.6_L5//cov/lcov/trace.lcov_base
+Capturing coverage data from ..
+Found gcov version: 7.4.0
+Scanning .. for .gcno files ...
+Out of memory!
+Found 367 graph files in ..
+Processing src/logname.gcno
+Processing src/uname-uname.gcno
+Processing src/rmdir.gcno
+Processing src/comm.gcno
+Processing src/numfmt.gcno
+Processing src/pr.gcno
+Processing src/chown.gcno
+Processing src/src_sha384sum-md5sum.gcno
+Processing src/stat.gcno
+Processing src/dirname.gcno
+Processing src/pathchk.gcno
+Processing src/cat.gcno
+Processing src/chmod.gcno
+Processing src/true.gcno
+Processing src/seq.gcno
+Processing src/group-list.gcno
+Processing src/expr.gcno
+Processing src/src_sha512sum-md5sum.gcno
+Processing src/csplit.gcno
+Processing src/mkdir.gcno
+Processing src/uptime.gcno
+Processing src/expand.gcno
+Processing src/ptx.gcno
+Processing src/factor.gcno
+Processing src/shred.gcno
+Processing src/nl.gcno
+Processing src/version.gcno
+Processing src/getlimits.gcno
+Processing src/tty.gcno
+Processing src/sort.gcno
+Processing src/env.gcno
+Processing src/whoami.gcno
+Processing src/src_md5sum-md5sum.gcno
+Processing src/find-mount-point.gcno
+Processing src/yes.gcno
+Processing src/mknod.gcno
+Processing src/chgrp.gcno
+Processing src/split.gcno
+Processing src/ls-dir.gcno
+Processing src/pwd.gcno
+Processing src/selinux.gcno
+Processing src/src_sha224sum-md5sum.gcno
+Processing src/truncate.gcno
+Processing src/uname.gcno
+Processing src/rm.gcno
+Processing src/chcon.gcno
+Processing src/echo.gcno
+Processing src/pinky.gcno
+Processing src/unexpand.gcno
+Processing src/lbracket.gcno
+Processing src/ls-vdir.gcno
+Processing src/join.gcno
+Processing src/touch.gcno
+Processing src/src_ginstall-install.gcno
+Processing src/src_sha256sum-md5sum.gcno
+Processing src/src_ginstall-extent-scan.gcno
+Processing src/prog-fprintf.gcno
+Processing src/runcon.gcno
+Processing src/chroot.gcno
+Processing src/du.gcno
+Processing src/copy.gcno
+Processing src/src_ginstall-prog-fprintf.gcno
+Processing src/dd.gcno
+Processing src/chown-core.gcno
+Processing src/make-prime-list.gcno
+Processing src/basename.gcno
+Processing src/tac.gcno
+Processing src/false.gcno
+Processing src/users.gcno
+Processing src/cut.gcno
+Processing src/hostid.gcno
+Processing src/base64.gcno
+Processing src/ls-ls.gcno
+Processing src/uniq.gcno
+Processing src/unlink.gcno
+Processing src/nice.gcno
+Processing src/cp-hash.gcno
+Processing src/wc.gcno
+Processing src/sleep.gcno
+Processing src/relpath.gcno
+Processing src/src_ginstall-cp-hash.gcno
+Processing src/head.gcno
+Processing src/mktemp.gcno
+Processing src/extent-scan.gcno
+Processing src/id.gcno
+Processing src/cksum.gcno
+Processing src/sync.gcno
+Processing src/ln.gcno
+Processing src/nohup.gcno
+Processing src/link.gcno
+Processing src/tee.gcno
+Processing src/readlink.gcno
+Processing src/operand2sig.gcno
+Processing src/nproc.gcno
+Processing src/od.gcno
+Processing src/who.gcno
+Processing src/kill.gcno
+Processing src/test.gcno
+Processing src/stdbuf.gcno
+Processing src/src_ginstall-copy.gcno
+Processing src/dircolors.gcno
+Processing src/remove.gcno
+Processing src/fmt.gcno
+Processing src/realpath.gcno
+Processing src/df.gcno
+Processing src/fold.gcno
+Processing src/tail.gcno
+Processing src/shuf.gcno
+Processing src/paste.gcno
+Processing src/tr.gcno
+Processing src/sum.gcno
+Processing src/groups.gcno
+Processing src/cp.gcno
+Processing src/printenv.gcno
+Processing src/src_sha1sum-md5sum.gcno
+Processing src/date.gcno
+Processing src/mv.gcno
+Processing src/stty.gcno
+Processing src/tsort.gcno
+Processing src/ls.gcno
+Processing src/src_libstdbuf_so-libstdbuf.gcno
+Processing src/timeout.gcno
+Processing src/src_ginstall-selinux.gcno
+Processing src/printf.gcno
+Processing src/mkfifo.gcno
+Processing lib/dirname-lgpl.gcno
+Processing lib/malloca.gcno
+Processing lib/fpurge.gcno
+Processing lib/memchr2.gcno
+Processing lib/dtotimespec.gcno
+Processing lib/localcharset.gcno
+Processing lib/cycle-check.gcno
+Processing lib/ldtoastr.gcno
+Processing lib/hash-pjw.gcno
+Processing lib/file-set.gcno
+Processing lib/strnumcmp.gcno
+Processing lib/idcache.gcno
+Processing lib/fseek.gcno
+Processing lib/cloexec.gcno
+Processing lib/memcasecmp.gcno
+Processing lib/filemode.gcno
+Processing lib/wctype-h.gcno
+Processing lib/dirname.gcno
+Processing lib/full-read.gcno
+Processing lib/areadlink-with-size.gcno
+Processing lib/readutmp.gcno
+Processing lib/xvasprintf.gcno
+Processing lib/exitfail.gcno
+Processing lib/sha1.gcno
+Processing lib/mgetgroups.gcno
+Processing lib/glthread/tls.gcno
+Processing lib/glthread/threadlib.gcno
+Processing lib/glthread/lock.gcno
+Processing lib/fcntl.gcno
+Processing lib/quotearg.gcno
+Processing lib/qcopy-acl.gcno
+Processing lib/inttostr.gcno
+Processing lib/dup-safer-flag.gcno
+Processing lib/xstrtol.gcno
+Processing lib/vfprintf.gcno
+
+*** Imported 214 new test cases from: ../../mopt_dict_0.6_L5//queue
+
+[+] AFL test case: id:000000,orig:rand.b64 (0 / 214), cycle: 0
+    lines......: 0.8% (264 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff (init) id:000000,orig:rand.b64
+diff (init) -> id:000000,orig:rand.b64
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'function' coverage: base64_decode_ctx()
+  New 'function' coverage: base64_decode_ctx_init()
+  New 'function' coverage: decode_4()
+  New 'function' coverage: get_4()
+  New 'function' coverage: isbase64()
+  New 'function' coverage: to_uchar()
+  New 'line' coverage: 331
+  New 'line' coverage: 333
+  New 'line' coverage: 338
+  New 'line' coverage: 340
+  New 'line' coverage: 341
+  New 'line' coverage: 351
+  New 'line' coverage: 355
+  New 'line' coverage: 358
+  New 'line' coverage: 360
+  New 'line' coverage: 361
+  New 'line' coverage: 362
+  New 'line' coverage: 363
+  New 'line' coverage: 364
+  New 'line' coverage: 365
+  New 'line' coverage: 368
+  New 'line' coverage: 369
+  New 'line' coverage: 370
+  New 'line' coverage: 409
+  New 'line' coverage: 412
+  New 'line' coverage: 413
+  New 'line' coverage: 414
+  New 'line' coverage: 416
+  New 'line' coverage: 417
+  New 'line' coverage: 418
+  New 'line' coverage: 419
+  New 'line' coverage: 420
+  New 'line' coverage: 421
+  New 'line' coverage: 422
+  New 'line' coverage: 423
+  New 'line' coverage: 424
+  New 'line' coverage: 425
+  New 'line' coverage: 426
+  New 'line' coverage: 427
+  New 'line' coverage: 428
+  New 'line' coverage: 429
+  New 'line' coverage: 430
+  New 'line' coverage: 431
+  New 'line' coverage: 432
+  New 'line' coverage: 433
+  New 'line' coverage: 435
+  New 'line' coverage: 437
+  New 'line' coverage: 438
+  New 'line' coverage: 439
+  New 'line' coverage: 440
+  New 'line' coverage: 441
+  New 'line' coverage: 442
+  New 'line' coverage: 443
+  New 'line' coverage: 444
+  New 'line' coverage: 445
+  New 'line' coverage: 446
+  New 'line' coverage: 447
+  New 'line' coverage: 448
+  New 'line' coverage: 449
+  New 'line' coverage: 450
+  New 'line' coverage: 451
+  New 'line' coverage: 454
+  New 'line' coverage: 457
+  New 'line' coverage: 459
+  New 'line' coverage: 460
+  New 'line' coverage: 462
+  New 'line' coverage: 467
+  New 'line' coverage: 468
+  New 'line' coverage: 469
+  New 'line' coverage: 470
+  New 'line' coverage: 471
+  New 'line' coverage: 474
+  New 'line' coverage: 476
+  New 'line' coverage: 477
+  New 'line' coverage: 478
+  New 'line' coverage: 479
+  New 'line' coverage: 480
+  New 'line' coverage: 481
+  New 'line' coverage: 482
+  New 'line' coverage: 483
+  New 'line' coverage: 484
+  New 'line' coverage: 487
+  New 'line' coverage: 490
+  New 'line' coverage: 497
+  New 'line' coverage: 498
+  New 'line' coverage: 499
+  New 'line' coverage: 500
+  New 'line' coverage: 501
+  New 'line' coverage: 502
+  New 'line' coverage: 503
+  New 'line' coverage: 504
+  New 'line' coverage: 505
+  New 'line' coverage: 508
+  New 'line' coverage: 510
+  New 'line' coverage: 511
+  New 'line' coverage: 512
+  New 'line' coverage: 513
+  New 'line' coverage: 514
+  New 'line' coverage: 515
+  New 'line' coverage: 516
+  New 'line' coverage: 517
+  New 'line' coverage: 518
+  New 'line' coverage: 519
+  New 'line' coverage: 520
+  New 'line' coverage: 521
+  New 'line' coverage: 522
+  New 'line' coverage: 523
+  New 'line' coverage: 524
+  New 'line' coverage: 529
+  New 'line' coverage: 530
+  New 'line' coverage: 552
+  New 'line' coverage: 556
+  New 'line' coverage: 557
+  New 'line' coverage: 558
+  New 'line' coverage: 559
+  New 'line' coverage: 561
+  New 'line' coverage: 563
+  New 'line' coverage: 564
+  New 'line' coverage: 569
+  New 'line' coverage: 570
+  New 'line' coverage: 571
+  New 'line' coverage: 577
+  New 'line' coverage: 578
+  New 'line' coverage: 579
+  New 'line' coverage: 580
+  New 'line' coverage: 581
+  New 'line' coverage: 582
+  New 'line' coverage: 583
+  New 'line' coverage: 584
+  New 'line' coverage: 585
+  New 'line' coverage: 586
+  New 'line' coverage: 587
+  New 'line' coverage: 588
+  New 'line' coverage: 589
+  New 'line' coverage: 59
+  New 'line' coverage: 591
+  New 'line' coverage: 592
+  New 'line' coverage: 596
+  New 'line' coverage: 597
+  New 'line' coverage: 601
+  New 'line' coverage: 603
+  New 'line' coverage: 604
+  New 'line' coverage: 605
+  New 'line' coverage: 609
+  New 'line' coverage: 61
+  New 'line' coverage: 610
+  New 'line' coverage: 613
+  New 'line' coverage: 616
+  New 'line' coverage: 617
+  New 'line' coverage: 618
+  New 'line' coverage: 619
+  New 'line' coverage: 620
+  New 'line' coverage: 621
+  New 'line' coverage: 622
+  New 'line' coverage: 623
+  New 'line' coverage: 624
+  New 'line' coverage: 625
+  New 'line' coverage: 626
+  New 'line' coverage: 627
+  New 'line' coverage: 628
+  New 'line' coverage: 629
+  New 'line' coverage: 630
+  New 'line' coverage: 631
+  New 'line' coverage: 632
+  New 'line' coverage: 633
+  New 'line' coverage: 634
+  New 'line' coverage: 635
+  New 'line' coverage: 642
+  New 'line' coverage: 647
+  New 'line' coverage: 648
+  New 'line' coverage: 649
+  New 'line' coverage: 650
+  New 'line' coverage: 651
+  New 'line' coverage: 652
+  New 'line' coverage: 653
+  New 'line' coverage: 654
+  New 'line' coverage: 655
+  New 'line' coverage: 656
+  New 'line' coverage: 657
+  New 'line' coverage: 658
+  New 'line' coverage: 659
+  New 'line' coverage: 660
+  New 'line' coverage: 661
+  New 'line' coverage: 664
+  New 'line' coverage: 668
+  New 'line' coverage: 670
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/progname.c
+  New 'function' coverage: set_program_name()
+  New 'line' coverage: 39
+  New 'line' coverage: 51
+  New 'line' coverage: 59
+  New 'line' coverage: 60
+  New 'line' coverage: 61
+  New 'line' coverage: 84
+  New 'line' coverage: 90
+  New 'line' coverage: 92
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/base64.c
+  New 'function' coverage: do_decode()
+  New 'function' coverage: lava_get()
+  New 'function' coverage: lava_set()
+  New 'function' coverage: main()
+  New 'line' coverage: 11
+  New 'line' coverage: 12
+  New 'line' coverage: 13
+  New 'line' coverage: 19
+  New 'line' coverage: 199
+  New 'line' coverage: 206
+  New 'line' coverage: 214
+  New 'line' coverage: 217
+  New 'line' coverage: 219
+  New 'line' coverage: 229
+  New 'line' coverage: 231
+  New 'line' coverage: 234
+  New 'line' coverage: 240
+  New 'line' coverage: 242
+  New 'line' coverage: 243
+  New 'line' coverage: 244
+  New 'line' coverage: 245
+  New 'line' coverage: 247
+  New 'line' coverage: 250
+  New 'line' coverage: 254
+  New 'line' coverage: 255
+  New 'line' coverage: 258
+  New 'line' coverage: 265
+  New 'line' coverage: 267
+  New 'line' coverage: 269
+  New 'line' coverage: 272
+  New 'line' coverage: 273
+  New 'line' coverage: 274
+  New 'line' coverage: 275
+  New 'line' coverage: 277
+  New 'line' coverage: 279
+  New 'line' coverage: 280
+  New 'line' coverage: 282
+  New 'line' coverage: 283
+  New 'line' coverage: 284
+  New 'line' coverage: 305
+  New 'line' coverage: 311
+  New 'line' coverage: 314
+  New 'line' coverage: 316
+  New 'line' coverage: 320
+  New 'line' coverage: 329
+  New 'line' coverage: 331
+  New 'line' coverage: 332
+  New 'line' coverage: 336
+  New 'line' coverage: 344
+  New 'line' coverage: 5
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/close-stream.c
+  New 'function' coverage: close_stream()
+  New 'line' coverage: 57
+  New 'line' coverage: 59
+  New 'line' coverage: 60
+  New 'line' coverage: 61
+  New 'line' coverage: 71
+  New 'line' coverage: 78
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/stdio.h
+  New 'function' coverage: rpl_fclose()
+  New 'function' coverage: rpl_fflush()
+  New 'line' coverage: 486
+  New 'line' coverage: 530
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fclose.c
+  New 'line' coverage: 104
+  New 'line' coverage: 110
+  New 'line' coverage: 59
+  New 'line' coverage: 61
+  New 'line' coverage: 64
+  New 'line' coverage: 65
+  New 'line' coverage: 71
+  New 'line' coverage: 72
+  New 'line' coverage: 99
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fadvise.c
+  New 'function' coverage: fadvise()
+  New 'function' coverage: fdadvise()
+  New 'line' coverage: 31
+  New 'line' coverage: 34
+  New 'line' coverage: 36
+  New 'line' coverage: 39
+  New 'line' coverage: 41
+  New 'line' coverage: 42
+  New 'line' coverage: 43
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/closeout.c
+  New 'function' coverage: close_stdout()
+  New 'line' coverage: 107
+  New 'line' coverage: 109
+  New 'line' coverage: 122
+  New 'line' coverage: 124
+New src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fflush.c
+  New 'line' coverage: 149
+  New 'line' coverage: 150
+
+
+
+++++++ BEGIN - first exec output for CMD: /bin/cat ../../mopt_dict_0.6_L5//queue/id:000000,orig:rand.b64 | ./base64 -d
+    Ý!Û@Áç¡e	Ë³ÆP›q\l[=JÕö¡f³Â¥¬ïI
+    ˜O×„ÇJÃK•¹Uû9vÆ±ÁH±n$(«-9Ë®|Fxp‰>Ê,žÍ›}×ÎjÁ„i)í˜A=9Ùß ,@~Ø5ü…Àm¨î*;}šYŽ”
+++++++ END
+
+[+] AFL test case: id:000001,src:000000,op:flip1,pos:0,+cov (1 / 214), cycle: 0
+    lines......: 0.8% (266 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000000,orig:rand.b64 id:000001,src:000000,op:flip1,pos:0,+cov
+diff id:000000,orig:rand.b64 -> id:000001,src:000000,op:flip1,pos:0,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 662
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/base64.c
+  New 'line' coverage: 251
+
+[+] AFL test case: id:000002,src:000000,op:flip1,pos:1,+cov (2 / 214), cycle: 0
+    lines......: 0.8% (266 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000003,src:000000,op:flip1,pos:2,+cov (3 / 214), cycle: 0
+    lines......: 0.8% (267 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000002,src:000000,op:flip1,pos:1,+cov id:000003,src:000000,op:flip1,pos:2,+cov
+diff id:000002,src:000000,op:flip1,pos:1,+cov -> id:000003,src:000000,op:flip1,pos:2,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 472
+
+[+] AFL test case: id:000004,src:000000,op:flip1,pos:3,+cov (4 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000003,src:000000,op:flip1,pos:2,+cov id:000004,src:000000,op:flip1,pos:3,+cov
+diff id:000003,src:000000,op:flip1,pos:2,+cov -> id:000004,src:000000,op:flip1,pos:3,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 506
+
+[+] AFL test case: id:000005,src:000000,op:flip1,pos:4 (5 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000006,src:000000,op:flip1,pos:5 (6 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000007,src:000000,op:flip1,pos:6 (7 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000008,src:000000,op:flip1,pos:7 (8 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000009,src:000000,op:flip1,pos:8 (9 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000010,src:000000,op:flip1,pos:9 (10 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000011,src:000000,op:flip1,pos:10 (11 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000012,src:000000,op:flip1,pos:11 (12 / 214), cycle: 0
+    lines......: 0.8% (268 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000013,src:000000,op:flip1,pos:11,+cov (13 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000012,src:000000,op:flip1,pos:11 id:000013,src:000000,op:flip1,pos:11,+cov
+diff id:000012,src:000000,op:flip1,pos:11 -> id:000013,src:000000,op:flip1,pos:11,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 356
+  New 'line' coverage: 376
+  New 'line' coverage: 377
+  New 'line' coverage: 379
+  New 'line' coverage: 380
+  New 'line' coverage: 382
+  New 'line' coverage: 383
+  New 'line' coverage: 384
+  New 'line' coverage: 388
+  New 'line' coverage: 389
+  New 'line' coverage: 390
+  New 'line' coverage: 644
+  New 'line' coverage: 645
+
+[+] AFL test case: id:000014,src:000000,op:flip1,pos:12 (14 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000015,src:000000,op:flip1,pos:16 (15 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000016,src:000000,op:flip1,pos:20 (16 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000017,src:000000,op:flip1,pos:22 (17 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000018,src:000000,op:flip1,pos:24 (18 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000019,src:000000,op:flip1,pos:25 (19 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000020,src:000000,op:flip1,pos:26 (20 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000021,src:000000,op:flip1,pos:27 (21 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000022,src:000000,op:flip1,pos:28 (22 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000023,src:000000,op:flip1,pos:29 (23 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000024,src:000000,op:flip1,pos:32 (24 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000025,src:000000,op:flip1,pos:40 (25 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000026,src:000000,op:flip1,pos:52 (26 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000027,src:000000,op:flip1,pos:54 (27 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000028,src:000000,op:flip1,pos:56 (28 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000029,src:000000,op:flip1,pos:57 (29 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000030,src:000000,op:flip1,pos:58 (30 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000031,src:000000,op:flip1,pos:59 (31 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000032,src:000000,op:flip1,pos:60 (32 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000033,src:000000,op:flip1,pos:64 (33 / 214), cycle: 0
+    lines......: 0.9% (281 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000034,src:000000,op:flip1,pos:72,+cov (34 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000033,src:000000,op:flip1,pos:64 id:000034,src:000000,op:flip1,pos:72,+cov
+diff id:000033,src:000000,op:flip1,pos:64 -> id:000034,src:000000,op:flip1,pos:72,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 492
+  New 'line' coverage: 493
+
+[+] AFL test case: id:000035,src:000000,op:flip1,pos:73 (35 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000036,src:000000,op:flip1,pos:100 (36 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000037,src:000000,op:flip1,pos:106 (37 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000038,src:000000,op:flip1,pos:128 (38 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000039,src:000000,op:flip1,pos:149 (39 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000040,src:000000,op:flip1,pos:150 (40 / 214), cycle: 0
+    lines......: 0.9% (283 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000041,src:000000,op:flip1,pos:169,+cov (41 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000040,src:000000,op:flip1,pos:150 id:000041,src:000000,op:flip1,pos:169,+cov
+diff id:000040,src:000000,op:flip1,pos:150 -> id:000041,src:000000,op:flip1,pos:169,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 463
+
+[+] AFL test case: id:000042,src:000000,op:flip1,pos:170,+cov (42 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000043,src:000000,op:flip2,pos:123 (43 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000044,src:000000,op:flip4,pos:93 (44 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000045,src:000000,op:ext_UO,pos:2 (45 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000046,src:000000,op:ext_UO,pos:10 (46 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000047,src:000000,op:ext_UO,pos:19 (47 / 214), cycle: 0
+    lines......: 0.9% (284 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000048,src:000000,op:ext_UO,pos:148,+cov (48 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000047,src:000000,op:ext_UO,pos:19 id:000048,src:000000,op:ext_UO,pos:148,+cov
+diff id:000047,src:000000,op:ext_UO,pos:19 -> id:000048,src:000000,op:ext_UO,pos:148,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 455
+
+[+] AFL test case: id:000049,src:000000,op:ext_UO,pos:162,+cov (49 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000050,src:000000,op:ext_UO,pos:166 (50 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000051,src:000000,op:ext_UI,pos:0,+cov (51 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000052,src:000000,op:ext_UI,pos:0 (52 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000053,src:000000,op:ext_UI,pos:0 (53 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000054,src:000000,op:ext_UI,pos:0 (54 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000055,src:000000,op:ext_UI,pos:3 (55 / 214), cycle: 0
+    lines......: 0.9% (285 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000056,src:000000,op:ext_UI,pos:71,+cov (56 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000055,src:000000,op:ext_UI,pos:3 id:000056,src:000000,op:ext_UI,pos:71,+cov
+diff id:000055,src:000000,op:ext_UI,pos:3 -> id:000056,src:000000,op:ext_UI,pos:71,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/base64.c
+  New 'line' coverage: 14
+
+[+] AFL test case: id:000057,src:000000,op:ext_UI,pos:136 (57 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000058,src:000000,op:ext_UI,pos:150 (58 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000059,src:000000,op:ext_UI,pos:165,+cov (59 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000060,src:000000,op:ext_UI,pos:165 (60 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000061,src:000000,op:ext_UI,pos:169,+cov (61 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000062,src:000000,op:ext_UI,pos:169 (62 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000063,src:000000,op:ext_UI,pos:170 (63 / 214), cycle: 0
+    lines......: 0.9% (286 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000064,src:000000,op:ext_UI,pos:170,+cov (64 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+
+    Coverage diff id:000063,src:000000,op:ext_UI,pos:170 id:000064,src:000000,op:ext_UI,pos:170,+cov
+diff id:000063,src:000000,op:ext_UI,pos:170 -> id:000064,src:000000,op:ext_UI,pos:170,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 488
+
+[+] AFL test case: id:000065,src:000000,op:ext_UI,pos:171 (65 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000066,src:000000,op:ext_UI,pos:171 (66 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000067,src:000000,op:ext_UI,pos:171 (67 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000068,src:000000,op:MOpt havoc,rep:8 (68 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000069,src:000000,op:MOpt havoc,rep:32 (69 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000070,src:000000,op:MOpt havoc,rep:16 (70 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000071,src:000000,op:MOpt havoc,rep:4 (71 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000072,src:000000,op:MOpt havoc,rep:16 (72 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000073,src:000000,op:MOpt havoc,rep:16 (73 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000074,src:000000,op:MOpt havoc,rep:4 (74 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000075,src:000000,op:MOpt havoc,rep:8 (75 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000076,src:000000,op:MOpt havoc,rep:2 (76 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000077,src:000000,op:MOpt havoc,rep:2 (77 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000078,src:000000,op:MOpt havoc,rep:64 (78 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000079,src:000000,op:MOpt havoc,rep:2 (79 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000080,src:000000,op:MOpt havoc,rep:4 (80 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000081,src:000000,op:MOpt havoc,rep:4,+cov (81 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000082,src:000000,op:MOpt havoc,rep:2 (82 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000083,src:000000,op:MOpt havoc,rep:2 (83 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000084,src:000036,op:ext_UI,pos:0,+cov (84 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000085,src:000036,op:ext_UI,pos:0,+cov (85 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000086,src:000036,op:ext_UI,pos:0,+cov (86 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000087,src:000036,op:ext_UI,pos:0,+cov (87 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000088,src:000036,op:ext_UI,pos:159,+cov (88 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000089,src:000036,op:MOpt havoc,rep:128 (89 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000090,src:000036,op:MOpt havoc,rep:128 (90 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000091,src:000036,op:MOpt havoc,rep:4 (91 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000092,src:000036,op:MOpt havoc,rep:2 (92 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000093,src:000036,op:MOpt havoc,rep:4 (93 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000094,src:000038,op:ext_UO,pos:144 (94 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000095,src:000038,op:ext_UI,pos:132 (95 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000096,src:000038,op:ext_UI,pos:165 (96 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000097,src:000038,op:ext_UI,pos:169,+cov (97 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000098,src:000048,op:ext_UI,pos:0,+cov (98 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000099,src:000048,op:ext_UI,pos:0 (99 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000100,src:000048,op:MOpt havoc,rep:4 (100 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000101,src:000048,op:MOpt havoc,rep:64 (101 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000102,src:000048,op:MOpt havoc,rep:128 (102 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000103,src:000049,op:flip1,pos:170 (103 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000104,src:000049,op:ext_UI,pos:169 (104 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000105,src:000059,op:ext_UO,pos:99 (105 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000106,src:000098,op:MOpt havoc,rep:2 (106 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000107,src:000098,op:MOpt havoc,rep:2,+cov (107 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000108,src:000107,op:MOpt havoc,rep:4 (108 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000109,src:000107,op:MOpt havoc,rep:4 (109 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000110,src:000107,op:MOpt havoc,rep:2 (110 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000111,src:000107,op:MOpt havoc,rep:4 (111 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000112,src:000111,op:MOpt havoc,rep:2 (112 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000113,src:000111,op:MOpt havoc,rep:4 (113 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000114,src:000111,op:MOpt havoc,rep:4 (114 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000115,src:000112,op:MOpt havoc,rep:4 (115 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000116,src:000115,op:MOpt havoc,rep:2 (116 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000117,src:000115,op:MOpt havoc,rep:2 (117 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000118,src:000115,op:MOpt havoc,rep:2 (118 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000119,src:000115,op:MOpt havoc,rep:2 (119 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000120,src:000089,op:MOpt havoc,rep:4 (120 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000121,src:000107,op:MOpt havoc,rep:2 (121 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000122,src:000038,op:MOpt havoc,rep:4 (122 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000123,src:000038,op:MOpt havoc,rep:128,+cov (123 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000124,src:000038,op:MOpt havoc,rep:8,+cov (124 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000125,src:000038,op:MOpt havoc,rep:8 (125 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000126,src:000038,op:MOpt havoc,rep:16 (126 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000127,src:000038,op:MOpt havoc,rep:4 (127 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000128,src:000071,op:MOpt havoc,rep:2 (128 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000129,src:000087,op:MOpt havoc,rep:4 (129 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000130,src:000124,op:MOpt havoc,rep:4 (130 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000131,src:000129,op:MOpt havoc,rep:4 (131 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000132,src:000089,op:MOpt havoc,rep:4 (132 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000133,src:000105,op:MOpt havoc,rep:16 (133 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000134,src:000131,op:MOpt havoc,rep:2 (134 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000135,src:000131,op:MOpt havoc,rep:2 (135 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000136,src:000134,op:MOpt havoc,rep:32 (136 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000137,src:000021+000129,op:MOpt splice,rep:2 (137 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000138,src:000081+000131,op:MOpt core splice,rep:2 (138 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000139,src:000086+000126,op:MOpt core splice,rep:16 (139 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000140,src:000086+000126,op:MOpt core splice,rep:8 (140 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000141,src:000086+000126,op:MOpt core splice,rep:4 (141 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000142,src:000086+000126,op:MOpt core splice,rep:16 (142 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000143,src:000086+000126,op:MOpt core splice,rep:16 (143 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000144,src:000096+000138,op:MOpt core splice,rep:2 (144 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000145,src:000096+000138,op:MOpt core splice,rep:4 (145 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000146,src:000105+000143,op:MOpt core splice,rep:8 (146 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000147,src:000107,op:MOpt core havoc,rep:4 (147 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000148,src:000107+000099,op:MOpt core splice,rep:2 (148 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000149,src:000107+000144,op:MOpt core splice,rep:4 (149 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000150,src:000131,op:MOpt core havoc,rep:2 (150 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000151,src:000134+000100,op:MOpt core splice,rep:4 (151 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000152,src:000134+000064,op:MOpt core splice,rep:2 (152 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000153,src:000021+000109,op:MOpt core splice,rep:128 (153 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000154,src:000038+000148,op:MOpt core splice,rep:2 (154 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000155,src:000105+000137,op:MOpt core splice,rep:4 (155 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000156,src:000016+000146,op:MOpt core splice,rep:2 (156 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000157,src:000016+000147,op:MOpt core splice,rep:32 (157 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000158,src:000038+000138,op:MOpt core splice,rep:4 (158 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000159,src:000016,op:MOpt core havoc,rep:64 (159 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000160,src:000105+000127,op:MOpt core splice,rep:32 (160 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000161,src:000107+000155,op:MOpt core splice,rep:2 (161 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000162,src:000130+000161,op:MOpt core splice,rep:16 (162 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000163,src:000162,op:MOpt core havoc,rep:2 (163 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000164,src:000162,op:MOpt core havoc,rep:2 (164 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000165,src:000162,op:MOpt core havoc,rep:4 (165 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000166,src:000162,op:MOpt core havoc,rep:2,+cov (166 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000167,src:000166,op:MOpt core havoc,rep:2 (167 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000168,src:000166,op:MOpt core havoc,rep:2 (168 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000169,src:000166,op:MOpt core havoc,rep:2 (169 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000170,src:000166,op:MOpt core havoc,rep:4 (170 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000171,src:000096,op:MOpt core havoc,rep:2 (171 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000172,src:000105,op:MOpt core havoc,rep:2 (172 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000173,src:000171,op:MOpt core havoc,rep:2 (173 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000174,src:000101+000138,op:MOpt core splice,rep:4 (174 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000175,src:000166,op:MOpt havoc,rep:16 (175 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000176,src:000134+000173,op:MOpt splice,rep:2 (176 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000177,src:000107+000056,op:MOpt splice,rep:2 (177 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000178,src:000151+000157,op:MOpt splice,rep:2 (178 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000179,src:000090+000178,op:MOpt core splice,rep:2 (179 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000180,src:000134+000159,op:MOpt core splice,rep:2 (180 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000181,src:000032+000175,op:MOpt core splice,rep:4 (181 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000182,src:000085+000181,op:MOpt core splice,rep:2 (182 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000183,src:000179,op:MOpt core havoc,rep:2 (183 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000184,src:000127+000183,op:MOpt core splice,rep:2 (184 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000185,src:000038+000181,op:MOpt core splice,rep:2 (185 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000186,src:000131+000185,op:MOpt core splice,rep:2 (186 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000187,src:000166,op:MOpt havoc,rep:2 (187 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000188,src:000105,op:MOpt core havoc,rep:8 (188 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000189,src:000171,op:MOpt havoc,rep:2 (189 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000190,src:000189,op:MOpt havoc,rep:2 (190 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000191,src:000189,op:MOpt havoc,rep:4 (191 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000192,src:000114+000187,op:MOpt splice,rep:2 (192 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000193,src:000178+000189,op:MOpt splice,rep:4 (193 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000194,src:000107+000193,op:MOpt splice,rep:2 (194 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000195,src:000086+000186,op:MOpt core splice,rep:2 (195 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000196,src:000047+000189,op:MOpt core splice,rep:2 (196 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000197,src:000107+000100,op:MOpt core splice,rep:4 (197 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000198,src:000107+000179,op:MOpt core splice,rep:2 (198 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000199,src:000005+000193,op:MOpt splice,rep:4 (199 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000200,src:000049+000194,op:MOpt core splice,rep:2 (200 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000201,src:000166+000177,op:MOpt splice,rep:2 (201 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000202,src:000061+000184,op:MOpt splice,rep:2 (202 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000203,src:000134+000202,op:MOpt splice,rep:4 (203 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000204,src:000038+000200,op:MOpt core splice,rep:2 (204 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000205,src:000134+000094,op:MOpt core splice,rep:2,+cov (205 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000206,src:000187,op:MOpt core havoc,rep:2 (206 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000207,src:000205+000207,op:MOpt core splice,rep:2 (207 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000208,src:000205,op:MOpt core havoc,rep:8,+cov (208 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000209,src:000208+000204,op:MOpt core splice,rep:2 (209 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000210,src:000205+000201,op:MOpt core splice,rep:4 (210 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000211,src:000208+000203,op:MOpt splice,rep:2 (211 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000212,src:000211,op:MOpt havoc,rep:16 (212 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] AFL test case: id:000213,src:000211,op:MOpt havoc,rep:2 (213 / 214), cycle: 0
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] Processed 214 / 214 test cases.
+
+[+] Final zero coverage report: ../../mopt_dict_0.6_L5//cov/zero-cov
+[+] Final positive coverage report: ../../mopt_dict_0.6_L5//cov/pos-cov
+    lines......: 0.9% (287 of 31588 lines)
+    functions..: 1.0% (17 of 1678 functions)
+[+] Final lcov web report: ../../mopt_dict_0.6_L5//cov/web/index.html

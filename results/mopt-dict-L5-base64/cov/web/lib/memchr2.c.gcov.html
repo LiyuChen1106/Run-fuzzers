@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/memchr2.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - memchr2.c<span style="font-size: 80%;"> (source / <a href="memchr2.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">35</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:41:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Copyright (C) 1991, 1993, 1996-1997, 1999-2000, 2003-2004, 2006, 2008-2015</a>
+<span class="lineNum">       2 </span>            :    Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    Based on strlen implementation by Torbjorn Granlund (tege@sics.se),
+<span class="lineNum">       5 </span>            :    with help from Dan Sahlin (dan@sics.se) and
+<span class="lineNum">       6 </span>            :    commentary by Jim Blandy (jimb@ai.mit.edu);
+<span class="lineNum">       7 </span>            :    adaptation to memchr suggested by Dick Karpinski (dick@cca.ucsf.edu),
+<span class="lineNum">       8 </span>            :    and implemented in glibc by Roland McGrath (roland@ai.mit.edu).
+<span class="lineNum">       9 </span>            :    Extension to memchr2 implemented by Eric Blake (ebb9@byu.net).
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : This program is free software: you can redistribute it and/or modify it
+<span class="lineNum">      12 </span>            : under the terms of the GNU General Public License as published by the
+<span class="lineNum">      13 </span>            : Free Software Foundation; either version 3 of the License, or any
+<span class="lineNum">      14 </span>            : later version.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : This program is distributed in the hope that it will be useful,
+<span class="lineNum">      17 </span>            : but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      18 </span>            : MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      19 </span>            : GNU General Public License for more details.
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : You should have received a copy of the GNU General Public License
+<span class="lineNum">      22 </span>            : along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;memchr2.h&quot;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : /* Return the first address of either C1 or C2 (treated as unsigned
+<span class="lineNum">      33 </span>            :    char) that occurs within N bytes of the memory region S.  If
+<a name="34"><span class="lineNum">      34 </span>            :    neither byte appears, return NULL.  */</a>
+<span class="lineNum">      35 </span>            : void *
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 : memchr2 (void const *s, int c1_in, int c2_in, size_t n)</span>
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span>            :   /* On 32-bit hardware, choosing longword to be a 32-bit unsigned
+<span class="lineNum">      39 </span>            :      long instead of a 64-bit uintmax_t tends to give better
+<span class="lineNum">      40 </span>            :      performance.  On 64-bit hardware, unsigned long is generally 64
+<span class="lineNum">      41 </span>            :      bits already.  Change this typedef to experiment with
+<span class="lineNum">      42 </span>            :      performance.  */
+<span class="lineNum">      43 </span>            :   typedef unsigned long int longword;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   const unsigned char *char_ptr;
+<span class="lineNum">      46 </span>            :   void const *void_ptr;
+<span class="lineNum">      47 </span>            :   const longword *longword_ptr;
+<span class="lineNum">      48 </span>            :   longword repeated_one;
+<span class="lineNum">      49 </span>            :   longword repeated_c1;
+<span class="lineNum">      50 </span>            :   longword repeated_c2;
+<span class="lineNum">      51 </span>            :   unsigned char c1;
+<span class="lineNum">      52 </span>            :   unsigned char c2;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :   c1 = (unsigned char) c1_in;</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   c2 = (unsigned char) c2_in;</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :   if (c1 == c2)</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     return memchr (s, c1, n);</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :   /* Handle the first few bytes by reading one byte at a time.
+<span class="lineNum">      61 </span>            :      Do this until VOID_PTR is aligned on a longword boundary.  */
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :   for (void_ptr = s;</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :        n &gt; 0 &amp;&amp; (uintptr_t) void_ptr % sizeof (longword) != 0;</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :        --n)</span>
+<span class="lineNum">      65 </span>            :     {
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       char_ptr = void_ptr;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       if (*char_ptr == c1 || *char_ptr == c2)</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         return (void *) void_ptr;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       void_ptr = char_ptr + 1;</span>
+<span class="lineNum">      70 </span>            :     }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   longword_ptr = void_ptr;</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   /* All these elucidatory comments refer to 4-byte longwords,
+<span class="lineNum">      75 </span>            :      but the theory applies equally well to any size longwords.  */
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   /* Compute auxiliary longword values:
+<span class="lineNum">      78 </span>            :      repeated_one is a value which has a 1 in every byte.
+<span class="lineNum">      79 </span>            :      repeated_c1 has c1 in every byte.
+<span class="lineNum">      80 </span>            :      repeated_c2 has c2 in every byte.  */
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   repeated_one = 0x01010101;</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   repeated_c1 = c1 | (c1 &lt;&lt; 8);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :   repeated_c2 = c2 | (c2 &lt;&lt; 8);</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :   repeated_c1 |= repeated_c1 &lt;&lt; 16;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :   repeated_c2 |= repeated_c2 &lt;&lt; 16;</span>
+<span class="lineNum">      86 </span>            :   if (0xffffffffU &lt; (longword) -1)
+<span class="lineNum">      87 </span>            :     {
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       repeated_one |= repeated_one &lt;&lt; 31 &lt;&lt; 1;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :       repeated_c1 |= repeated_c1 &lt;&lt; 31 &lt;&lt; 1;</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       repeated_c2 |= repeated_c2 &lt;&lt; 31 &lt;&lt; 1;</span>
+<span class="lineNum">      91 </span>            :       if (8 &lt; sizeof (longword))
+<span class="lineNum">      92 </span>            :         {
+<span class="lineNum">      93 </span>            :           size_t i;
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :           for (i = 64; i &lt; sizeof (longword) * 8; i *= 2)
+<span class="lineNum">      96 </span>            :             {
+<span class="lineNum">      97 </span>            :               repeated_one |= repeated_one &lt;&lt; i;
+<span class="lineNum">      98 </span>            :               repeated_c1 |= repeated_c1 &lt;&lt; i;
+<span class="lineNum">      99 </span>            :               repeated_c2 |= repeated_c2 &lt;&lt; i;
+<span class="lineNum">     100 </span>            :             }
+<span class="lineNum">     101 </span>            :         }
+<span class="lineNum">     102 </span>            :     }
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :   /* Instead of the traditional loop which tests each byte, we will test a
+<span class="lineNum">     105 </span>            :      longword at a time.  The tricky part is testing if *any of the four*
+<span class="lineNum">     106 </span>            :      bytes in the longword in question are equal to c1 or c2.  We first use
+<span class="lineNum">     107 </span>            :      an xor with repeated_c1 and repeated_c2, respectively.  This reduces
+<span class="lineNum">     108 </span>            :      the task to testing whether *any of the four* bytes in longword1 or
+<span class="lineNum">     109 </span>            :      longword2 is zero.
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :      Let's consider longword1.  We compute tmp1 =
+<span class="lineNum">     112 </span>            :        ((longword1 - repeated_one) &amp; ~longword1) &amp; (repeated_one &lt;&lt; 7).
+<span class="lineNum">     113 </span>            :      That is, we perform the following operations:
+<span class="lineNum">     114 </span>            :        1. Subtract repeated_one.
+<span class="lineNum">     115 </span>            :        2. &amp; ~longword1.
+<span class="lineNum">     116 </span>            :        3. &amp; a mask consisting of 0x80 in every byte.
+<span class="lineNum">     117 </span>            :      Consider what happens in each byte:
+<span class="lineNum">     118 </span>            :        - If a byte of longword1 is zero, step 1 and 2 transform it into 0xff,
+<span class="lineNum">     119 </span>            :          and step 3 transforms it into 0x80.  A carry can also be propagated
+<span class="lineNum">     120 </span>            :          to more significant bytes.
+<span class="lineNum">     121 </span>            :        - If a byte of longword1 is nonzero, let its lowest 1 bit be at
+<span class="lineNum">     122 </span>            :          position k (0 &lt;= k &lt;= 7); so the lowest k bits are 0.  After step 1,
+<span class="lineNum">     123 </span>            :          the byte ends in a single bit of value 0 and k bits of value 1.
+<span class="lineNum">     124 </span>            :          After step 2, the result is just k bits of value 1: 2^k - 1.  After
+<span class="lineNum">     125 </span>            :          step 3, the result is 0.  And no carry is produced.
+<span class="lineNum">     126 </span>            :      So, if longword1 has only non-zero bytes, tmp1 is zero.
+<span class="lineNum">     127 </span>            :      Whereas if longword1 has a zero byte, call j the position of the least
+<span class="lineNum">     128 </span>            :      significant zero byte.  Then the result has a zero at positions 0, ...,
+<span class="lineNum">     129 </span>            :      j-1 and a 0x80 at position j.  We cannot predict the result at the more
+<span class="lineNum">     130 </span>            :      significant bytes (positions j+1..3), but it does not matter since we
+<span class="lineNum">     131 </span>            :      already have a non-zero bit at position 8*j+7.
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :      Similarly, we compute tmp2 =
+<span class="lineNum">     134 </span>            :        ((longword2 - repeated_one) &amp; ~longword2) &amp; (repeated_one &lt;&lt; 7).
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :      The test whether any byte in longword1 or longword2 is zero is equivalent
+<span class="lineNum">     137 </span>            :      to testing whether tmp1 is nonzero or tmp2 is nonzero.  We can combine
+<span class="lineNum">     138 </span>            :      this into a single test, whether (tmp1 | tmp2) is nonzero.  */
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   while (n &gt;= sizeof (longword))</span>
+<span class="lineNum">     141 </span>            :     {
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :       longword longword1 = *longword_ptr ^ repeated_c1;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :       longword longword2 = *longword_ptr ^ repeated_c2;</span>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       if (((((longword1 - repeated_one) &amp; ~longword1)</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :             | ((longword2 - repeated_one) &amp; ~longword2))</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :            &amp; (repeated_one &lt;&lt; 7)) != 0)</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :       longword_ptr++;</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :       n -= sizeof (longword);</span>
+<span class="lineNum">     151 </span>            :     }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   char_ptr = (const unsigned char *) longword_ptr;</span>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :   /* At this point, we know that either n &lt; sizeof (longword), or one of the
+<span class="lineNum">     156 </span>            :      sizeof (longword) bytes starting at char_ptr is == c1 or == c2.  On
+<span class="lineNum">     157 </span>            :      little-endian machines, we could determine the first such byte without
+<span class="lineNum">     158 </span>            :      any further memory accesses, just by looking at the (tmp1 | tmp2) result
+<span class="lineNum">     159 </span>            :      from the last loop iteration.  But this does not work on big-endian
+<span class="lineNum">     160 </span>            :      machines.  Choose code that works in both cases.  */
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :   for (; n &gt; 0; --n, ++char_ptr)</span>
+<span class="lineNum">     163 </span>            :     {
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :       if (*char_ptr == c1 || *char_ptr == c2)</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :         return (void *) char_ptr;</span>
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     169 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
