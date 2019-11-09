@@ -1,0 +1,5 @@
+diff id:000000,orig:rand.b64 -> id:000001,src:000000,op:flip1,pos:0,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 662
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/base64.c
+  New 'line' coverage: 251

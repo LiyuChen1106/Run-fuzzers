@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/malloca.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - malloca.c<span style="font-size: 80%;"> (source / <a href="malloca.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:41:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Safe automatic memory allocation.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2003, 2006-2007, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            :    Written by Bruno Haible &lt;bruno@clisp.org&gt;, 2003.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software; you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       8 </span>            :    any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program; if not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #define _GL_USE_STDLIB_ALLOC 1
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : /* Specification.  */
+<span class="lineNum">      22 </span>            : #include &quot;malloca.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;verify.h&quot;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : /* The speed critical point in this file is freea() applied to an alloca()
+<span class="lineNum">      29 </span>            :    result: it must be fast, to match the speed of alloca().  The speed of
+<span class="lineNum">      30 </span>            :    mmalloca() and freea() in the other case are not critical, because they
+<span class="lineNum">      31 </span>            :    are only invoked for big memory sizes.  */
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #if HAVE_ALLOCA
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : /* Store the mmalloca() results in a hash table.  This is needed to reliably
+<span class="lineNum">      36 </span>            :    distinguish a mmalloca() result and an alloca() result.
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :    Although it is possible that the same pointer is returned by alloca() and
+<span class="lineNum">      39 </span>            :    by mmalloca() at different times in the same application, it does not lead
+<span class="lineNum">      40 </span>            :    to a bug in freea(), because:
+<span class="lineNum">      41 </span>            :      - Before a pointer returned by alloca() can point into malloc()ed memory,
+<span class="lineNum">      42 </span>            :        the function must return, and once this has happened the programmer must
+<span class="lineNum">      43 </span>            :        not call freea() on it anyway.
+<span class="lineNum">      44 </span>            :      - Before a pointer returned by mmalloca() can point into the stack, it
+<span class="lineNum">      45 </span>            :        must be freed.  The only function that can free it is freea(), and
+<span class="lineNum">      46 </span>            :        when freea() frees it, it also removes it from the hash table.  */
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #define MAGIC_NUMBER 0x1415fb4a
+<span class="lineNum">      49 </span>            : #define MAGIC_SIZE sizeof (int)
+<span class="lineNum">      50 </span>            : /* This is how the header info would look like without any alignment
+<span class="lineNum">      51 </span>            :    considerations.  */
+<span class="lineNum">      52 </span>            : struct preliminary_header { void *next; int magic; };
+<span class="lineNum">      53 </span>            : /* But the header's size must be a multiple of sa_alignment_max.  */
+<span class="lineNum">      54 </span>            : #define HEADER_SIZE \
+<span class="lineNum">      55 </span>            :   (((sizeof (struct preliminary_header) + sa_alignment_max - 1) / sa_alignment_max) * sa_alignment_max)
+<span class="lineNum">      56 </span>            : union header {
+<span class="lineNum">      57 </span>            :   void *next;
+<span class="lineNum">      58 </span>            :   struct {
+<span class="lineNum">      59 </span>            :     char room[HEADER_SIZE - MAGIC_SIZE];
+<span class="lineNum">      60 </span>            :     int word;
+<span class="lineNum">      61 </span>            :   } magic;
+<span class="lineNum">      62 </span>            : };
+<span class="lineNum">      63 </span>            : verify (HEADER_SIZE == sizeof (union header));
+<span class="lineNum">      64 </span>            : /* We make the hash table quite big, so that during lookups the probability
+<span class="lineNum">      65 </span>            :    of empty hash buckets is quite high.  There is no need to make the hash
+<span class="lineNum">      66 </span>            :    table resizable, because when the hash table gets filled so much that the
+<span class="lineNum">      67 </span>            :    lookup becomes slow, it means that the application has memory leaks.  */
+<span class="lineNum">      68 </span>            : #define HASH_TABLE_SIZE 257
+<span class="lineNum">      69 </span>            : static void * mmalloca_results[HASH_TABLE_SIZE];
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : #endif
+<a name="72"><span class="lineNum">      72 </span>            : </a>
+<span class="lineNum">      73 </span>            : void *
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 : mmalloca (size_t n)</span>
+<span class="lineNum">      75 </span>            : {
+<span class="lineNum">      76 </span>            : #if HAVE_ALLOCA
+<span class="lineNum">      77 </span>            :   /* Allocate one more word, that serves as an indicator for malloc()ed
+<span class="lineNum">      78 </span>            :      memory, so that freea() of an alloca() result is fast.  */
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :   size_t nplus = n + HEADER_SIZE;</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   if (nplus &gt;= n)</span>
+<span class="lineNum">      82 </span>            :     {
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :       void *p = malloc (nplus);</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :       if (p != NULL)</span>
+<span class="lineNum">      86 </span>            :         {
+<span class="lineNum">      87 </span>            :           size_t slot;
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :           union header *h = p;</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :           p = h + 1;</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :           /* Put a magic number into the indicator word.  */
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :           h-&gt;magic.word = MAGIC_NUMBER;</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :           /* Enter p into the hash table.  */
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :           slot = (uintptr_t) p % HASH_TABLE_SIZE;</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :           h-&gt;next = mmalloca_results[slot];</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :           mmalloca_results[slot] = p;</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :           return p;</span>
+<span class="lineNum">     101 </span>            :         }
+<span class="lineNum">     102 </span>            :     }
+<span class="lineNum">     103 </span>            :   /* Out of memory.  */
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     105 </span>            : #else
+<span class="lineNum">     106 </span>            : # if !MALLOC_0_IS_NONNULL
+<span class="lineNum">     107 </span>            :   if (n == 0)
+<span class="lineNum">     108 </span>            :     n = 1;
+<span class="lineNum">     109 </span>            : # endif
+<span class="lineNum">     110 </span>            :   return malloc (n);
+<span class="lineNum">     111 </span>            : #endif
+<span class="lineNum">     112 </span>            : }
+<span class="lineNum">     113 </span>            : 
+<a name="114"><span class="lineNum">     114 </span>            : #if HAVE_ALLOCA</a>
+<span class="lineNum">     115 </span>            : void
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 : freea (void *p)</span>
+<span class="lineNum">     117 </span>            : {
+<span class="lineNum">     118 </span>            :   /* mmalloca() may have returned NULL.  */
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   if (p != NULL)</span>
+<span class="lineNum">     120 </span>            :     {
+<span class="lineNum">     121 </span>            :       /* Attempt to quickly distinguish the mmalloca() result - which has
+<span class="lineNum">     122 </span>            :          a magic indicator word - and the alloca() result - which has an
+<span class="lineNum">     123 </span>            :          uninitialized indicator word.  It is for this test that sa_increment
+<span class="lineNum">     124 </span>            :          additional bytes are allocated in the alloca() case.  */
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       if (((int *) p)[-1] == MAGIC_NUMBER)</span>
+<span class="lineNum">     126 </span>            :         {
+<span class="lineNum">     127 </span>            :           /* Looks like a mmalloca() result.  To see whether it really is one,
+<span class="lineNum">     128 </span>            :              perform a lookup in the hash table.  */
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :           size_t slot = (uintptr_t) p % HASH_TABLE_SIZE;</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :           void **chain = &amp;mmalloca_results[slot];</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :           for (; *chain != NULL;)</span>
+<span class="lineNum">     132 </span>            :             {
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :               union header *h = p;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :               if (*chain == p)</span>
+<span class="lineNum">     135 </span>            :                 {
+<span class="lineNum">     136 </span>            :                   /* Found it.  Remove it from the hash table and free it.  */
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                   union header *p_begin = h - 1;</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                   *chain = p_begin-&gt;next;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                   free (p_begin);</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                   return;</span>
+<span class="lineNum">     141 </span>            :                 }
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :               h = *chain;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :               chain = &amp;h[-1].next;</span>
+<span class="lineNum">     144 </span>            :             }
+<span class="lineNum">     145 </span>            :         }
+<span class="lineNum">     146 </span>            :       /* At this point, we know it was not a mmalloca() result.  */
+<span class="lineNum">     147 </span>            :     }
+<span class="lineNum">     148 </span>            : }
+<span class="lineNum">     149 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

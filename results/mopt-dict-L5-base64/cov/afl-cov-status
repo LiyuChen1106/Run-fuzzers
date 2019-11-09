@@ -1,0 +1,3 @@
+afl_cov_pid     : 11739
+afl_cov_version : 0.6.2
+command_line    : /home/ubuntu/afl-cov/afl-cov -d ../../mopt_dict_0.6_L5/ --coverage-cmd /bin/cat AFL_FILE | ./base64 -d --code-dir ..

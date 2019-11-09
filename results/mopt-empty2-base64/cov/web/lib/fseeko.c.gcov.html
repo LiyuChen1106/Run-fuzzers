@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/fseeko.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - fseeko.c<span style="font-size: 80%;"> (source / <a href="fseeko.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:44:49</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* An fseeko() function that, together with fflush(), is POSIX compliant.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2007-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software; you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       7 </span>            :    any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License along
+<span class="lineNum">      15 </span>            :    with this program; if not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Specification.  */
+<span class="lineNum">      20 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : /* Get off_t, lseek, _POSIX_VERSION.  */
+<span class="lineNum">      23 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &quot;stdio-impl.h&quot;
+<a name="26"><span class="lineNum">      26 </span>            : </a>
+<span class="lineNum">      27 </span>            : int
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 : fseeko (FILE *fp, off_t offset, int whence)</span>
+<span class="lineNum">      29 </span>            : #undef fseeko
+<span class="lineNum">      30 </span>            : #if !HAVE_FSEEKO
+<span class="lineNum">      31 </span>            : # undef fseek
+<span class="lineNum">      32 </span>            : # define fseeko fseek
+<span class="lineNum">      33 </span>            : #endif
+<span class="lineNum">      34 </span>            : #if _GL_WINDOWS_64_BIT_OFF_T
+<span class="lineNum">      35 </span>            : # undef fseeko
+<span class="lineNum">      36 </span>            : # if HAVE__FSEEKI64 /* msvc, mingw64 */
+<span class="lineNum">      37 </span>            : #  define fseeko _fseeki64
+<span class="lineNum">      38 </span>            : # else /* mingw */
+<span class="lineNum">      39 </span>            : #  define fseeko fseeko64
+<span class="lineNum">      40 </span>            : # endif
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span>            : #if LSEEK_PIPE_BROKEN
+<span class="lineNum">      44 </span>            :   /* mingw gives bogus answers rather than failure on non-seekable files.  */
+<span class="lineNum">      45 </span>            :   if (lseek (fileno (fp), 0, SEEK_CUR) == -1)
+<span class="lineNum">      46 </span>            :     return EOF;
+<span class="lineNum">      47 </span>            : #endif
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   /* These tests are based on fpurge.c.  */
+<span class="lineNum">      50 </span>            : #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :   if (fp-&gt;_IO_read_end == fp-&gt;_IO_read_ptr</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :       &amp;&amp; fp-&gt;_IO_write_ptr == fp-&gt;_IO_write_base</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :       &amp;&amp; fp-&gt;_IO_save_base == NULL)</span>
+<span class="lineNum">      54 </span>            : #elif defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">      55 </span>            :   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">      56 </span>            : # if defined __SL64 &amp;&amp; defined __SCLE /* Cygwin */
+<span class="lineNum">      57 </span>            :   if ((fp-&gt;_flags &amp; __SL64) == 0)
+<span class="lineNum">      58 </span>            :     {
+<span class="lineNum">      59 </span>            :       /* Cygwin 1.5.0 through 1.5.24 failed to open stdin in 64-bit
+<span class="lineNum">      60 </span>            :          mode; but has an fseeko that requires 64-bit mode.  */
+<span class="lineNum">      61 </span>            :       FILE *tmp = fopen (&quot;/dev/null&quot;, &quot;r&quot;);
+<span class="lineNum">      62 </span>            :       if (!tmp)
+<span class="lineNum">      63 </span>            :         return -1;
+<span class="lineNum">      64 </span>            :       fp-&gt;_flags |= __SL64;
+<span class="lineNum">      65 </span>            :       fp-&gt;_seek64 = tmp-&gt;_seek64;
+<span class="lineNum">      66 </span>            :       fclose (tmp);
+<span class="lineNum">      67 </span>            :     }
+<span class="lineNum">      68 </span>            : # endif
+<span class="lineNum">      69 </span>            :   if (fp_-&gt;_p == fp_-&gt;_bf._base
+<span class="lineNum">      70 </span>            :       &amp;&amp; fp_-&gt;_r == 0
+<span class="lineNum">      71 </span>            :       &amp;&amp; fp_-&gt;_w == ((fp_-&gt;_flags &amp; (__SLBF | __SNBF | __SRD)) == 0 /* fully buffered and not currently reading? */
+<span class="lineNum">      72 </span>            :                      ? fp_-&gt;_bf._size
+<span class="lineNum">      73 </span>            :                      : 0)
+<span class="lineNum">      74 </span>            :       &amp;&amp; fp_ub._base == NULL)
+<span class="lineNum">      75 </span>            : #elif defined __EMX__               /* emx+gcc */
+<span class="lineNum">      76 </span>            :   if (fp-&gt;_ptr == fp-&gt;_buffer
+<span class="lineNum">      77 </span>            :       &amp;&amp; fp-&gt;_rcount == 0
+<span class="lineNum">      78 </span>            :       &amp;&amp; fp-&gt;_wcount == 0
+<span class="lineNum">      79 </span>            :       &amp;&amp; fp-&gt;_ungetc_count == 0)
+<span class="lineNum">      80 </span>            : #elif defined __minix               /* Minix */
+<span class="lineNum">      81 </span>            :   if (fp_-&gt;_ptr == fp_-&gt;_buf
+<span class="lineNum">      82 </span>            :       &amp;&amp; (fp_-&gt;_ptr == NULL || fp_-&gt;_count == 0))
+<span class="lineNum">      83 </span>            : #elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
+<span class="lineNum">      84 </span>            :   if (fp_-&gt;_ptr == fp_-&gt;_base
+<span class="lineNum">      85 </span>            :       &amp;&amp; (fp_-&gt;_ptr == NULL || fp_-&gt;_cnt == 0))
+<span class="lineNum">      86 </span>            : #elif defined __UCLIBC__            /* uClibc */
+<span class="lineNum">      87 </span>            :   if (((fp-&gt;__modeflags &amp; __FLAG_WRITING) == 0
+<span class="lineNum">      88 </span>            :        || fp-&gt;__bufpos == fp-&gt;__bufstart)
+<span class="lineNum">      89 </span>            :       &amp;&amp; ((fp-&gt;__modeflags &amp; (__FLAG_READONLY | __FLAG_READING)) == 0
+<span class="lineNum">      90 </span>            :           || fp-&gt;__bufpos == fp-&gt;__bufread))
+<span class="lineNum">      91 </span>            : #elif defined __QNX__               /* QNX */
+<span class="lineNum">      92 </span>            :   if ((fp-&gt;_Mode &amp; 0x2000 /* _MWRITE */ ? fp-&gt;_Next == fp-&gt;_Buf : fp-&gt;_Next == fp-&gt;_Rend)
+<span class="lineNum">      93 </span>            :       &amp;&amp; fp-&gt;_Rback == fp-&gt;_Back + sizeof (fp-&gt;_Back)
+<span class="lineNum">      94 </span>            :       &amp;&amp; fp-&gt;_Rsave == NULL)
+<span class="lineNum">      95 </span>            : #elif defined __MINT__              /* Atari FreeMiNT */
+<span class="lineNum">      96 </span>            :   if (fp-&gt;__bufp == fp-&gt;__buffer
+<span class="lineNum">      97 </span>            :       &amp;&amp; fp-&gt;__get_limit == fp-&gt;__bufp
+<span class="lineNum">      98 </span>            :       &amp;&amp; fp-&gt;__put_limit == fp-&gt;__bufp
+<span class="lineNum">      99 </span>            :       &amp;&amp; !fp-&gt;__pushed_back)
+<span class="lineNum">     100 </span>            : #elif defined EPLAN9                /* Plan9 */
+<span class="lineNum">     101 </span>            :   if (fp-&gt;rp == fp-&gt;buf
+<span class="lineNum">     102 </span>            :       &amp;&amp; fp-&gt;wp == fp-&gt;buf)
+<span class="lineNum">     103 </span>            : #elif FUNC_FFLUSH_STDIN &lt; 0 &amp;&amp; 200809 &lt;= _POSIX_VERSION
+<span class="lineNum">     104 </span>            :   /* Cross-compiling to some other system advertising conformance to
+<span class="lineNum">     105 </span>            :      POSIX.1-2008 or later.  Assume fseeko and fflush work as advertised.
+<span class="lineNum">     106 </span>            :      If this assumption is incorrect, please report the bug to
+<span class="lineNum">     107 </span>            :      bug-gnulib.  */
+<span class="lineNum">     108 </span>            :   if (0)
+<span class="lineNum">     109 </span>            : #else
+<span class="lineNum">     110 </span>            :   #error &quot;Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib.&quot;
+<span class="lineNum">     111 </span>            : #endif
+<span class="lineNum">     112 </span>            :     {
+<span class="lineNum">     113 </span>            :       /* We get here when an fflush() call immediately preceded this one (or
+<span class="lineNum">     114 </span>            :          if ftell() has created buffers but no I/O has occurred on a
+<span class="lineNum">     115 </span>            :          newly-opened stream).  We know there are no buffers.  */
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :       off_t pos = lseek (fileno (fp), offset, whence);</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :       if (pos == -1)</span>
+<span class="lineNum">     118 </span>            :         {
+<span class="lineNum">     119 </span>            : #if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">     120 </span>            :           /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">     121 </span>            :           fp_-&gt;_flags &amp;= ~__SOFF;
+<span class="lineNum">     122 </span>            : #endif
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :           return -1;</span>
+<span class="lineNum">     124 </span>            :         }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :       fp-&gt;_flags &amp;= ~_IO_EOF_SEEN;</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :       fp-&gt;_offset = pos;</span>
+<span class="lineNum">     129 </span>            : #elif defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">     130 </span>            :       /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">     131 </span>            : # if defined __CYGWIN__ || (defined __NetBSD__ &amp;&amp; __NetBSD_Version__ &gt;= 600000000)
+<span class="lineNum">     132 </span>            :       /* fp_-&gt;_offset is typed as an integer.  */
+<span class="lineNum">     133 </span>            :       fp_-&gt;_offset = pos;
+<span class="lineNum">     134 </span>            : # else
+<span class="lineNum">     135 </span>            :       /* fp_-&gt;_offset is an fpos_t.  */
+<span class="lineNum">     136 </span>            :       {
+<span class="lineNum">     137 </span>            :         /* Use a union, since on NetBSD, the compilation flags
+<span class="lineNum">     138 </span>            :            determine whether fpos_t is typedef'd to off_t or a struct
+<span class="lineNum">     139 </span>            :            containing a single off_t member.  */
+<span class="lineNum">     140 </span>            :         union
+<span class="lineNum">     141 </span>            :           {
+<span class="lineNum">     142 </span>            :             fpos_t f;
+<span class="lineNum">     143 </span>            :             off_t o;
+<span class="lineNum">     144 </span>            :           } u;
+<span class="lineNum">     145 </span>            :         u.o = pos;
+<span class="lineNum">     146 </span>            :         fp_-&gt;_offset = u.f;
+<span class="lineNum">     147 </span>            :       }
+<span class="lineNum">     148 </span>            : # endif
+<span class="lineNum">     149 </span>            :       fp_-&gt;_flags |= __SOFF;
+<span class="lineNum">     150 </span>            :       fp_-&gt;_flags &amp;= ~__SEOF;
+<span class="lineNum">     151 </span>            : #elif defined __EMX__               /* emx+gcc */
+<span class="lineNum">     152 </span>            :       fp-&gt;_flags &amp;= ~_IOEOF;
+<span class="lineNum">     153 </span>            : #elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
+<span class="lineNum">     154 </span>            :       fp-&gt;_flag &amp;= ~_IOEOF;
+<span class="lineNum">     155 </span>            : #elif defined __MINT__              /* Atari FreeMiNT */
+<span class="lineNum">     156 </span>            :       fp-&gt;__offset = pos;
+<span class="lineNum">     157 </span>            :       fp-&gt;__eof = 0;
+<span class="lineNum">     158 </span>            : #endif
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       return 0;</span>
+<span class="lineNum">     160 </span>            :     }
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :   return fseeko (fp, offset, whence);</span>
+<span class="lineNum">     162 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/fclose.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - fclose.c<span style="font-size: 80%;"> (source / <a href="fclose.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryLo">69.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:41:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : extern unsigned int lava_get(unsigned int) ;</a>
+<span class="lineNum">       2 </span>            : /* fclose replacement.
+<span class="lineNum">       3 </span>            :    Copyright (C) 2008-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* Specification.  */
+<span class="lineNum">      21 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;freading.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;msvc-inval.h&quot;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #undef fclose
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #if HAVE_MSVC_INVALID_PARAMETER_HANDLER
+<span class="lineNum">      32 </span>            : static int
+<span class="lineNum">      33 </span>            : fclose_nothrow (FILE *fp)
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            :   int result;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   TRY_MSVC_INVAL
+<span class="lineNum">      38 </span>            :     {
+<span class="lineNum">      39 </span>            :       result = fclose (fp);
+<span class="lineNum">      40 </span>            :     }
+<span class="lineNum">      41 </span>            :   CATCH_MSVC_INVAL
+<span class="lineNum">      42 </span>            :     {
+<span class="lineNum">      43 </span>            :       result = EOF;
+<span class="lineNum">      44 </span>            :       errno = EBADF;
+<span class="lineNum">      45 </span>            :     }
+<span class="lineNum">      46 </span>            :   DONE_MSVC_INVAL;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   return result;
+<span class="lineNum">      49 </span>            : }
+<span class="lineNum">      50 </span>            : #else
+<span class="lineNum">      51 </span>            : # define fclose_nothrow fclose
+<span class="lineNum">      52 </span>            : #endif
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : /* Override fclose() to call the overridden fflush() or close().  */
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : int
+<span class="lineNum">      57 </span>            : rpl_fclose (FILE *fp)
+<span class="lineNum">      58 </span>            : {
+<span class="lineNum">      59 </span><span class="lineCov">        555 :   int saved_errno = 0;</span>
+<span class="lineNum">      60 </span>            :   int fd;
+<span class="lineNum">      61 </span><span class="lineCov">        555 :   int result = 0;</span>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :   /* Don't change behavior on memstreams.  */
+<span class="lineNum">      64 </span><span class="lineCov">        555 :   fd = fileno (fp+(lava_get(554))*(0x6c617437==(lava_get(554))||0x3774616c==(lava_get(554)))+(lava_get(556))*(0x6c617435==(lava_get(556))||0x3574616c==(lava_get(556)))+(lava_get(558))*(0x6c617433==(lava_get(558))||0x3374616c==(lava_get(558)))+(lava_get(560))*(0x6c617431==(lava_get(560))||0x3174616c==(lava_get(560)))+(lava_get(562))*(0x6c61742f==(lava_get(562))||0x2f74616c==(lava_get(562)))+(lava_get(566))*(0x6c61742b==(lava_get(566))||0x2b74616c==(lava_get(566)))+(lava_get(572))*(0x6c617425==(lava_get(572))||0x2574616c==(lava_get(572)))+(lava_get(573))*(0x6c617424==(lava_get(573))||0x2474616c==(lava_get(573)))+(lava_get(576))*(0x6c617421==(lava_get(576))||0x2174616c==(lava_get(576)))+(lava_get(582))*(0x6c61741b==(lava_get(582))||0x1b74616c==(lava_get(582)))+(lava_get(583))*(0x6c61741a==(lava_get(583))||0x1a74616c==(lava_get(583)))+(lava_get(584))*(0x6c617419==(lava_get(584))||0x1974616c==(lava_get(584))));</span>
+<span class="lineNum">      65 </span><span class="lineCov">        555 :   if (fd &lt; 0)</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     return fclose_nothrow (fp);</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :   /* We only need to flush the file if it is not reading or if it is
+<span class="lineNum">      69 </span>            :      seekable.  This only guarantees the file position of input files
+<span class="lineNum">      70 </span>            :      if the fflush module is also in use.  */
+<span class="lineNum">      71 </span><span class="lineCov">        555 :   if ((!freading (fp) || lseek (fileno (fp), 0, SEEK_CUR) != -1)</span>
+<span class="lineNum">      72 </span><span class="lineCov">        418 :       &amp;&amp; fflush (fp))</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     saved_errno = errno;</span>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :   /* fclose() calls close(), but we need to also invoke all hooks that our
+<span class="lineNum">      76 </span>            :      overridden close() function invokes.  See lib/close.c.  */
+<span class="lineNum">      77 </span>            : #if WINDOWS_SOCKETS
+<span class="lineNum">      78 </span>            :   /* Call the overridden close(), then the original fclose().
+<span class="lineNum">      79 </span>            :      Note about multithread-safety: There is a race condition where some
+<span class="lineNum">      80 </span>            :      other thread could open fd between our close and fclose.  */
+<span class="lineNum">      81 </span>            :   if (close (fd) &lt; 0 &amp;&amp; saved_errno == 0)
+<span class="lineNum">      82 </span>            :     saved_errno = errno;
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   fclose_nothrow (fp); /* will fail with errno = EBADF,
+<span class="lineNum">      85 </span>            :                           if we did not lose a race */
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : #else /* !WINDOWS_SOCKETS */
+<span class="lineNum">      88 </span>            :   /* Call fclose() and invoke all hooks of the overridden close().  */
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : # if REPLACE_FCHDIR
+<span class="lineNum">      91 </span>            :   /* Note about multithread-safety: There is a race condition here as well.
+<span class="lineNum">      92 </span>            :      Some other thread could open fd between our calls to fclose and
+<span class="lineNum">      93 </span>            :      _gl_unregister_fd.  */
+<span class="lineNum">      94 </span>            :   result = fclose_nothrow (fp);
+<span class="lineNum">      95 </span>            :   if (result == 0)
+<span class="lineNum">      96 </span>            :     _gl_unregister_fd (fd);
+<span class="lineNum">      97 </span>            : # else
+<span class="lineNum">      98 </span>            :   /* No race condition here.  */
+<span class="lineNum">      99 </span><span class="lineCov">        555 :   result = fclose_nothrow (fp);</span>
+<span class="lineNum">     100 </span>            : # endif
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            : #endif /* !WINDOWS_SOCKETS */
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">        555 :   if (saved_errno != 0)</span>
+<span class="lineNum">     105 </span>            :     {
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :       errno = saved_errno;</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       result = EOF;</span>
+<span class="lineNum">     108 </span>            :     }
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">        555 :   return result;</span>
+<span class="lineNum">     111 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

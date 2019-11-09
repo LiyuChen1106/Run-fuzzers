@@ -1,0 +1,15 @@
+diff id:000012,src:000000,op:flip1,pos:11 -> id:000013,src:000000,op:flip1,pos:11,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+  New 'line' coverage: 356
+  New 'line' coverage: 376
+  New 'line' coverage: 377
+  New 'line' coverage: 379
+  New 'line' coverage: 380
+  New 'line' coverage: 382
+  New 'line' coverage: 383
+  New 'line' coverage: 384
+  New 'line' coverage: 388
+  New 'line' coverage: 389
+  New 'line' coverage: 390
+  New 'line' coverage: 644
+  New 'line' coverage: 645
