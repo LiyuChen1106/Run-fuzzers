@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/xstrtod.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - xstrtod.c<span style="font-size: 80%;"> (source / <a href="xstrtod.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* error-checking interface to strtod-like functions</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1996, 1999-2000, 2003-2006, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by Jim Meyering.  */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &quot;xstrtod.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #if LONG
+<span class="lineNum">      30 </span>            : # define XSTRTOD xstrtold
+<span class="lineNum">      31 </span>            : # define DOUBLE long double
+<span class="lineNum">      32 </span>            : #else
+<span class="lineNum">      33 </span>            : # define XSTRTOD xstrtod
+<span class="lineNum">      34 </span>            : # define DOUBLE double
+<span class="lineNum">      35 </span>            : #endif
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : /* An interface to a string-to-floating-point conversion function that
+<span class="lineNum">      38 </span>            :    encapsulates all the error checking one should usually perform.
+<span class="lineNum">      39 </span>            :    Like strtod/strtold, but upon successful
+<span class="lineNum">      40 </span>            :    conversion put the result in *RESULT and return true.  Return
+<span class="lineNum">      41 </span>            :    false and don't modify *RESULT upon any failure.  CONVERT
+<span class="lineNum">      42 </span>            :    specifies the conversion function, e.g., strtod itself.  */
+<a name="43"><span class="lineNum">      43 </span>            : </a>
+<span class="lineNum">      44 </span>            : bool
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 : XSTRTOD (char const *str, char const **ptr, DOUBLE *result,</span>
+<span class="lineNum">      46 </span>            :          DOUBLE (*convert) (char const *, char **))
+<span class="lineNum">      47 </span>            : {
+<span class="lineNum">      48 </span>            :   DOUBLE val;
+<span class="lineNum">      49 </span>            :   char *terminator;
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :   bool ok = true;</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   errno = 0;</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   val = convert (str, &amp;terminator);</span>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :   /* Having a non-zero terminator is an error only when PTR is NULL. */
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   if (terminator == str || (ptr == NULL &amp;&amp; *terminator != '\0'))</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     ok = false;</span>
+<span class="lineNum">      58 </span>            :   else
+<span class="lineNum">      59 </span>            :     {
+<span class="lineNum">      60 </span>            :       /* Allow underflow (in which case CONVERT returns zero),
+<span class="lineNum">      61 </span>            :          but flag overflow as an error. */
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       if (val != 0 &amp;&amp; errno == ERANGE)</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :         ok = false;</span>
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   if (ptr != NULL)</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :     *ptr = terminator;</span>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :   *result = val;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   return ok;</span>
+<span class="lineNum">      71 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

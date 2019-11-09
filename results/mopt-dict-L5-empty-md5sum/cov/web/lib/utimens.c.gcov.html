@@ -1,0 +1,618 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/utimens.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - utimens.c<span style="font-size: 80%;"> (source / <a href="utimens.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">157</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Set file access and modification times.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2003-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify it
+<span class="lineNum">       6 </span>            :    under the terms of the GNU General Public License as published by the
+<span class="lineNum">       7 </span>            :    Free Software Foundation; either version 3 of the License, or any
+<span class="lineNum">       8 </span>            :    later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* derived from a function in touch.c */
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #define _GL_UTIMENS_INLINE _GL_EXTERN_INLINE
+<span class="lineNum">      25 </span>            : #include &quot;utimens.h&quot;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;sys/time.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #include &quot;stat-time.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;timespec.h&quot;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #if HAVE_UTIME_H
+<span class="lineNum">      38 </span>            : # include &lt;utime.h&gt;
+<span class="lineNum">      39 </span>            : #endif
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : /* Some systems (even some that do have &lt;utime.h&gt;) don't declare this
+<span class="lineNum">      42 </span>            :    structure anywhere.  */
+<span class="lineNum">      43 </span>            : #ifndef HAVE_STRUCT_UTIMBUF
+<span class="lineNum">      44 </span>            : struct utimbuf
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span>            :   long actime;
+<span class="lineNum">      47 </span>            :   long modtime;
+<span class="lineNum">      48 </span>            : };
+<span class="lineNum">      49 </span>            : #endif
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : /* Avoid recursion with rpl_futimens or rpl_utimensat.  */
+<span class="lineNum">      52 </span>            : #undef futimens
+<span class="lineNum">      53 </span>            : #undef utimensat
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : /* Solaris 9 mistakenly succeeds when given a non-directory with a
+<span class="lineNum">      56 </span>            :    trailing slash.  Force the use of rpl_stat for a fix.  */
+<span class="lineNum">      57 </span>            : #ifndef REPLACE_FUNC_STAT_FILE
+<span class="lineNum">      58 </span>            : # define REPLACE_FUNC_STAT_FILE 0
+<span class="lineNum">      59 </span>            : #endif
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : #if HAVE_UTIMENSAT || HAVE_FUTIMENS
+<span class="lineNum">      62 </span>            : /* Cache variables for whether the utimensat syscall works; used to
+<span class="lineNum">      63 </span>            :    avoid calling the syscall if we know it will just fail with ENOSYS,
+<span class="lineNum">      64 </span>            :    and to avoid unnecessary work in massaging timestamps if the
+<span class="lineNum">      65 </span>            :    syscall will work.  Multiple variables are needed, to distinguish
+<span class="lineNum">      66 </span>            :    between the following scenarios on Linux:
+<span class="lineNum">      67 </span>            :    utimensat doesn't exist, or is in glibc but kernel 2.6.18 fails with ENOSYS
+<span class="lineNum">      68 </span>            :    kernel 2.6.22 and earlier rejects AT_SYMLINK_NOFOLLOW
+<span class="lineNum">      69 </span>            :    kernel 2.6.25 and earlier reject UTIME_NOW/UTIME_OMIT with non-zero tv_sec
+<span class="lineNum">      70 </span>            :    kernel 2.6.32 used with xfs or ntfs-3g fail to honor UTIME_OMIT
+<span class="lineNum">      71 </span>            :    utimensat completely works
+<span class="lineNum">      72 </span>            :    For each cache variable: 0 = unknown, 1 = yes, -1 = no.  */
+<span class="lineNum">      73 </span>            : static int utimensat_works_really;
+<span class="lineNum">      74 </span>            : static int lutimensat_works_really;
+<span class="lineNum">      75 </span>            : #endif /* HAVE_UTIMENSAT || HAVE_FUTIMENS */
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : /* Validate the requested timestamps.  Return 0 if the resulting
+<span class="lineNum">      78 </span>            :    timespec can be used for utimensat (after possibly modifying it to
+<span class="lineNum">      79 </span>            :    work around bugs in utimensat).  Return a positive value if the
+<span class="lineNum">      80 </span>            :    timespec needs further adjustment based on stat results: 1 if any
+<span class="lineNum">      81 </span>            :    adjustment is needed for utimes, and 2 if any adjustment is needed
+<span class="lineNum">      82 </span>            :    for Linux utimensat.  Return -1, with errno set to EINVAL, if
+<a name="83"><span class="lineNum">      83 </span>            :    timespec is out of range.  */</a>
+<span class="lineNum">      84 </span>            : static int
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 : validate_timespec (struct timespec timespec[2])</span>
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   int result = 0;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   int utime_omit_count = 0;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :   if ((timespec[0].tv_nsec != UTIME_NOW</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :        &amp;&amp; timespec[0].tv_nsec != UTIME_OMIT</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :        &amp;&amp; ! (0 &lt;= timespec[0].tv_nsec</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :              &amp;&amp; timespec[0].tv_nsec &lt; TIMESPEC_RESOLUTION))</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :       || (timespec[1].tv_nsec != UTIME_NOW</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :           &amp;&amp; timespec[1].tv_nsec != UTIME_OMIT</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :           &amp;&amp; ! (0 &lt;= timespec[1].tv_nsec</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :                 &amp;&amp; timespec[1].tv_nsec &lt; TIMESPEC_RESOLUTION)))</span>
+<span class="lineNum">      97 </span>            :     {
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :       errno = EINVAL;</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :       return -1;</span>
+<span class="lineNum">     100 </span>            :     }
+<span class="lineNum">     101 </span>            :   /* Work around Linux kernel 2.6.25 bug, where utimensat fails with
+<span class="lineNum">     102 </span>            :      EINVAL if tv_sec is not 0 when using the flag values of tv_nsec.
+<span class="lineNum">     103 </span>            :      Flag a Linux kernel 2.6.32 bug, where an mtime of UTIME_OMIT
+<span class="lineNum">     104 </span>            :      fails to bump ctime.  */
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   if (timespec[0].tv_nsec == UTIME_NOW</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :       || timespec[0].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     107 </span>            :     {
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :       timespec[0].tv_sec = 0;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :       result = 1;</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :       if (timespec[0].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :         utime_omit_count++;</span>
+<span class="lineNum">     112 </span>            :     }
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   if (timespec[1].tv_nsec == UTIME_NOW</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :       || timespec[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     115 </span>            :     {
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :       timespec[1].tv_sec = 0;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :       result = 1;</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       if (timespec[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :         utime_omit_count++;</span>
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   return result + (utime_omit_count == 1);</span>
+<span class="lineNum">     122 </span>            : }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : /* Normalize any UTIME_NOW or UTIME_OMIT values in *TS, using stat
+<span class="lineNum">     125 </span>            :    buffer STATBUF to obtain the current timestamps of the file.  If
+<span class="lineNum">     126 </span>            :    both times are UTIME_NOW, set *TS to NULL (as this can avoid some
+<span class="lineNum">     127 </span>            :    permissions issues).  If both times are UTIME_OMIT, return true
+<span class="lineNum">     128 </span>            :    (nothing further beyond the prior collection of STATBUF is
+<a name="129"><span class="lineNum">     129 </span>            :    necessary); otherwise return false.  */</a>
+<span class="lineNum">     130 </span>            : static bool
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 : update_timespec (struct stat const *statbuf, struct timespec *ts[2])</span>
+<span class="lineNum">     132 </span>            : {
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :   struct timespec *timespec = *ts;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   if (timespec[0].tv_nsec == UTIME_OMIT</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :       &amp;&amp; timespec[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :   if (timespec[0].tv_nsec == UTIME_NOW</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :       &amp;&amp; timespec[1].tv_nsec == UTIME_NOW)</span>
+<span class="lineNum">     139 </span>            :     {
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       *ts = NULL;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     142 </span>            :     }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   if (timespec[0].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     timespec[0] = get_stat_atime (statbuf);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   else if (timespec[0].tv_nsec == UTIME_NOW)</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     gettime (&amp;timespec[0]);</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   if (timespec[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :     timespec[1] = get_stat_mtime (statbuf);</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   else if (timespec[1].tv_nsec == UTIME_NOW)</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     gettime (&amp;timespec[1]);</span>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">     155 </span>            : }
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            : /* Set the access and modification time stamps of FD (a.k.a. FILE) to be
+<span class="lineNum">     158 </span>            :    TIMESPEC[0] and TIMESPEC[1], respectively.
+<span class="lineNum">     159 </span>            :    FD must be either negative -- in which case it is ignored --
+<span class="lineNum">     160 </span>            :    or a file descriptor that is open on FILE.
+<span class="lineNum">     161 </span>            :    If FD is nonnegative, then FILE can be NULL, which means
+<span class="lineNum">     162 </span>            :    use just futimes (or equivalent) instead of utimes (or equivalent),
+<span class="lineNum">     163 </span>            :    and fail if on an old system without futimes (or equivalent).
+<span class="lineNum">     164 </span>            :    If TIMESPEC is null, set the time stamps to the current time.
+<span class="lineNum">     165 </span>            :    Return 0 on success, -1 (setting errno) on failure.  */
+<a name="166"><span class="lineNum">     166 </span>            : </a>
+<span class="lineNum">     167 </span>            : int
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 : fdutimens (int fd, char const *file, struct timespec const timespec[2])</span>
+<span class="lineNum">     169 </span>            : {
+<span class="lineNum">     170 </span>            :   struct timespec adjusted_timespec[2];
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   struct timespec *ts = timespec ? adjusted_timespec : NULL;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   int adjustment_needed = 0;</span>
+<span class="lineNum">     173 </span>            :   struct stat st;
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :   if (ts)</span>
+<span class="lineNum">     176 </span>            :     {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       adjusted_timespec[0] = timespec[0];</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       adjusted_timespec[1] = timespec[1];</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :       adjustment_needed = validate_timespec (ts);</span>
+<span class="lineNum">     180 </span>            :     }
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   if (adjustment_needed &lt; 0)</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :   /* Require that at least one of FD or FILE are potentially valid, to avoid
+<span class="lineNum">     185 </span>            :      a Linux bug where futimens (AT_FDCWD, NULL) changes &quot;.&quot; rather
+<span class="lineNum">     186 </span>            :      than failing.  */
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :   if (fd &lt; 0 &amp;&amp; !file)</span>
+<span class="lineNum">     188 </span>            :     {
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :       errno = EBADF;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :       return -1;</span>
+<span class="lineNum">     191 </span>            :     }
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :   /* Some Linux-based NFS clients are buggy, and mishandle time stamps
+<span class="lineNum">     194 </span>            :      of files in NFS file systems in some cases.  We have no
+<span class="lineNum">     195 </span>            :      configure-time test for this, but please see
+<span class="lineNum">     196 </span>            :      &lt;http://bugs.gentoo.org/show_bug.cgi?id=132673&gt; for references to
+<span class="lineNum">     197 </span>            :      some of the problems with Linux 2.6.16.  If this affects you,
+<span class="lineNum">     198 </span>            :      compile with -DHAVE_BUGGY_NFS_TIME_STAMPS; this is reported to
+<span class="lineNum">     199 </span>            :      help in some cases, albeit at a cost in performance.  But you
+<span class="lineNum">     200 </span>            :      really should upgrade your kernel to a fixed version, since the
+<span class="lineNum">     201 </span>            :      problem affects many applications.  */
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span>            : #if HAVE_BUGGY_NFS_TIME_STAMPS
+<span class="lineNum">     204 </span>            :   if (fd &lt; 0)
+<span class="lineNum">     205 </span>            :     sync ();
+<span class="lineNum">     206 </span>            :   else
+<span class="lineNum">     207 </span>            :     fsync (fd);
+<span class="lineNum">     208 </span>            : #endif
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   /* POSIX 2008 added two interfaces to set file timestamps with
+<span class="lineNum">     211 </span>            :      nanosecond resolution; newer Linux implements both functions via
+<span class="lineNum">     212 </span>            :      a single syscall.  We provide a fallback for ENOSYS (for example,
+<span class="lineNum">     213 </span>            :      compiling against Linux 2.6.25 kernel headers and glibc 2.7, but
+<span class="lineNum">     214 </span>            :      running on Linux 2.6.18 kernel).  */
+<span class="lineNum">     215 </span>            : #if HAVE_UTIMENSAT || HAVE_FUTIMENS
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :   if (0 &lt;= utimensat_works_really)</span>
+<span class="lineNum">     217 </span>            :     {
+<span class="lineNum">     218 </span>            :       int result;
+<span class="lineNum">     219 </span>            : # if __linux__ || __sun
+<span class="lineNum">     220 </span>            :       /* As recently as Linux kernel 2.6.32 (Dec 2009), several file
+<span class="lineNum">     221 </span>            :          systems (xfs, ntfs-3g) have bugs with a single UTIME_OMIT,
+<span class="lineNum">     222 </span>            :          but work if both times are either explicitly specified or
+<span class="lineNum">     223 </span>            :          UTIME_NOW.  Work around it with a preparatory [f]stat prior
+<span class="lineNum">     224 </span>            :          to calling futimens/utimensat; fortunately, there is not much
+<span class="lineNum">     225 </span>            :          timing impact due to the extra syscall even on file systems
+<span class="lineNum">     226 </span>            :          where UTIME_OMIT would have worked.
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :          The same bug occurs in Solaris 11.1 (Apr 2013).
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :          FIXME: Simplify this for Linux in 2016 and for Solaris in
+<span class="lineNum">     231 </span>            :          2024, when file system bugs are no longer common.  */
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :       if (adjustment_needed == 2)</span>
+<span class="lineNum">     233 </span>            :         {
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :           if (fd &lt; 0 ? stat (file, &amp;st) : fstat (fd, &amp;st))</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :           if (ts[0].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :             ts[0] = get_stat_atime (&amp;st);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :           else if (ts[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :             ts[1] = get_stat_mtime (&amp;st);</span>
+<span class="lineNum">     240 </span>            :           /* Note that st is good, in case utimensat gives ENOSYS.  */
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :           adjustment_needed++;</span>
+<span class="lineNum">     242 </span>            :         }
+<span class="lineNum">     243 </span>            : # endif
+<span class="lineNum">     244 </span>            : # if HAVE_UTIMENSAT
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :       if (fd &lt; 0)</span>
+<span class="lineNum">     246 </span>            :         {
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :           result = utimensat (AT_FDCWD, file, ts, 0);</span>
+<span class="lineNum">     248 </span>            : #  ifdef __linux__
+<span class="lineNum">     249 </span>            :           /* Work around a kernel bug:
+<span class="lineNum">     250 </span>            :              http://bugzilla.redhat.com/442352
+<span class="lineNum">     251 </span>            :              http://bugzilla.redhat.com/449910
+<span class="lineNum">     252 </span>            :              It appears that utimensat can mistakenly return 280 rather
+<span class="lineNum">     253 </span>            :              than -1 upon ENOSYS failure.
+<span class="lineNum">     254 </span>            :              FIXME: remove in 2010 or whenever the offending kernels
+<span class="lineNum">     255 </span>            :              are no longer in common use.  */
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :           if (0 &lt; result)</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :             errno = ENOSYS;</span>
+<span class="lineNum">     258 </span>            : #  endif /* __linux__ */
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :           if (result == 0 || errno != ENOSYS)</span>
+<span class="lineNum">     260 </span>            :             {
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :               utimensat_works_really = 1;</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :               return result;</span>
+<span class="lineNum">     263 </span>            :             }
+<span class="lineNum">     264 </span>            :         }
+<span class="lineNum">     265 </span>            : # endif /* HAVE_UTIMENSAT */
+<span class="lineNum">     266 </span>            : # if HAVE_FUTIMENS
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :       if (0 &lt;= fd)</span>
+<span class="lineNum">     268 </span>            :         {
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :           result = futimens (fd, ts);</span>
+<span class="lineNum">     270 </span>            : #  ifdef __linux__
+<span class="lineNum">     271 </span>            :           /* Work around the same bug as above.  */
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :           if (0 &lt; result)</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :             errno = ENOSYS;</span>
+<span class="lineNum">     274 </span>            : #  endif /* __linux__ */
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :           if (result == 0 || errno != ENOSYS)</span>
+<span class="lineNum">     276 </span>            :             {
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :               utimensat_works_really = 1;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :               return result;</span>
+<span class="lineNum">     279 </span>            :             }
+<span class="lineNum">     280 </span>            :         }
+<span class="lineNum">     281 </span>            : # endif /* HAVE_FUTIMENS */
+<span class="lineNum">     282 </span>            :     }
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :   utimensat_works_really = -1;</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :   lutimensat_works_really = -1;</span>
+<span class="lineNum">     285 </span>            : #endif /* HAVE_UTIMENSAT || HAVE_FUTIMENS */
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :   /* The platform lacks an interface to set file timestamps with
+<span class="lineNum">     288 </span>            :      nanosecond resolution, so do the best we can, discarding any
+<span class="lineNum">     289 </span>            :      fractional part of the timestamp.  */
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :   if (adjustment_needed || (REPLACE_FUNC_STAT_FILE &amp;&amp; fd &lt; 0))</span>
+<span class="lineNum">     292 </span>            :     {
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :       if (adjustment_needed != 3</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :           &amp;&amp; (fd &lt; 0 ? stat (file, &amp;st) : fstat (fd, &amp;st)))</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :       if (ts &amp;&amp; update_timespec (&amp;st, &amp;ts))</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     298 </span>            :     }
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   {
+<span class="lineNum">     301 </span>            : #if HAVE_FUTIMESAT || HAVE_WORKING_UTIMES
+<span class="lineNum">     302 </span>            :     struct timeval timeval[2];
+<span class="lineNum">     303 </span>            :     struct timeval *t;
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :     if (ts)</span>
+<span class="lineNum">     305 </span>            :       {
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :         timeval[0].tv_sec = ts[0].tv_sec;</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :         timeval[0].tv_usec = ts[0].tv_nsec / 1000;</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :         timeval[1].tv_sec = ts[1].tv_sec;</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :         timeval[1].tv_usec = ts[1].tv_nsec / 1000;</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :         t = timeval;</span>
+<span class="lineNum">     311 </span>            :       }
+<span class="lineNum">     312 </span>            :     else
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :       t = NULL;</span>
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :     if (fd &lt; 0)</span>
+<span class="lineNum">     316 </span>            :       {
+<span class="lineNum">     317 </span>            : # if HAVE_FUTIMESAT
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :         return futimesat (AT_FDCWD, file, t);</span>
+<span class="lineNum">     319 </span>            : # endif
+<span class="lineNum">     320 </span>            :       }
+<span class="lineNum">     321 </span>            :     else
+<span class="lineNum">     322 </span>            :       {
+<span class="lineNum">     323 </span>            :         /* If futimesat or futimes fails here, don't try to speed things
+<span class="lineNum">     324 </span>            :            up by returning right away.  glibc can incorrectly fail with
+<span class="lineNum">     325 </span>            :            errno == ENOENT if /proc isn't mounted.  Also, Mandrake 10.0
+<span class="lineNum">     326 </span>            :            in high security mode doesn't allow ordinary users to read
+<span class="lineNum">     327 </span>            :            /proc/self, so glibc incorrectly fails with errno == EACCES.
+<span class="lineNum">     328 </span>            :            If errno == EIO, EPERM, or EROFS, it's probably safe to fail
+<span class="lineNum">     329 </span>            :            right away, but these cases are rare enough that they're not
+<span class="lineNum">     330 </span>            :            worth optimizing, and who knows what other messed-up systems
+<span class="lineNum">     331 </span>            :            are out there?  So play it safe and fall back on the code
+<span class="lineNum">     332 </span>            :            below.  */
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            : # if (HAVE_FUTIMESAT &amp;&amp; !FUTIMESAT_NULL_BUG) || HAVE_FUTIMES
+<span class="lineNum">     335 </span>            : #  if HAVE_FUTIMESAT &amp;&amp; !FUTIMESAT_NULL_BUG
+<span class="lineNum">     336 </span>            : #   undef futimes
+<span class="lineNum">     337 </span>            : #   define futimes(fd, t) futimesat (fd, NULL, t)
+<span class="lineNum">     338 </span>            : #  endif
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :         if (futimes (fd, t) == 0)</span>
+<span class="lineNum">     340 </span>            :           {
+<span class="lineNum">     341 </span>            : #  if __linux__ &amp;&amp; __GLIBC__
+<span class="lineNum">     342 </span>            :             /* Work around a longstanding glibc bug, still present as
+<span class="lineNum">     343 </span>            :                of 2010-12-27.  On older Linux kernels that lack both
+<span class="lineNum">     344 </span>            :                utimensat and utimes, glibc's futimes rounds instead of
+<span class="lineNum">     345 </span>            :                truncating when falling back on utime.  The same bug
+<span class="lineNum">     346 </span>            :                occurs in futimesat with a null 2nd arg.  */
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :             if (t)</span>
+<span class="lineNum">     348 </span>            :               {
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                 bool abig = 500000 &lt;= t[0].tv_usec;</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                 bool mbig = 500000 &lt;= t[1].tv_usec;</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                 if ((abig | mbig) &amp;&amp; fstat (fd, &amp;st) == 0)</span>
+<span class="lineNum">     352 </span>            :                   {
+<span class="lineNum">     353 </span>            :                     /* If these two subtractions overflow, they'll
+<span class="lineNum">     354 </span>            :                        track the overflows inside the buggy glibc.  */
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                     time_t adiff = st.st_atime - t[0].tv_sec;</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                     time_t mdiff = st.st_mtime - t[1].tv_sec;</span>
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                     struct timeval *tt = NULL;</span>
+<span class="lineNum">     359 </span>            :                     struct timeval truncated_timeval[2];
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                     truncated_timeval[0] = t[0];</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                     truncated_timeval[1] = t[1];</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :                     if (abig &amp;&amp; adiff == 1 &amp;&amp; get_stat_atime_ns (&amp;st) == 0)</span>
+<span class="lineNum">     363 </span>            :                       {
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :                         tt = truncated_timeval;</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                         tt[0].tv_usec = 0;</span>
+<span class="lineNum">     366 </span>            :                       }
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                     if (mbig &amp;&amp; mdiff == 1 &amp;&amp; get_stat_mtime_ns (&amp;st) == 0)</span>
+<span class="lineNum">     368 </span>            :                       {
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                         tt = truncated_timeval;</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                         tt[1].tv_usec = 0;</span>
+<span class="lineNum">     371 </span>            :                       }
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :                     if (tt)</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                       futimes (fd, tt);</span>
+<span class="lineNum">     374 </span>            :                   }
+<span class="lineNum">     375 </span>            :               }
+<span class="lineNum">     376 </span>            : #  endif
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :             return 0;</span>
+<span class="lineNum">     379 </span>            :           }
+<span class="lineNum">     380 </span>            : # endif
+<span class="lineNum">     381 </span>            :       }
+<span class="lineNum">     382 </span>            : #endif /* HAVE_FUTIMESAT || HAVE_WORKING_UTIMES */
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :     if (!file)</span>
+<span class="lineNum">     385 </span>            :       {
+<span class="lineNum">     386 </span>            : #if ! ((HAVE_FUTIMESAT &amp;&amp; !FUTIMESAT_NULL_BUG)          \
+<span class="lineNum">     387 </span>            :         || (HAVE_WORKING_UTIMES &amp;&amp; HAVE_FUTIMES))
+<span class="lineNum">     388 </span>            :         errno = ENOSYS;
+<span class="lineNum">     389 </span>            : #endif
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     391 </span>            :       }
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : #if HAVE_WORKING_UTIMES
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :     return utimes (file, t);</span>
+<span class="lineNum">     395 </span>            : #else
+<span class="lineNum">     396 </span>            :     {
+<span class="lineNum">     397 </span>            :       struct utimbuf utimbuf;
+<span class="lineNum">     398 </span>            :       struct utimbuf *ut;
+<span class="lineNum">     399 </span>            :       if (ts)
+<span class="lineNum">     400 </span>            :         {
+<span class="lineNum">     401 </span>            :           utimbuf.actime = ts[0].tv_sec;
+<span class="lineNum">     402 </span>            :           utimbuf.modtime = ts[1].tv_sec;
+<span class="lineNum">     403 </span>            :           ut = &amp;utimbuf;
+<span class="lineNum">     404 </span>            :         }
+<span class="lineNum">     405 </span>            :       else
+<span class="lineNum">     406 </span>            :         ut = NULL;
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            :       return utime (file, ut);
+<span class="lineNum">     409 </span>            :     }
+<span class="lineNum">     410 </span>            : #endif /* !HAVE_WORKING_UTIMES */
+<span class="lineNum">     411 </span>            :   }
+<span class="lineNum">     412 </span>            : }
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            : /* Set the access and modification time stamps of FILE to be
+<a name="415"><span class="lineNum">     415 </span>            :    TIMESPEC[0] and TIMESPEC[1], respectively.  */</a>
+<span class="lineNum">     416 </span>            : int
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 : utimens (char const *file, struct timespec const timespec[2])</span>
+<span class="lineNum">     418 </span>            : {
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :   return fdutimens (-1, file, timespec);</span>
+<span class="lineNum">     420 </span>            : }
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : /* Set the access and modification time stamps of FILE to be
+<span class="lineNum">     423 </span>            :    TIMESPEC[0] and TIMESPEC[1], respectively, without dereferencing
+<span class="lineNum">     424 </span>            :    symlinks.  Fail with ENOSYS if the platform does not support
+<a name="425"><span class="lineNum">     425 </span>            :    changing symlink timestamps, but FILE was a symlink.  */</a>
+<span class="lineNum">     426 </span>            : int
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 : lutimens (char const *file, struct timespec const timespec[2])</span>
+<span class="lineNum">     428 </span>            : {
+<span class="lineNum">     429 </span>            :   struct timespec adjusted_timespec[2];
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :   struct timespec *ts = timespec ? adjusted_timespec : NULL;</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :   int adjustment_needed = 0;</span>
+<span class="lineNum">     432 </span>            :   struct stat st;
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :   if (ts)</span>
+<span class="lineNum">     435 </span>            :     {
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :       adjusted_timespec[0] = timespec[0];</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :       adjusted_timespec[1] = timespec[1];</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :       adjustment_needed = validate_timespec (ts);</span>
+<span class="lineNum">     439 </span>            :     }
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :   if (adjustment_needed &lt; 0)</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            :   /* The Linux kernel did not support symlink timestamps until
+<span class="lineNum">     444 </span>            :      utimensat, in version 2.6.22, so we don't need to mimic
+<span class="lineNum">     445 </span>            :      fdutimens' worry about buggy NFS clients.  But we do have to
+<span class="lineNum">     446 </span>            :      worry about bogus return values.  */
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            : #if HAVE_UTIMENSAT
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :   if (0 &lt;= lutimensat_works_really)</span>
+<span class="lineNum">     450 </span>            :     {
+<span class="lineNum">     451 </span>            :       int result;
+<span class="lineNum">     452 </span>            : # if __linux__ || __sun
+<span class="lineNum">     453 </span>            :       /* As recently as Linux kernel 2.6.32 (Dec 2009), several file
+<span class="lineNum">     454 </span>            :          systems (xfs, ntfs-3g) have bugs with a single UTIME_OMIT,
+<span class="lineNum">     455 </span>            :          but work if both times are either explicitly specified or
+<span class="lineNum">     456 </span>            :          UTIME_NOW.  Work around it with a preparatory lstat prior to
+<span class="lineNum">     457 </span>            :          calling utimensat; fortunately, there is not much timing
+<span class="lineNum">     458 </span>            :          impact due to the extra syscall even on file systems where
+<span class="lineNum">     459 </span>            :          UTIME_OMIT would have worked.
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :          The same bug occurs in Solaris 11.1 (Apr 2013).
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            :          FIXME: Simplify this for Linux in 2016 and for Solaris in
+<span class="lineNum">     464 </span>            :          2024, when file system bugs are no longer common.  */
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :       if (adjustment_needed == 2)</span>
+<span class="lineNum">     466 </span>            :         {
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :           if (lstat (file, &amp;st))</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :           if (ts[0].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :             ts[0] = get_stat_atime (&amp;st);</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :           else if (ts[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :             ts[1] = get_stat_mtime (&amp;st);</span>
+<span class="lineNum">     473 </span>            :           /* Note that st is good, in case utimensat gives ENOSYS.  */
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :           adjustment_needed++;</span>
+<span class="lineNum">     475 </span>            :         }
+<span class="lineNum">     476 </span>            : # endif
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :       result = utimensat (AT_FDCWD, file, ts, AT_SYMLINK_NOFOLLOW);</span>
+<span class="lineNum">     478 </span>            : # ifdef __linux__
+<span class="lineNum">     479 </span>            :       /* Work around a kernel bug:
+<span class="lineNum">     480 </span>            :          http://bugzilla.redhat.com/442352
+<span class="lineNum">     481 </span>            :          http://bugzilla.redhat.com/449910
+<span class="lineNum">     482 </span>            :          It appears that utimensat can mistakenly return 280 rather
+<span class="lineNum">     483 </span>            :          than -1 upon ENOSYS failure.
+<span class="lineNum">     484 </span>            :          FIXME: remove in 2010 or whenever the offending kernels
+<span class="lineNum">     485 </span>            :          are no longer in common use.  */
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :       if (0 &lt; result)</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :         errno = ENOSYS;</span>
+<span class="lineNum">     488 </span>            : # endif
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :       if (result == 0 || errno != ENOSYS)</span>
+<span class="lineNum">     490 </span>            :         {
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :           utimensat_works_really = 1;</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :           lutimensat_works_really = 1;</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :           return result;</span>
+<span class="lineNum">     494 </span>            :         }
+<span class="lineNum">     495 </span>            :     }
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :   lutimensat_works_really = -1;</span>
+<span class="lineNum">     497 </span>            : #endif /* HAVE_UTIMENSAT */
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :   /* The platform lacks an interface to set file timestamps with
+<span class="lineNum">     500 </span>            :      nanosecond resolution, so do the best we can, discarding any
+<span class="lineNum">     501 </span>            :      fractional part of the timestamp.  */
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :   if (adjustment_needed || REPLACE_FUNC_STAT_FILE)</span>
+<span class="lineNum">     504 </span>            :     {
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :       if (adjustment_needed != 3 &amp;&amp; lstat (file, &amp;st))</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :       if (ts &amp;&amp; update_timespec (&amp;st, &amp;ts))</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     509 </span>            :     }
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :   /* On Linux, lutimes is a thin wrapper around utimensat, so there is
+<span class="lineNum">     512 </span>            :      no point trying lutimes if utimensat failed with ENOSYS.  */
+<span class="lineNum">     513 </span>            : #if HAVE_LUTIMES &amp;&amp; !HAVE_UTIMENSAT
+<span class="lineNum">     514 </span>            :   {
+<span class="lineNum">     515 </span>            :     struct timeval timeval[2];
+<span class="lineNum">     516 </span>            :     struct timeval *t;
+<span class="lineNum">     517 </span>            :     int result;
+<span class="lineNum">     518 </span>            :     if (ts)
+<span class="lineNum">     519 </span>            :       {
+<span class="lineNum">     520 </span>            :         timeval[0].tv_sec = ts[0].tv_sec;
+<span class="lineNum">     521 </span>            :         timeval[0].tv_usec = ts[0].tv_nsec / 1000;
+<span class="lineNum">     522 </span>            :         timeval[1].tv_sec = ts[1].tv_sec;
+<span class="lineNum">     523 </span>            :         timeval[1].tv_usec = ts[1].tv_nsec / 1000;
+<span class="lineNum">     524 </span>            :         t = timeval;
+<span class="lineNum">     525 </span>            :       }
+<span class="lineNum">     526 </span>            :     else
+<span class="lineNum">     527 </span>            :       t = NULL;
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            :     result = lutimes (file, t);
+<span class="lineNum">     530 </span>            :     if (result == 0 || errno != ENOSYS)
+<span class="lineNum">     531 </span>            :       return result;
+<span class="lineNum">     532 </span>            :   }
+<span class="lineNum">     533 </span>            : #endif /* HAVE_LUTIMES &amp;&amp; !HAVE_UTIMENSAT */
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            :   /* Out of luck for symlinks, but we still handle regular files.  */
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :   if (!(adjustment_needed || REPLACE_FUNC_STAT_FILE) &amp;&amp; lstat (file, &amp;st))</span>
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :   if (!S_ISLNK (st.st_mode))</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :     return fdutimens (-1, file, ts);</span>
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :   errno = ENOSYS;</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :   return -1;</span>
+<span class="lineNum">     542 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

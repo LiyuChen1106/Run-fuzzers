@@ -1,0 +1,773 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - src/system.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - system.h<span style="font-size: 80%;"> (source / <a href="system.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">100</td>
+            <td class="headerCovTableEntryLo">7.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryLo">9.1 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* system-dependent definitions for coreutils</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 1989-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* Include this file _after_ system headers if possible.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;alloca.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : /* Commonly used file permission combination.  */
+<span class="lineNum">      24 </span>            : #define MODE_RW_UGO (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #if !defined HAVE_MKFIFO
+<span class="lineNum">      27 </span>            : # define mkfifo(name, mode) mknod (name, (mode) | S_IFIFO, 0)
+<span class="lineNum">      28 </span>            : #endif
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #if HAVE_SYS_PARAM_H
+<span class="lineNum">      31 </span>            : # include &lt;sys/param.h&gt;
+<span class="lineNum">      32 </span>            : #endif
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #include &quot;pathmax.h&quot;
+<span class="lineNum">      39 </span>            : #ifndef PATH_MAX
+<span class="lineNum">      40 </span>            : # define PATH_MAX 8192
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #include &quot;configmake.h&quot;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #include &lt;sys/time.h&gt;
+<span class="lineNum">      46 </span>            : #include &lt;time.h&gt;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : /* Since major is a function on SVR4, we can't use 'ifndef major'.  */
+<span class="lineNum">      49 </span>            : #if MAJOR_IN_MKDEV
+<span class="lineNum">      50 </span>            : # include &lt;sys/mkdev.h&gt;
+<span class="lineNum">      51 </span>            : # define HAVE_MAJOR
+<span class="lineNum">      52 </span>            : #endif
+<span class="lineNum">      53 </span>            : #if MAJOR_IN_SYSMACROS
+<span class="lineNum">      54 </span>            : # include &lt;sys/sysmacros.h&gt;
+<span class="lineNum">      55 </span>            : # define HAVE_MAJOR
+<span class="lineNum">      56 </span>            : #endif
+<span class="lineNum">      57 </span>            : #ifdef major                    /* Might be defined in sys/types.h.  */
+<span class="lineNum">      58 </span>            : # define HAVE_MAJOR
+<span class="lineNum">      59 </span>            : #endif
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : #ifndef HAVE_MAJOR
+<span class="lineNum">      62 </span>            : # define major(dev)  (((dev) &gt;&gt; 8) &amp; 0xff)
+<span class="lineNum">      63 </span>            : # define minor(dev)  ((dev) &amp; 0xff)
+<span class="lineNum">      64 </span>            : # define makedev(maj, min)  (((maj) &lt;&lt; 8) | (min))
+<span class="lineNum">      65 </span>            : #endif
+<span class="lineNum">      66 </span>            : #undef HAVE_MAJOR
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            : #if ! defined makedev &amp;&amp; defined mkdev
+<span class="lineNum">      69 </span>            : # define makedev(maj, min)  mkdev (maj, min)
+<span class="lineNum">      70 </span>            : #endif
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      73 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : /* Some systems don't define this; POSIX mentions it but says it is
+<span class="lineNum">      76 </span>            :    obsolete.  gnulib defines it, but only on native Windows systems,
+<span class="lineNum">      77 </span>            :    and there only because MSVC 10 does.  */
+<span class="lineNum">      78 </span>            : #ifndef ENODATA
+<span class="lineNum">      79 </span>            : # define ENODATA (-1)
+<span class="lineNum">      80 </span>            : #endif
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      83 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      84 </span>            : #include &quot;version.h&quot;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : /* Exit statuses for programs like 'env' that exec other programs.  */
+<span class="lineNum">      87 </span>            : enum
+<span class="lineNum">      88 </span>            : {
+<span class="lineNum">      89 </span>            :   EXIT_TIMEDOUT = 124, /* Time expired before child completed.  */
+<span class="lineNum">      90 </span>            :   EXIT_CANCELED = 125, /* Internal error prior to exec attempt.  */
+<span class="lineNum">      91 </span>            :   EXIT_CANNOT_INVOKE = 126, /* Program located, but not usable.  */
+<span class="lineNum">      92 </span>            :   EXIT_ENOENT = 127 /* Could not find program to exec.  */
+<span class="lineNum">      93 </span>            : };
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : #include &quot;exitfail.h&quot;
+<span class="lineNum">      96 </span>            : 
+<a name="97"><span class="lineNum">      97 </span>            : /* Set exit_failure to STATUS if that's not the default already.  */</a>
+<span class="lineNum">      98 </span>            : static inline void
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 : initialize_exit_failure (int status)</span>
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   if (status != EXIT_FAILURE)</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     exit_failure = status;</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : #include &lt;dirent.h&gt;
+<span class="lineNum">     108 </span>            : #ifndef _D_EXACT_NAMLEN
+<span class="lineNum">     109 </span>            : # define _D_EXACT_NAMLEN(dp) strlen ((dp)-&gt;d_name)
+<span class="lineNum">     110 </span>            : #endif
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : enum
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span>            :   NOT_AN_INODE_NUMBER = 0
+<span class="lineNum">     115 </span>            : };
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : #ifdef D_INO_IN_DIRENT
+<span class="lineNum">     118 </span>            : # define D_INO(dp) (dp)-&gt;d_ino
+<span class="lineNum">     119 </span>            : #else
+<span class="lineNum">     120 </span>            : /* Some systems don't have inodes, so fake them to avoid lots of ifdefs.  */
+<span class="lineNum">     121 </span>            : # define D_INO(dp) NOT_AN_INODE_NUMBER
+<span class="lineNum">     122 </span>            : #endif
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : /* include here for SIZE_MAX.  */
+<span class="lineNum">     125 </span>            : #include &lt;inttypes.h&gt;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            : /* Redirection and wildcarding when done by the utility itself.
+<span class="lineNum">     128 </span>            :    Generally a noop, but used in particular for OS/2.  */
+<span class="lineNum">     129 </span>            : #ifndef initialize_main
+<span class="lineNum">     130 </span>            : # ifndef __OS2__
+<span class="lineNum">     131 </span>            : #  define initialize_main(ac, av)
+<span class="lineNum">     132 </span>            : # else
+<span class="lineNum">     133 </span>            : #  define initialize_main(ac, av) \
+<span class="lineNum">     134 </span>            :      do { _wildcard (ac, av); _response (ac, av); } while (0)
+<span class="lineNum">     135 </span>            : # endif
+<span class="lineNum">     136 </span>            : #endif
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : #include &quot;stat-macros.h&quot;
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            : #include &quot;timespec.h&quot;
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            : /* ISDIGIT differs from isdigit, as follows:
+<span class="lineNum">     145 </span>            :    - Its arg may be any int or unsigned int; it need not be an unsigned char
+<span class="lineNum">     146 </span>            :      or EOF.
+<span class="lineNum">     147 </span>            :    - It's typically faster.
+<span class="lineNum">     148 </span>            :    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
+<span class="lineNum">     149 </span>            :    isdigit unless it's important to use the locale's definition
+<span class="lineNum">     150 </span>            :    of 'digit' even when the host does not conform to POSIX.  */
+<span class="lineNum">     151 </span>            : #define ISDIGIT(c) ((unsigned int) (c) - '0' &lt;= 9)
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            : /* Convert a possibly-signed character to an unsigned character.  This is
+<a name="154"><span class="lineNum">     154 </span>            :    a bit safer than casting to unsigned char, since it catches some type</a>
+<span class="lineNum">     155 </span>            :    errors that the cast doesn't.  */
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 : static inline unsigned char to_uchar (char ch) { return ch; }</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : #include &lt;locale.h&gt;
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : /* Take care of NLS matters.  */
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">     163 </span>            : #if ! ENABLE_NLS
+<span class="lineNum">     164 </span>            : # undef textdomain
+<span class="lineNum">     165 </span>            : # define textdomain(Domainname) /* empty */
+<span class="lineNum">     166 </span>            : # undef bindtextdomain
+<span class="lineNum">     167 </span>            : # define bindtextdomain(Domainname, Dirname) /* empty */
+<span class="lineNum">     168 </span>            : #endif
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">     171 </span>            : #define N_(msgid) msgid
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            : /* Return a value that pluralizes the same way that N does, in all
+<a name="174"><span class="lineNum">     174 </span>            :    languages we know of.  */</a>
+<span class="lineNum">     175 </span>            : static inline unsigned long int
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 : select_plural (uintmax_t n)</span>
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span>            :   /* Reduce by a power of ten, but keep it away from zero.  The
+<span class="lineNum">     179 </span>            :      gettext manual says 1000000 should be safe.  */
+<span class="lineNum">     180 </span>            :   enum { PLURAL_REDUCER = 1000000 };
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   return (n &lt;= ULONG_MAX ? n : n % PLURAL_REDUCER + PLURAL_REDUCER);</span>
+<span class="lineNum">     182 </span>            : }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : #define STREQ(a, b) (strcmp (a, b) == 0)
+<span class="lineNum">     185 </span>            : #define STREQ_LEN(a, b, n) (strncmp (a, b, n) == 0)
+<span class="lineNum">     186 </span>            : #define STRPREFIX(a, b) (strncmp (a, b, strlen (b)) == 0)
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            : /* Just like strncmp, but the second argument must be a literal string
+<span class="lineNum">     189 </span>            :    and you don't specify the length;  that comes from the literal.  */
+<span class="lineNum">     190 </span>            : #define STRNCMP_LIT(s, lit) strncmp (s, &quot;&quot; lit &quot;&quot;, sizeof (lit) - 1)
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : #if !HAVE_DECL_GETLOGIN
+<span class="lineNum">     193 </span>            : char *getlogin ();
+<span class="lineNum">     194 </span>            : #endif
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            : #if !HAVE_DECL_TTYNAME
+<span class="lineNum">     197 </span>            : char *ttyname ();
+<span class="lineNum">     198 </span>            : #endif
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : #if !HAVE_DECL_GETEUID
+<span class="lineNum">     201 </span>            : uid_t geteuid ();
+<span class="lineNum">     202 </span>            : #endif
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : #if !HAVE_DECL_GETPWUID
+<span class="lineNum">     205 </span>            : struct passwd *getpwuid ();
+<span class="lineNum">     206 </span>            : #endif
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            : #if !HAVE_DECL_GETGRGID
+<span class="lineNum">     209 </span>            : struct group *getgrgid ();
+<span class="lineNum">     210 </span>            : #endif
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : /* Interix has replacements for getgr{gid,nam,ent}, that don't
+<span class="lineNum">     213 </span>            :    query the domain controller for group members when not required.
+<span class="lineNum">     214 </span>            :    This speeds up the calls tremendously (&lt;1 ms vs. &gt;3 s). */
+<span class="lineNum">     215 </span>            : /* To protect any system that could provide _nomembers functions
+<span class="lineNum">     216 </span>            :    other than interix, check for HAVE_SETGROUPS, as interix is
+<span class="lineNum">     217 </span>            :    one of the very few (the only?) platform that lacks it */
+<span class="lineNum">     218 </span>            : #if ! HAVE_SETGROUPS
+<span class="lineNum">     219 </span>            : # if HAVE_GETGRGID_NOMEMBERS
+<span class="lineNum">     220 </span>            : #  define getgrgid(gid) getgrgid_nomembers(gid)
+<span class="lineNum">     221 </span>            : # endif
+<span class="lineNum">     222 </span>            : # if HAVE_GETGRNAM_NOMEMBERS
+<span class="lineNum">     223 </span>            : #  define getgrnam(nam) getgrnam_nomembers(nam)
+<span class="lineNum">     224 </span>            : # endif
+<span class="lineNum">     225 </span>            : # if HAVE_GETGRENT_NOMEMBERS
+<span class="lineNum">     226 </span>            : #  define getgrent() getgrent_nomembers()
+<span class="lineNum">     227 </span>            : # endif
+<span class="lineNum">     228 </span>            : #endif
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            : #if !HAVE_DECL_GETUID
+<span class="lineNum">     231 </span>            : uid_t getuid ();
+<span class="lineNum">     232 </span>            : #endif
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">     235 </span>            : #include &quot;verify.h&quot;
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : /* This is simply a shorthand for the common case in which
+<span class="lineNum">     238 </span>            :    the third argument to x2nrealloc would be 'sizeof *(P)'.
+<span class="lineNum">     239 </span>            :    Ensure that sizeof *(P) is *not* 1.  In that case, it'd be
+<span class="lineNum">     240 </span>            :    better to use X2REALLOC, although not strictly necessary.  */
+<span class="lineNum">     241 </span>            : #define X2NREALLOC(P, PN) ((void) verify_true (sizeof *(P) != 1), \
+<span class="lineNum">     242 </span>            :                            x2nrealloc (P, PN, sizeof *(P)))
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            : /* Using x2realloc (when appropriate) usually makes your code more
+<span class="lineNum">     245 </span>            :    readable than using x2nrealloc, but it also makes it so your
+<span class="lineNum">     246 </span>            :    code will malfunction if sizeof *(P) ever becomes 2 or greater.
+<span class="lineNum">     247 </span>            :    So use this macro instead of using x2realloc directly.  */
+<span class="lineNum">     248 </span>            : #define X2REALLOC(P, PN) ((void) verify_true (sizeof *(P) == 1), \
+<span class="lineNum">     249 </span>            :                           x2realloc (P, PN))
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            : #include &quot;unlocked-io.h&quot;
+<span class="lineNum">     252 </span>            : #include &quot;same-inode.h&quot;
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            : #include &quot;dirname.h&quot;
+<span class="lineNum">     255 </span>            : #include &quot;openat.h&quot;
+<a name="256"><span class="lineNum">     256 </span>            : </a>
+<span class="lineNum">     257 </span>            : static inline bool
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 : dot_or_dotdot (char const *file_name)</span>
+<span class="lineNum">     259 </span>            : {
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :   if (file_name[0] == '.')</span>
+<span class="lineNum">     261 </span>            :     {
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       char sep = file_name[(file_name[1] == '.') + 1];</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :       return (! sep || ISSLASH (sep));</span>
+<span class="lineNum">     264 </span>            :     }
+<span class="lineNum">     265 </span>            :   else
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     267 </span>            : }
+<span class="lineNum">     268 </span>            : 
+<a name="269"><span class="lineNum">     269 </span>            : /* A wrapper for readdir so that callers don't see entries for '.' or '..'.  */</a>
+<span class="lineNum">     270 </span>            : static inline struct dirent const *
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 : readdir_ignoring_dot_and_dotdot (DIR *dirp)</span>
+<span class="lineNum">     272 </span>            : {
+<span class="lineNum">     273 </span>            :   while (1)
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :       struct dirent const *dp = readdir (dirp);</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :       if (dp == NULL || ! dot_or_dotdot (dp-&gt;d_name))</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :         return dp;</span>
+<span class="lineNum">     278 </span>            :     }
+<span class="lineNum">     279 </span>            : }
+<span class="lineNum">     280 </span>            : 
+<a name="281"><span class="lineNum">     281 </span>            : /* Return true if DIR is determined to be an empty directory.  */</a>
+<span class="lineNum">     282 </span>            : static inline bool
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 : is_empty_dir (int fd_cwd, char const *dir)</span>
+<span class="lineNum">     284 </span>            : {
+<span class="lineNum">     285 </span>            :   DIR *dirp;
+<span class="lineNum">     286 </span>            :   struct dirent const *dp;
+<span class="lineNum">     287 </span>            :   int saved_errno;
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :   int fd = openat (fd_cwd, dir,</span>
+<span class="lineNum">     289 </span>            :                    (O_RDONLY | O_DIRECTORY
+<span class="lineNum">     290 </span>            :                     | O_NOCTTY | O_NOFOLLOW | O_NONBLOCK));
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   if (fd &lt; 0)</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :   dirp = fdopendir (fd);</span>
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :   if (dirp == NULL)</span>
+<span class="lineNum">     297 </span>            :     {
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :       close (fd);</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     300 </span>            :     }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :   errno = 0;</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :   dp = readdir_ignoring_dot_and_dotdot (dirp);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :   saved_errno = errno;</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :   closedir (dirp);</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :   if (dp != NULL)</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :   return saved_errno == 0 ? true : false;</span>
+<span class="lineNum">     309 </span>            : }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            : /* Factor out some of the common --help and --version processing code.  */
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            : /* These enum values cannot possibly conflict with the option values
+<span class="lineNum">     314 </span>            :    ordinarily used by commands, including CHAR_MAX + 1, etc.  Avoid
+<span class="lineNum">     315 </span>            :    CHAR_MIN - 1, as it may equal -1, the getopt end-of-options value.  */
+<span class="lineNum">     316 </span>            : enum
+<span class="lineNum">     317 </span>            : {
+<span class="lineNum">     318 </span>            :   GETOPT_HELP_CHAR = (CHAR_MIN - 2),
+<span class="lineNum">     319 </span>            :   GETOPT_VERSION_CHAR = (CHAR_MIN - 3)
+<span class="lineNum">     320 </span>            : };
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            : #define GETOPT_HELP_OPTION_DECL \
+<span class="lineNum">     323 </span>            :   &quot;help&quot;, no_argument, NULL, GETOPT_HELP_CHAR
+<span class="lineNum">     324 </span>            : #define GETOPT_VERSION_OPTION_DECL \
+<span class="lineNum">     325 </span>            :   &quot;version&quot;, no_argument, NULL, GETOPT_VERSION_CHAR
+<span class="lineNum">     326 </span>            : #define GETOPT_SELINUX_CONTEXT_OPTION_DECL \
+<span class="lineNum">     327 </span>            :   &quot;context&quot;, optional_argument, NULL, 'Z'
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            : #define case_GETOPT_HELP_CHAR                   \
+<span class="lineNum">     330 </span>            :   case GETOPT_HELP_CHAR:                        \
+<span class="lineNum">     331 </span>            :     usage (EXIT_SUCCESS);                       \
+<span class="lineNum">     332 </span>            :     break;
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            : /* Program_name must be a literal string.
+<span class="lineNum">     335 </span>            :    Usually it is just PROGRAM_NAME.  */
+<span class="lineNum">     336 </span>            : #define USAGE_BUILTIN_WARNING \
+<span class="lineNum">     337 </span>            :   _(&quot;\n&quot; \
+<span class="lineNum">     338 </span>            : &quot;NOTE: your shell may have its own version of %s, which usually supersedes\n&quot; \
+<span class="lineNum">     339 </span>            : &quot;the version described here.  Please refer to your shell's documentation\n&quot; \
+<span class="lineNum">     340 </span>            : &quot;for details about the options it supports.\n&quot;)
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            : #define HELP_OPTION_DESCRIPTION \
+<span class="lineNum">     343 </span>            :   _(&quot;      --help     display this help and exit\n&quot;)
+<span class="lineNum">     344 </span>            : #define VERSION_OPTION_DESCRIPTION \
+<span class="lineNum">     345 </span>            :   _(&quot;      --version  output version information and exit\n&quot;)
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            : #include &quot;closein.h&quot;
+<span class="lineNum">     348 </span>            : #include &quot;closeout.h&quot;
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            : #define emit_bug_reporting_address unused__emit_bug_reporting_address
+<span class="lineNum">     351 </span>            : #include &quot;version-etc.h&quot;
+<span class="lineNum">     352 </span>            : #undef emit_bug_reporting_address
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            : #include &quot;propername.h&quot;
+<span class="lineNum">     355 </span>            : /* Define away proper_name (leaving proper_name_utf8, which affects far
+<span class="lineNum">     356 </span>            :    fewer programs), since it's not worth the cost of adding ~17KB to
+<span class="lineNum">     357 </span>            :    the x86_64 text size of every single program.  This avoids a 40%
+<span class="lineNum">     358 </span>            :    (almost ~2MB) increase in the on-disk space utilization for the set
+<span class="lineNum">     359 </span>            :    of the 100 binaries. */
+<span class="lineNum">     360 </span>            : #define proper_name(x) (x)
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            : #include &quot;progname.h&quot;
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            : #define case_GETOPT_VERSION_CHAR(Program_name, Authors)                 \
+<span class="lineNum">     365 </span>            :   case GETOPT_VERSION_CHAR:                                             \
+<span class="lineNum">     366 </span>            :     version_etc (stdout, Program_name, PACKAGE_NAME, Version, Authors,  \
+<span class="lineNum">     367 </span>            :                  (char *) NULL);                                        \
+<span class="lineNum">     368 </span>            :     exit (EXIT_SUCCESS);                                                \
+<span class="lineNum">     369 </span>            :     break;
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            : #ifndef MAX
+<span class="lineNum">     372 </span>            : # define MAX(a, b) ((a) &gt; (b) ? (a) : (b))
+<span class="lineNum">     373 </span>            : #endif
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            : #ifndef MIN
+<span class="lineNum">     376 </span>            : # define MIN(a,b) (((a) &lt; (b)) ? (a) : (b))
+<span class="lineNum">     377 </span>            : #endif
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            : #include &quot;intprops.h&quot;
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            : #ifndef SSIZE_MAX
+<span class="lineNum">     382 </span>            : # define SSIZE_MAX TYPE_MAXIMUM (ssize_t)
+<span class="lineNum">     383 </span>            : #endif
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            : #ifndef OFF_T_MIN
+<span class="lineNum">     386 </span>            : # define OFF_T_MIN TYPE_MINIMUM (off_t)
+<span class="lineNum">     387 </span>            : #endif
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span>            : #ifndef OFF_T_MAX
+<span class="lineNum">     390 </span>            : # define OFF_T_MAX TYPE_MAXIMUM (off_t)
+<span class="lineNum">     391 </span>            : #endif
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : #ifndef UID_T_MAX
+<span class="lineNum">     394 </span>            : # define UID_T_MAX TYPE_MAXIMUM (uid_t)
+<span class="lineNum">     395 </span>            : #endif
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            : #ifndef GID_T_MAX
+<span class="lineNum">     398 </span>            : # define GID_T_MAX TYPE_MAXIMUM (gid_t)
+<span class="lineNum">     399 </span>            : #endif
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : #ifndef PID_T_MAX
+<span class="lineNum">     402 </span>            : # define PID_T_MAX TYPE_MAXIMUM (pid_t)
+<span class="lineNum">     403 </span>            : #endif
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : /* Use this to suppress gcc's '...may be used before initialized' warnings. */
+<span class="lineNum">     406 </span>            : #ifdef lint
+<span class="lineNum">     407 </span>            : # define IF_LINT(Code) Code
+<span class="lineNum">     408 </span>            : #else
+<span class="lineNum">     409 </span>            : # define IF_LINT(Code) /* empty */
+<span class="lineNum">     410 </span>            : #endif
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span>            : #ifndef __attribute__
+<span class="lineNum">     413 </span>            : # if __GNUC__ &lt; 2 || (__GNUC__ == 2 &amp;&amp; __GNUC_MINOR__ &lt; 8)
+<span class="lineNum">     414 </span>            : #  define __attribute__(x) /* empty */
+<span class="lineNum">     415 </span>            : # endif
+<span class="lineNum">     416 </span>            : #endif
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            : #ifndef ATTRIBUTE_NORETURN
+<span class="lineNum">     419 </span>            : # define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+<span class="lineNum">     420 </span>            : #endif
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : /* The warn_unused_result attribute appeared first in gcc-3.4.0 */
+<span class="lineNum">     423 </span>            : #undef ATTRIBUTE_WARN_UNUSED_RESULT
+<span class="lineNum">     424 </span>            : #if __GNUC__ &lt; 3 || (__GNUC__ == 3 &amp;&amp; __GNUC_MINOR__ &lt; 4)
+<span class="lineNum">     425 </span>            : # define ATTRIBUTE_WARN_UNUSED_RESULT /* empty */
+<span class="lineNum">     426 </span>            : #else
+<span class="lineNum">     427 </span>            : # define ATTRIBUTE_WARN_UNUSED_RESULT __attribute__ ((__warn_unused_result__))
+<span class="lineNum">     428 </span>            : #endif
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            : #if defined strdupa
+<span class="lineNum">     431 </span>            : # define ASSIGN_STRDUPA(DEST, S)                \
+<span class="lineNum">     432 </span>            :   do { DEST = strdupa (S); } while (0)
+<span class="lineNum">     433 </span>            : #else
+<span class="lineNum">     434 </span>            : # define ASSIGN_STRDUPA(DEST, S)                \
+<span class="lineNum">     435 </span>            :   do                                            \
+<span class="lineNum">     436 </span>            :     {                                           \
+<span class="lineNum">     437 </span>            :       const char *s_ = (S);                     \
+<span class="lineNum">     438 </span>            :       size_t len_ = strlen (s_) + 1;            \
+<span class="lineNum">     439 </span>            :       char *tmp_dest_ = alloca (len_);          \
+<span class="lineNum">     440 </span>            :       DEST = memcpy (tmp_dest_, s_, len_);      \
+<span class="lineNum">     441 </span>            :     }                                           \
+<span class="lineNum">     442 </span>            :   while (0)
+<span class="lineNum">     443 </span>            : #endif
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            : #if ! HAVE_SYNC
+<span class="lineNum">     446 </span>            : # define sync() /* empty */
+<span class="lineNum">     447 </span>            : #endif
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            : /* Compute the greatest common divisor of U and V using Euclid's
+<span class="lineNum">     450 </span>            :    algorithm.  U and V must be nonzero.  */
+<a name="451"><span class="lineNum">     451 </span>            : </a>
+<span class="lineNum">     452 </span>            : static inline size_t _GL_ATTRIBUTE_CONST
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 : gcd (size_t u, size_t v)</span>
+<span class="lineNum">     454 </span>            : {
+<span class="lineNum">     455 </span>            :   do
+<span class="lineNum">     456 </span>            :     {
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :       size_t t = u % v;</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :       u = v;</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :       v = t;</span>
+<span class="lineNum">     460 </span>            :     }
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :   while (v);</span>
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :   return u;</span>
+<span class="lineNum">     464 </span>            : }
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            : /* Compute the least common multiple of U and V.  U and V must be
+<span class="lineNum">     467 </span>            :    nonzero.  There is no overflow checking, so callers should not
+<span class="lineNum">     468 </span>            :    specify outlandish sizes.  */
+<a name="469"><span class="lineNum">     469 </span>            : </a>
+<span class="lineNum">     470 </span>            : static inline size_t _GL_ATTRIBUTE_CONST
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 : lcm (size_t u, size_t v)</span>
+<span class="lineNum">     472 </span>            : {
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :   return u * (v / gcd (u, v));</span>
+<span class="lineNum">     474 </span>            : }
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span>            : /* Return PTR, aligned upward to the next multiple of ALIGNMENT.
+<span class="lineNum">     477 </span>            :    ALIGNMENT must be nonzero.  The caller must arrange for ((char *)
+<span class="lineNum">     478 </span>            :    PTR) through ((char *) PTR + ALIGNMENT - 1) to be addressable
+<span class="lineNum">     479 </span>            :    locations.  */
+<a name="480"><span class="lineNum">     480 </span>            : </a>
+<span class="lineNum">     481 </span>            : static inline void *
+<span class="lineNum">     482 </span><span class="lineCov">          1 : ptr_align (void const *ptr, size_t alignment)</span>
+<span class="lineNum">     483 </span>            : {
+<span class="lineNum">     484 </span><span class="lineCov">          1 :   char const *p0 = ptr;</span>
+<span class="lineNum">     485 </span><span class="lineCov">          1 :   char const *p1 = p0 + alignment - 1;</span>
+<span class="lineNum">     486 </span><span class="lineCov">          1 :   return (void *) (p1 - (size_t) p1 % alignment);</span>
+<span class="lineNum">     487 </span>            : }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            : /* Return whether the buffer consists entirely of NULs.
+<span class="lineNum">     490 </span>            :    Note the word after the buffer must be non NUL. */
+<a name="491"><span class="lineNum">     491 </span>            : </a>
+<span class="lineNum">     492 </span>            : static inline bool _GL_ATTRIBUTE_PURE
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 : is_nul (void const *buf, size_t bufsize)</span>
+<span class="lineNum">     494 </span>            : {
+<span class="lineNum">     495 </span>            :   typedef uintptr_t word;
+<span class="lineNum">     496 </span>            :   void const *vp;
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :   char const *cbuf = buf;</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :   word const *wp = buf;</span>
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span>            :   /* Find first nonzero *word*, or the word with the sentinel.  */
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :   while (*wp++ == 0)</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :     continue;</span>
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            :   /* Find the first nonzero *byte*, or the sentinel.  */
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :   vp = wp - 1;</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :   char const *cp = vp;</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :   while (*cp++ == 0)</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :     continue;</span>
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :   return cbuf + bufsize &lt; cp;</span>
+<span class="lineNum">     511 </span>            : }
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            : /* If 10*Accum + Digit_val is larger than the maximum value for Type,
+<span class="lineNum">     514 </span>            :    then don't update Accum and return false to indicate it would
+<span class="lineNum">     515 </span>            :    overflow.  Otherwise, set Accum to that new value and return true.
+<span class="lineNum">     516 </span>            :    Verify at compile-time that Type is Accum's type, and that Type is
+<span class="lineNum">     517 </span>            :    unsigned.  Accum must be an object, so that we can take its
+<span class="lineNum">     518 </span>            :    address.  Accum and Digit_val may be evaluated multiple times.
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span>            :    The &quot;Added check&quot; below is not strictly required, but it causes GCC
+<span class="lineNum">     521 </span>            :    to return a nonzero exit status instead of merely a warning
+<span class="lineNum">     522 </span>            :    diagnostic, and that is more useful.  */
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            : #define DECIMAL_DIGIT_ACCUMULATE(Accum, Digit_val, Type)                \
+<span class="lineNum">     525 </span>            :   (                                                                     \
+<span class="lineNum">     526 </span>            :    (void) (&amp;(Accum) == (Type *) NULL),  /* The type matches.  */    \
+<span class="lineNum">     527 </span>            :    (void) verify_true (! TYPE_SIGNED (Type)), /* The type is unsigned.  */ \
+<span class="lineNum">     528 </span>            :    (void) verify_true (sizeof (Accum) == sizeof (Type)), /* Added check.  */ \
+<span class="lineNum">     529 </span>            :    (((Type) -1 / 10 &lt; (Accum)                                                \
+<span class="lineNum">     530 </span>            :      || (Type) ((Accum) * 10 + (Digit_val)) &lt; (Accum))                       \
+<span class="lineNum">     531 </span>            :     ? false : (((Accum) = (Accum) * 10 + (Digit_val)), true))           \
+<span class="lineNum">     532 </span>            :   )
+<a name="533"><span class="lineNum">     533 </span>            : </a>
+<span class="lineNum">     534 </span>            : static inline void
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 : emit_stdin_note (void)</span>
+<span class="lineNum">     536 </span>            : {
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :   fputs (_(&quot;\n\</span>
+<span class="lineNum">     538 </span>            : With no FILE, or when FILE is -, read standard input.\n\
+<span class="lineNum">     539 </span>            : &quot;), stdout);
+<a name="540"><span class="lineNum">     540 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     541 </span>            : static inline void
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 : emit_mandatory_arg_note (void)</span>
+<span class="lineNum">     543 </span>            : {
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :   fputs (_(&quot;\n\</span>
+<span class="lineNum">     545 </span>            : Mandatory arguments to long options are mandatory for short options too.\n\
+<span class="lineNum">     546 </span>            : &quot;), stdout);
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 : }</span>
+<a name="548"><span class="lineNum">     548 </span>            : </a>
+<span class="lineNum">     549 </span>            : static inline void
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 : emit_size_note (void)</span>
+<span class="lineNum">     551 </span>            : {
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :   fputs (_(&quot;\n\</span>
+<span class="lineNum">     553 </span>            : The SIZE argument is an integer and optional unit (example: 10K is 10*1024).\n\
+<span class="lineNum">     554 </span>            : Units are K,M,G,T,P,E,Z,Y (powers of 1024) or KB,MB,... (powers of 1000).\n\
+<span class="lineNum">     555 </span>            : &quot;), stdout);
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 : }</span>
+<a name="557"><span class="lineNum">     557 </span>            : </a>
+<span class="lineNum">     558 </span>            : static inline void
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 : emit_blocksize_note (char const *program)</span>
+<span class="lineNum">     560 </span>            : {
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :   printf (_(&quot;\n\</span>
+<span class="lineNum">     562 </span>            : Display values are in units of the first available SIZE from --block-size,\n\
+<span class="lineNum">     563 </span>            : and the %s_BLOCK_SIZE, BLOCK_SIZE and BLOCKSIZE environment variables.\n\
+<span class="lineNum">     564 </span>            : Otherwise, units default to 1024 bytes (or 512 if POSIXLY_CORRECT is set).\n\
+<span class="lineNum">     565 </span>            : &quot;), program);
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 : }</span>
+<a name="567"><span class="lineNum">     567 </span>            : </a>
+<span class="lineNum">     568 </span>            : static inline void
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 : emit_ancillary_info (char const *program)</span>
+<span class="lineNum">     570 </span>            : {
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :   struct infomap { char const *program; char const *node; } const infomap[] = {</span>
+<span class="lineNum">     572 </span>            :     { &quot;[&quot;, &quot;test invocation&quot; },
+<span class="lineNum">     573 </span>            :     { &quot;coreutils&quot;, &quot;Multi-call invocation&quot; },
+<span class="lineNum">     574 </span>            :     { &quot;sha224sum&quot;, &quot;sha2 utilities&quot; },
+<span class="lineNum">     575 </span>            :     { &quot;sha256sum&quot;, &quot;sha2 utilities&quot; },
+<span class="lineNum">     576 </span>            :     { &quot;sha384sum&quot;, &quot;sha2 utilities&quot; },
+<span class="lineNum">     577 </span>            :     { &quot;sha512sum&quot;, &quot;sha2 utilities&quot; },
+<span class="lineNum">     578 </span>            :     { NULL, NULL }
+<span class="lineNum">     579 </span>            :   };
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :   char const *node = program;</span>
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :   struct infomap const *map_prog = infomap;</span>
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :   while (map_prog-&gt;program &amp;&amp; ! STREQ (program, map_prog-&gt;program))</span>
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :     map_prog++;</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :   if (map_prog-&gt;node)</span>
+<span class="lineNum">     588 </span><span class="lineNoCov">          0 :     node = map_prog-&gt;node;</span>
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :   printf (_(&quot;\n%s online help: &lt;%s&gt;\n&quot;), PACKAGE_NAME, PACKAGE_URL);</span>
+<span class="lineNum">     591 </span>            : 
+<span class="lineNum">     592 </span>            :   /* Don't output this redundant message for English locales.
+<span class="lineNum">     593 </span>            :      Note we still output for 'C' so that it gets included in the man page.  */
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :   const char *lc_messages = setlocale (LC_MESSAGES, NULL);</span>
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :   if (lc_messages &amp;&amp; STRNCMP_LIT (lc_messages, &quot;en_&quot;))</span>
+<span class="lineNum">     596 </span>            :     {
+<span class="lineNum">     597 </span>            :       /* TRANSLATORS: Replace LANG_CODE in this URL with your language code
+<span class="lineNum">     598 </span>            :          &lt;http://translationproject.org/team/LANG_CODE.html&gt; to form one of
+<span class="lineNum">     599 </span>            :          the URLs at http://translationproject.org/team/.  Otherwise, replace
+<span class="lineNum">     600 </span>            :          the entire URL with your translation team's email address.  */
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :       printf (_(&quot;Report %s translation bugs to &quot;</span>
+<span class="lineNum">     602 </span>            :                 &quot;&lt;http://translationproject.org/team/&gt;\n&quot;), program);
+<span class="lineNum">     603 </span>            :     }
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 :   printf (_(&quot;Full documentation at: &lt;%s%s&gt;\n&quot;),</span>
+<span class="lineNum">     605 </span>            :           PACKAGE_URL, program);
+<span class="lineNum">     606 </span><span class="lineNoCov">          0 :   printf (_(&quot;or available locally via: info '(coreutils) %s%s'\n&quot;),</span>
+<span class="lineNum">     607 </span>            :           node, node == program ? &quot; invocation&quot; : &quot;&quot;);
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 : }</span>
+<a name="609"><span class="lineNum">     609 </span>            : </a>
+<span class="lineNum">     610 </span>            : static inline void
+<span class="lineNum">     611 </span><span class="lineCov">          1 : emit_try_help (void)</span>
+<span class="lineNum">     612 </span>            : {
+<span class="lineNum">     613 </span><span class="lineCov">          1 :   fprintf (stderr, _(&quot;Try '%s --help' for more information.\n&quot;), program_name);</span>
+<span class="lineNum">     614 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span>            : #include &quot;inttostr.h&quot;
+<a name="617"><span class="lineNum">     617 </span>            : </a>
+<span class="lineNum">     618 </span>            : static inline char *
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 : timetostr (time_t t, char *buf)</span>
+<span class="lineNum">     620 </span>            : {
+<span class="lineNum">     621 </span>            :   return (TYPE_SIGNED (time_t)
+<span class="lineNum">     622 </span>            :           ? imaxtostr (t, buf)
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :           : umaxtostr (t, buf));</span>
+<span class="lineNum">     624 </span>            : }
+<a name="625"><span class="lineNum">     625 </span>            : </a>
+<span class="lineNum">     626 </span>            : static inline char *
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 : bad_cast (char const *s)</span>
+<span class="lineNum">     628 </span>            : {
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :   return (char *) s;</span>
+<span class="lineNum">     630 </span>            : }
+<span class="lineNum">     631 </span>            : 
+<a name="632"><span class="lineNum">     632 </span>            : /* Return a boolean indicating whether SB-&gt;st_size is defined.  */</a>
+<span class="lineNum">     633 </span>            : static inline bool
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 : usable_st_size (struct stat const *sb)</span>
+<span class="lineNum">     635 </span>            : {
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :   return (S_ISREG (sb-&gt;st_mode) || S_ISLNK (sb-&gt;st_mode)</span>
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :           || S_TYPEISSHM (sb) || S_TYPEISTMO (sb));</span>
+<span class="lineNum">     638 </span>            : }
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span>            : void usage (int status) ATTRIBUTE_NORETURN;
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            : /* Like error(0, 0, ...), but without an implicit newline.
+<span class="lineNum">     643 </span>            :    Also a noop unless the global DEV_DEBUG is set.  */
+<span class="lineNum">     644 </span>            : #define devmsg(...)                     \
+<span class="lineNum">     645 </span>            :   do                                    \
+<span class="lineNum">     646 </span>            :     {                                   \
+<span class="lineNum">     647 </span>            :       if (dev_debug)                    \
+<span class="lineNum">     648 </span>            :         fprintf (stderr, __VA_ARGS__);  \
+<span class="lineNum">     649 </span>            :     }                                   \
+<span class="lineNum">     650 </span>            :   while (0)
+<span class="lineNum">     651 </span>            : 
+<span class="lineNum">     652 </span>            : #define emit_cycle_warning(file_name)   \
+<span class="lineNum">     653 </span>            :   do                                    \
+<span class="lineNum">     654 </span>            :     {                                   \
+<span class="lineNum">     655 </span>            :       error (0, 0, _(&quot;\
+<span class="lineNum">     656 </span>            : WARNING: Circular directory structure.\n\
+<span class="lineNum">     657 </span>            : This almost certainly means that you have a corrupted file system.\n\
+<span class="lineNum">     658 </span>            : NOTIFY YOUR SYSTEM MANAGER.\n\
+<span class="lineNum">     659 </span>            : The following directory is part of the cycle:\n  %s\n&quot;), \
+<span class="lineNum">     660 </span>            :              quote (file_name));        \
+<span class="lineNum">     661 </span>            :     }                                   \
+<span class="lineNum">     662 </span>            :   while (0)
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            : /* Like stpncpy, but do ensure that the result is NUL-terminated,
+<span class="lineNum">     665 </span>            :    and do not NUL-pad out to LEN.  I.e., when strnlen (src, len) == len,
+<span class="lineNum">     666 </span>            :    this function writes a NUL byte into dest[len].  Thus, the length
+<span class="lineNum">     667 </span>            :    of the destination buffer must be at least LEN + 1.
+<a name="668"><span class="lineNum">     668 </span>            :    The DEST and SRC buffers must not overlap.  */</a>
+<span class="lineNum">     669 </span>            : static inline char *
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 : stzncpy (char *restrict dest, char const *restrict src, size_t len)</span>
+<span class="lineNum">     671 </span>            : {
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :   char const *src_end = src + len;</span>
+<span class="lineNum">     673 </span><span class="lineNoCov">          0 :   while (src &lt; src_end &amp;&amp; *src)</span>
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :     *dest++ = *src++;</span>
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :   *dest = 0;</span>
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :   return dest;</span>
+<span class="lineNum">     677 </span>            : }
+<span class="lineNum">     678 </span>            : 
+<span class="lineNum">     679 </span>            : #ifndef ARRAY_CARDINALITY
+<span class="lineNum">     680 </span>            : # define ARRAY_CARDINALITY(Array) (sizeof (Array) / sizeof *(Array))
+<span class="lineNum">     681 </span>            : #endif
+<span class="lineNum">     682 </span>            : 
+<span class="lineNum">     683 </span>            : /* Avoid const warnings by casting to more portable type.
+<span class="lineNum">     684 </span>            :    This is to cater for the incorrect const function declarations
+<a name="685"><span class="lineNum">     685 </span>            :    in selinux.h before libselinux-2.3 (May 2014).</a>
+<span class="lineNum">     686 </span>            :    When version &gt;= 2.3 is ubiquitous remove this function.  */
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 : static inline char * se_const (char const * sctx) { return (char *) sctx; }</span>
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            : /* Return true if ERR is ENOTSUP or EOPNOTSUPP, otherwise false.
+<span class="lineNum">     690 </span>            :    This wrapper function avoids the redundant 'or'd comparison on
+<span class="lineNum">     691 </span>            :    systems like Linux for which they have the same value.  It also
+<a name="692"><span class="lineNum">     692 </span>            :    avoids the gcc warning to that effect.  */</a>
+<span class="lineNum">     693 </span>            : static inline bool
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 : is_ENOTSUP (int err)</span>
+<span class="lineNum">     695 </span>            : {
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 :   return err == EOPNOTSUPP || (ENOTSUP != EOPNOTSUPP &amp;&amp; err == ENOTSUP);</span>
+<span class="lineNum">     697 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

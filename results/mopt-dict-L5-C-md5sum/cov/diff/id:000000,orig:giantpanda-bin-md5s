@@ -1,0 +1,81 @@
+diff (init) -> id:000000,orig:giantpanda-bin-md5s
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/fflush.c
+  New 'line' coverage: 149
+  New 'line' coverage: 150
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/src/system.h
+  New 'function' coverage: emit_try_help()
+  New 'function' coverage: ptr_align()
+  New 'line' coverage: 482
+  New 'line' coverage: 484
+  New 'line' coverage: 485
+  New 'line' coverage: 486
+  New 'line' coverage: 611
+  New 'line' coverage: 613
+  New 'line' coverage: 614
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/close-stream.c
+  New 'function' coverage: close_stream()
+  New 'line' coverage: 57
+  New 'line' coverage: 59
+  New 'line' coverage: 60
+  New 'line' coverage: 61
+  New 'line' coverage: 71
+  New 'line' coverage: 78
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/stdio.h
+  New 'function' coverage: rpl_fclose()
+  New 'function' coverage: rpl_fflush()
+  New 'line' coverage: 486
+  New 'line' coverage: 530
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/src/md5sum.c
+  New 'function' coverage: lava_get()
+  New 'function' coverage: main()
+  New 'function' coverage: usage()
+  New 'line' coverage: 10
+  New 'line' coverage: 11
+  New 'line' coverage: 17
+  New 'line' coverage: 176
+  New 'line' coverage: 178
+  New 'line' coverage: 179
+  New 'line' coverage: 237
+  New 'line' coverage: 8
+  New 'line' coverage: 821
+  New 'line' coverage: 825
+  New 'line' coverage: 826
+  New 'line' coverage: 828
+  New 'line' coverage: 829
+  New 'line' coverage: 830
+  New 'line' coverage: 834
+  New 'line' coverage: 835
+  New 'line' coverage: 836
+  New 'line' coverage: 837
+  New 'line' coverage: 839
+  New 'line' coverage: 843
+  New 'line' coverage: 845
+  New 'line' coverage: 846
+  New 'line' coverage: 881
+  New 'line' coverage: 882
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/closeout.c
+  New 'function' coverage: close_stdout()
+  New 'line' coverage: 107
+  New 'line' coverage: 109
+  New 'line' coverage: 122
+  New 'line' coverage: 124
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/fclose.c
+  New 'line' coverage: 104
+  New 'line' coverage: 110
+  New 'line' coverage: 59
+  New 'line' coverage: 61
+  New 'line' coverage: 64
+  New 'line' coverage: 65
+  New 'line' coverage: 71
+  New 'line' coverage: 72
+  New 'line' coverage: 99
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/progname.c
+  New 'function' coverage: set_program_name()
+  New 'line' coverage: 39
+  New 'line' coverage: 51
+  New 'line' coverage: 59
+  New 'line' coverage: 60
+  New 'line' coverage: 61
+  New 'line' coverage: 84
+  New 'line' coverage: 90
+  New 'line' coverage: 92

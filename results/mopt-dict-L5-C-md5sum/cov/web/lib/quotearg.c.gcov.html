@@ -1,0 +1,1044 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/quotearg.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - quotearg.c<span style="font-size: 80%;"> (source / <a href="quotearg.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">368</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* quotearg.c - quote arguments for output</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1998-2002, 2004-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Paul Eggert &lt;eggert@twinsun.com&gt; */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* Without this pragma, gcc 4.7.0 20111124 mistakenly suggests that
+<span class="lineNum">      21 </span>            :    the quoting_options_from_style function might be candidate for
+<span class="lineNum">      22 </span>            :    attribute 'pure'  */
+<span class="lineNum">      23 </span>            : #if (__GNUC__ == 4 &amp;&amp; 6 &lt;= __GNUC_MINOR__) || 4 &lt; __GNUC__
+<span class="lineNum">      24 </span>            : # pragma GCC diagnostic ignored &quot;-Wsuggest-attribute=pure&quot;
+<span class="lineNum">      25 </span>            : #endif
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &quot;quotearg.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;quote.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;c-strcaseeq.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;localcharset.h&quot;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">      37 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      38 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      39 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      40 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      41 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      42 </span>            : #include &lt;wchar.h&gt;
+<span class="lineNum">      43 </span>            : #include &lt;wctype.h&gt;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      46 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      47 </span>            : #define N_(msgid) msgid
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #ifndef SIZE_MAX
+<span class="lineNum">      50 </span>            : # define SIZE_MAX ((size_t) -1)
+<span class="lineNum">      51 </span>            : #endif
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : #define INT_BITS (sizeof (int) * CHAR_BIT)
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : struct quoting_options
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            :   /* Basic quoting style.  */
+<span class="lineNum">      58 </span>            :   enum quoting_style style;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :   /* Additional flags.  Bitwise combination of enum quoting_flags.  */
+<span class="lineNum">      61 </span>            :   int flags;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :   /* Quote the characters indicated by this bit vector even if the
+<span class="lineNum">      64 </span>            :      quoting style would not normally require them to be quoted.  */
+<span class="lineNum">      65 </span>            :   unsigned int quote_these_too[(UCHAR_MAX / INT_BITS) + 1];
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :   /* The left quote for custom_quoting_style.  */
+<span class="lineNum">      68 </span>            :   char const *left_quote;
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :   /* The right quote for custom_quoting_style.  */
+<span class="lineNum">      71 </span>            :   char const *right_quote;
+<span class="lineNum">      72 </span>            : };
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : /* Names of quoting styles.  */
+<span class="lineNum">      75 </span>            : char const *const quoting_style_args[] =
+<span class="lineNum">      76 </span>            : {
+<span class="lineNum">      77 </span>            :   &quot;literal&quot;,
+<span class="lineNum">      78 </span>            :   &quot;shell&quot;,
+<span class="lineNum">      79 </span>            :   &quot;shell-always&quot;,
+<span class="lineNum">      80 </span>            :   &quot;c&quot;,
+<span class="lineNum">      81 </span>            :   &quot;c-maybe&quot;,
+<span class="lineNum">      82 </span>            :   &quot;escape&quot;,
+<span class="lineNum">      83 </span>            :   &quot;locale&quot;,
+<span class="lineNum">      84 </span>            :   &quot;clocale&quot;,
+<span class="lineNum">      85 </span>            :   0
+<span class="lineNum">      86 </span>            : };
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            : /* Correspondences to quoting style names.  */
+<span class="lineNum">      89 </span>            : enum quoting_style const quoting_style_vals[] =
+<span class="lineNum">      90 </span>            : {
+<span class="lineNum">      91 </span>            :   literal_quoting_style,
+<span class="lineNum">      92 </span>            :   shell_quoting_style,
+<span class="lineNum">      93 </span>            :   shell_always_quoting_style,
+<span class="lineNum">      94 </span>            :   c_quoting_style,
+<span class="lineNum">      95 </span>            :   c_maybe_quoting_style,
+<span class="lineNum">      96 </span>            :   escape_quoting_style,
+<span class="lineNum">      97 </span>            :   locale_quoting_style,
+<span class="lineNum">      98 </span>            :   clocale_quoting_style
+<span class="lineNum">      99 </span>            : };
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /* The default quoting options.  */
+<span class="lineNum">     102 </span>            : static struct quoting_options default_quoting_options;
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            : /* Allocate a new set of quoting options, with contents initially identical
+<span class="lineNum">     105 </span>            :    to O if O is not null, or to the default if O is null.
+<a name="106"><span class="lineNum">     106 </span>            :    It is the caller's responsibility to free the result.  */</a>
+<span class="lineNum">     107 </span>            : struct quoting_options *
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 : clone_quoting_options (struct quoting_options *o)</span>
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   int e = errno;</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   struct quoting_options *p = xmemdup (o ? o : &amp;default_quoting_options,</span>
+<span class="lineNum">     112 </span>            :                                        sizeof *o);
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   errno = e;</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   return p;</span>
+<span class="lineNum">     115 </span>            : }
+<span class="lineNum">     116 </span>            : 
+<a name="117"><span class="lineNum">     117 </span>            : /* Get the value of O's quoting style.  If O is null, use the default.  */</a>
+<span class="lineNum">     118 </span>            : enum quoting_style
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 : get_quoting_style (struct quoting_options *o)</span>
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   return (o ? o : &amp;default_quoting_options)-&gt;style;</span>
+<span class="lineNum">     122 </span>            : }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : /* In O (or in the default if O is null),
+<a name="125"><span class="lineNum">     125 </span>            :    set the value of the quoting style to S.  */</a>
+<span class="lineNum">     126 </span>            : void
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 : set_quoting_style (struct quoting_options *o, enum quoting_style s)</span>
+<span class="lineNum">     128 </span>            : {
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   (o ? o : &amp;default_quoting_options)-&gt;style = s;</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : /* In O (or in the default if O is null),
+<span class="lineNum">     133 </span>            :    set the value of the quoting options for character C to I.
+<span class="lineNum">     134 </span>            :    Return the old value.  Currently, the only values defined for I are
+<span class="lineNum">     135 </span>            :    0 (the default) and 1 (which means to quote the character even if
+<a name="136"><span class="lineNum">     136 </span>            :    it would not otherwise be quoted).  */</a>
+<span class="lineNum">     137 </span>            : int
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 : set_char_quoting (struct quoting_options *o, char c, int i)</span>
+<span class="lineNum">     139 </span>            : {
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   unsigned char uc = c;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   unsigned int *p =</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     (o ? o : &amp;default_quoting_options)-&gt;quote_these_too + uc / INT_BITS;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :   int shift = uc % INT_BITS;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   int r = (*p &gt;&gt; shift) &amp; 1;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :   *p ^= ((i &amp; 1) ^ r) &lt;&lt; shift;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   return r;</span>
+<span class="lineNum">     147 </span>            : }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            : /* In O (or in the default if O is null),
+<span class="lineNum">     150 </span>            :    set the value of the quoting options flag to I, which can be a
+<span class="lineNum">     151 </span>            :    bitwise combination of enum quoting_flags, or 0 for default
+<a name="152"><span class="lineNum">     152 </span>            :    behavior.  Return the old value.  */</a>
+<span class="lineNum">     153 </span>            : int
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 : set_quoting_flags (struct quoting_options *o, int i)</span>
+<span class="lineNum">     155 </span>            : {
+<span class="lineNum">     156 </span>            :   int r;
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   if (!o)</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     o = &amp;default_quoting_options;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :   r = o-&gt;flags;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :   o-&gt;flags = i;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :   return r;</span>
+<span class="lineNum">     162 </span>            : }
+<a name="163"><span class="lineNum">     163 </span>            : </a>
+<span class="lineNum">     164 </span>            : void
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 : set_custom_quoting (struct quoting_options *o,</span>
+<span class="lineNum">     166 </span>            :                     char const *left_quote, char const *right_quote)
+<span class="lineNum">     167 </span>            : {
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   if (!o)</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     o = &amp;default_quoting_options;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :   o-&gt;style = custom_quoting_style;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   if (!left_quote || !right_quote)</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   o-&gt;left_quote = left_quote;</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :   o-&gt;right_quote = right_quote;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     176 </span>            : 
+<a name="177"><span class="lineNum">     177 </span>            : /* Return quoting options for STYLE, with no extra quoting.  */</a>
+<span class="lineNum">     178 </span>            : static struct quoting_options /* NOT PURE!! */
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 : quoting_options_from_style (enum quoting_style style)</span>
+<span class="lineNum">     180 </span>            : {
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   struct quoting_options o = { literal_quoting_style, 0, { 0 }, NULL, NULL };</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :   if (style == custom_quoting_style)</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :   o.style = style;</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   return o;</span>
+<span class="lineNum">     186 </span>            : }
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            : /* MSGID approximates a quotation mark.  Return its translation if it
+<span class="lineNum">     189 </span>            :    has one; otherwise, return either it or &quot;\&quot;&quot;, depending on S.
+<span class="lineNum">     190 </span>            : 
+<a name="191"><span class="lineNum">     191 </span>            :    S is either clocale_quoting_style or locale_quoting_style.  */</a>
+<span class="lineNum">     192 </span>            : static char const *
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 : gettext_quote (char const *msgid, enum quoting_style s)</span>
+<span class="lineNum">     194 </span>            : {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :   char const *translation = _(msgid);</span>
+<span class="lineNum">     196 </span>            :   char const *locale_code;
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :   if (translation != msgid)</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     return translation;</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :   /* For UTF-8 and GB-18030, use single quotes U+2018 and U+2019.
+<span class="lineNum">     202 </span>            :      Here is a list of other locales that include U+2018 and U+2019:
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :         ISO-8859-7   0xA1                 KOI8-T       0x91
+<span class="lineNum">     205 </span>            :         CP869        0x8B                 CP874        0x91
+<span class="lineNum">     206 </span>            :         CP932        0x81 0x65            CP936        0xA1 0xAE
+<span class="lineNum">     207 </span>            :         CP949        0xA1 0xAE            CP950        0xA1 0xA5
+<span class="lineNum">     208 </span>            :         CP1250       0x91                 CP1251       0x91
+<span class="lineNum">     209 </span>            :         CP1252       0x91                 CP1253       0x91
+<span class="lineNum">     210 </span>            :         CP1254       0x91                 CP1255       0x91
+<span class="lineNum">     211 </span>            :         CP1256       0x91                 CP1257       0x91
+<span class="lineNum">     212 </span>            :         EUC-JP       0xA1 0xC6            EUC-KR       0xA1 0xAE
+<span class="lineNum">     213 </span>            :         EUC-TW       0xA1 0xE4            BIG5         0xA1 0xA5
+<span class="lineNum">     214 </span>            :         BIG5-HKSCS   0xA1 0xA5            EUC-CN       0xA1 0xAE
+<span class="lineNum">     215 </span>            :         GBK          0xA1 0xAE            Georgian-PS  0x91
+<span class="lineNum">     216 </span>            :         PT154        0x91
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :      None of these is still in wide use; using iconv is overkill.  */
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   locale_code = locale_charset ();</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :   if (STRCASEEQ (locale_code, &quot;UTF-8&quot;, 'U','T','F','-','8',0,0,0,0))</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :     return msgid[0] == '`' ? &quot;\xe2\x80\x98&quot;: &quot;\xe2\x80\x99&quot;;</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :   if (STRCASEEQ (locale_code, &quot;GB18030&quot;, 'G','B','1','8','0','3','0',0,0))</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :     return msgid[0] == '`' ? &quot;\xa1\ae&quot;: &quot;\xa1\xaf&quot;;</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :   return (s == clocale_quoting_style ? &quot;\&quot;&quot; : &quot;'&quot;);</span>
+<span class="lineNum">     226 </span>            : }
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            : /* Place into buffer BUFFER (of size BUFFERSIZE) a quoted version of
+<span class="lineNum">     229 </span>            :    argument ARG (of size ARGSIZE), using QUOTING_STYLE, FLAGS, and
+<span class="lineNum">     230 </span>            :    QUOTE_THESE_TOO to control quoting.
+<span class="lineNum">     231 </span>            :    Terminate the output with a null character, and return the written
+<span class="lineNum">     232 </span>            :    size of the output, not counting the terminating null.
+<span class="lineNum">     233 </span>            :    If BUFFERSIZE is too small to store the output string, return the
+<span class="lineNum">     234 </span>            :    value that would have been returned had BUFFERSIZE been large enough.
+<span class="lineNum">     235 </span>            :    If ARGSIZE is SIZE_MAX, use the string length of the argument for ARGSIZE.
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :    This function acts like quotearg_buffer (BUFFER, BUFFERSIZE, ARG,
+<span class="lineNum">     238 </span>            :    ARGSIZE, O), except it breaks O into its component pieces and is
+<span class="lineNum">     239 </span>            :    not careful about errno.  */
+<a name="240"><span class="lineNum">     240 </span>            : </a>
+<span class="lineNum">     241 </span>            : static size_t
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 : quotearg_buffer_restyled (char *buffer, size_t buffersize,</span>
+<span class="lineNum">     243 </span>            :                           char const *arg, size_t argsize,
+<span class="lineNum">     244 </span>            :                           enum quoting_style quoting_style, int flags,
+<span class="lineNum">     245 </span>            :                           unsigned int const *quote_these_too,
+<span class="lineNum">     246 </span>            :                           char const *left_quote,
+<span class="lineNum">     247 </span>            :                           char const *right_quote)
+<span class="lineNum">     248 </span>            : {
+<span class="lineNum">     249 </span>            :   size_t i;
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :   size_t len = 0;</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :   char const *quote_string = 0;</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :   size_t quote_string_len = 0;</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :   bool backslash_escapes = false;</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :   bool unibyte_locale = MB_CUR_MAX == 1;</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :   bool elide_outer_quotes = (flags &amp; QA_ELIDE_OUTER_QUOTES) != 0;</span>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : #define STORE(c) \
+<span class="lineNum">     258 </span>            :     do \
+<span class="lineNum">     259 </span>            :       { \
+<span class="lineNum">     260 </span>            :         if (len &lt; buffersize) \
+<span class="lineNum">     261 </span>            :           buffer[len] = (c); \
+<span class="lineNum">     262 </span>            :         len++; \
+<span class="lineNum">     263 </span>            :       } \
+<span class="lineNum">     264 </span>            :     while (0)
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :   switch (quoting_style)</span>
+<span class="lineNum">     267 </span>            :     {
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :     case c_maybe_quoting_style:</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       quoting_style = c_quoting_style;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :       elide_outer_quotes = true;</span>
+<span class="lineNum">     271 </span>            :       /* Fall through.  */
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     case c_quoting_style:</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       if (!elide_outer_quotes)</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :         STORE ('&quot;');</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :       backslash_escapes = true;</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :       quote_string = &quot;\&quot;&quot;;</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :       quote_string_len = 1;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :     case escape_quoting_style:</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :       backslash_escapes = true;</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       elide_outer_quotes = false;</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :     case locale_quoting_style:</span>
+<span class="lineNum">     286 </span>            :     case clocale_quoting_style:
+<span class="lineNum">     287 </span>            :     case custom_quoting_style:
+<span class="lineNum">     288 </span>            :       {
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :         if (quoting_style != custom_quoting_style)</span>
+<span class="lineNum">     290 </span>            :           {
+<span class="lineNum">     291 </span>            :             /* TRANSLATORS:
+<span class="lineNum">     292 </span>            :                Get translations for open and closing quotation marks.
+<span class="lineNum">     293 </span>            :                The message catalog should translate &quot;`&quot; to a left
+<span class="lineNum">     294 </span>            :                quotation mark suitable for the locale, and similarly for
+<span class="lineNum">     295 </span>            :                &quot;'&quot;.  For example, a French Unicode local should translate
+<span class="lineNum">     296 </span>            :                these to U+00AB (LEFT-POINTING DOUBLE ANGLE
+<span class="lineNum">     297 </span>            :                QUOTATION MARK), and U+00BB (RIGHT-POINTING DOUBLE ANGLE
+<span class="lineNum">     298 </span>            :                QUOTATION MARK), respectively.
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :                If the catalog has no translation, we will try to
+<span class="lineNum">     301 </span>            :                use Unicode U+2018 (LEFT SINGLE QUOTATION MARK) and
+<span class="lineNum">     302 </span>            :                Unicode U+2019 (RIGHT SINGLE QUOTATION MARK).  If the
+<span class="lineNum">     303 </span>            :                current locale is not Unicode, locale_quoting_style
+<span class="lineNum">     304 </span>            :                will quote 'like this', and clocale_quoting_style will
+<span class="lineNum">     305 </span>            :                quote &quot;like this&quot;.  You should always include translations
+<span class="lineNum">     306 </span>            :                for &quot;`&quot; and &quot;'&quot; even if U+2018 and U+2019 are appropriate
+<span class="lineNum">     307 </span>            :                for your locale.
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :                If you don't know what to put here, please see
+<span class="lineNum">     310 </span>            :                &lt;http://en.wikipedia.org/wiki/Quotation_marks_in_other_languages&gt;
+<span class="lineNum">     311 </span>            :                and use glyphs suitable for your language.  */
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :             left_quote = gettext_quote (N_(&quot;`&quot;), quoting_style);</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :             right_quote = gettext_quote (N_(&quot;'&quot;), quoting_style);</span>
+<span class="lineNum">     314 </span>            :           }
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :         if (!elide_outer_quotes)</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :           for (quote_string = left_quote; *quote_string; quote_string++)</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :             STORE (*quote_string);</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :         backslash_escapes = true;</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :         quote_string = right_quote;</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :         quote_string_len = strlen (quote_string);</span>
+<span class="lineNum">     321 </span>            :       }
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     case shell_quoting_style:</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :       quoting_style = shell_always_quoting_style;</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :       elide_outer_quotes = true;</span>
+<span class="lineNum">     327 </span>            :       /* Fall through.  */
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :     case shell_always_quoting_style:</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :       if (!elide_outer_quotes)</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :         STORE ('\'');</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :       quote_string = &quot;'&quot;;</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :       quote_string_len = 1;</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :     case literal_quoting_style:</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :       elide_outer_quotes = false;</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :     default:</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :       abort ();</span>
+<span class="lineNum">     341 </span>            :     }
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :   for (i = 0;  ! (argsize == SIZE_MAX ? arg[i] == '\0' : i == argsize);  i++)</span>
+<span class="lineNum">     344 </span>            :     {
+<span class="lineNum">     345 </span>            :       unsigned char c;
+<span class="lineNum">     346 </span>            :       unsigned char esc;
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :       bool is_right_quote = false;</span>
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :       if (backslash_escapes</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :           &amp;&amp; quote_string_len</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :           &amp;&amp; (i + quote_string_len</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :               &lt;= (argsize == SIZE_MAX &amp;&amp; 1 &lt; quote_string_len</span>
+<span class="lineNum">     353 </span>            :                   /* Use strlen only if we must: when argsize is SIZE_MAX,
+<span class="lineNum">     354 </span>            :                      and when the quote string is more than 1 byte long.
+<span class="lineNum">     355 </span>            :                      If we do call strlen, save the result.  */
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                   ? (argsize = strlen (arg)) : argsize))</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :           &amp;&amp; memcmp (arg + i, quote_string, quote_string_len) == 0)</span>
+<span class="lineNum">     358 </span>            :         {
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :           if (elide_outer_quotes)</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :             goto force_outer_quoting_style;</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :           is_right_quote = true;</span>
+<span class="lineNum">     362 </span>            :         }
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :       c = arg[i];</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :       switch (c)</span>
+<span class="lineNum">     366 </span>            :         {
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :         case '\0':</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :           if (backslash_escapes)</span>
+<span class="lineNum">     369 </span>            :             {
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :               if (elide_outer_quotes)</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                 goto force_outer_quoting_style;</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :               STORE ('\\');</span>
+<span class="lineNum">     373 </span>            :               /* If quote_string were to begin with digits, we'd need to
+<span class="lineNum">     374 </span>            :                  test for the end of the arg as well.  However, it's
+<span class="lineNum">     375 </span>            :                  hard to imagine any locale that would use digits in
+<span class="lineNum">     376 </span>            :                  quotes, and set_custom_quoting is documented not to
+<span class="lineNum">     377 </span>            :                  accept them.  */
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :               if (i + 1 &lt; argsize &amp;&amp; '0' &lt;= arg[i + 1] &amp;&amp; arg[i + 1] &lt;= '9')</span>
+<span class="lineNum">     379 </span>            :                 {
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :                   STORE ('0');</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :                   STORE ('0');</span>
+<span class="lineNum">     382 </span>            :                 }
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :               c = '0';</span>
+<span class="lineNum">     384 </span>            :               /* We don't have to worry that this last '0' will be
+<span class="lineNum">     385 </span>            :                  backslash-escaped because, again, quote_string should
+<span class="lineNum">     386 </span>            :                  not start with it and because quote_these_too is
+<span class="lineNum">     387 </span>            :                  documented as not accepting it.  */
+<span class="lineNum">     388 </span>            :             }
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :           else if (flags &amp; QA_ELIDE_NULL_BYTES)</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :         case '?':</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :           switch (quoting_style)</span>
+<span class="lineNum">     395 </span>            :             {
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :             case shell_always_quoting_style:</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :               if (elide_outer_quotes)</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :                 goto force_outer_quoting_style;</span>
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :             case c_quoting_style:</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :               if ((flags &amp; QA_SPLIT_TRIGRAPHS)</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :                   &amp;&amp; i + 2 &lt; argsize &amp;&amp; arg[i + 1] == '?')</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :                 switch (arg[i + 2])</span>
+<span class="lineNum">     405 </span>            :                   {
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :                   case '!': case '\'':</span>
+<span class="lineNum">     407 </span>            :                   case '(': case ')': case '-': case '/':
+<span class="lineNum">     408 </span>            :                   case '&lt;': case '=': case '&gt;':
+<span class="lineNum">     409 </span>            :                     /* Escape the second '?' in what would otherwise be
+<span class="lineNum">     410 </span>            :                        a trigraph.  */
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                     if (elide_outer_quotes)</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                       goto force_outer_quoting_style;</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                     c = arg[i + 2];</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                     i += 2;</span>
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :                     STORE ('?');</span>
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :                     STORE ('&quot;');</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :                     STORE ('&quot;');</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :                     STORE ('?');</span>
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :                   default:</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     423 </span>            :                   }
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :             default:</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     428 </span>            :             }
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :         case '\a': esc = 'a'; goto c_escape;</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :         case '\b': esc = 'b'; goto c_escape;</span>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :         case '\f': esc = 'f'; goto c_escape;</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :         case '\n': esc = 'n'; goto c_and_shell_escape;</span>
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :         case '\r': esc = 'r'; goto c_and_shell_escape;</span>
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :         case '\t': esc = 't'; goto c_and_shell_escape;</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :         case '\v': esc = 'v'; goto c_escape;</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :         case '\\': esc = c;</span>
+<span class="lineNum">     439 </span>            :           /* No need to escape the escape if we are trying to elide
+<span class="lineNum">     440 </span>            :              outer quotes and nothing else is problematic.  */
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :           if (backslash_escapes &amp;&amp; elide_outer_quotes &amp;&amp; quote_string_len)</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :             goto store_c;</span>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :         c_and_shell_escape:</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :           if (quoting_style == shell_always_quoting_style</span>
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :               &amp;&amp; elide_outer_quotes)</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :             goto force_outer_quoting_style;</span>
+<span class="lineNum">     448 </span>            :           /* Fall through.  */
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :         c_escape:</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :           if (backslash_escapes)</span>
+<span class="lineNum">     451 </span>            :             {
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :               c = esc;</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :               goto store_escape;</span>
+<span class="lineNum">     454 </span>            :             }
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :         case '{': case '}': /* sometimes special if isolated */</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :           if (! (argsize == SIZE_MAX ? arg[1] == '\0' : argsize == 1))</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     460 </span>            :           /* Fall through.  */
+<span class="lineNum">     461 </span>            :         case '#': case '~':
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :           if (i != 0)</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     464 </span>            :           /* Fall through.  */
+<span class="lineNum">     465 </span>            :         case ' ':
+<span class="lineNum">     466 </span>            :         case '!': /* special in bash */
+<span class="lineNum">     467 </span>            :         case '&quot;': case '$': case '&amp;':
+<span class="lineNum">     468 </span>            :         case '(': case ')': case '*': case ';':
+<span class="lineNum">     469 </span>            :         case '&lt;':
+<span class="lineNum">     470 </span>            :         case '=': /* sometimes special in 0th or (with &quot;set -k&quot;) later args */
+<span class="lineNum">     471 </span>            :         case '&gt;': case '[':
+<span class="lineNum">     472 </span>            :         case '^': /* special in old /bin/sh, e.g. SunOS 4.1.4 */
+<span class="lineNum">     473 </span>            :         case '`': case '|':
+<span class="lineNum">     474 </span>            :           /* A shell special character.  In theory, '$' and '`' could
+<span class="lineNum">     475 </span>            :              be the first bytes of multibyte characters, which means
+<span class="lineNum">     476 </span>            :              we should check them with mbrtowc, but in practice this
+<span class="lineNum">     477 </span>            :              doesn't happen so it's not worth worrying about.  */
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :           if (quoting_style == shell_always_quoting_style</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :               &amp;&amp; elide_outer_quotes)</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :             goto force_outer_quoting_style;</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :         case '\'':</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :           if (quoting_style == shell_always_quoting_style)</span>
+<span class="lineNum">     485 </span>            :             {
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :               if (elide_outer_quotes)</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :                 goto force_outer_quoting_style;</span>
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :               STORE ('\'');</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :               STORE ('\\');</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :               STORE ('\'');</span>
+<span class="lineNum">     491 </span>            :             }
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :         case '%': case '+': case ',': case '-': case '.': case '/':</span>
+<span class="lineNum">     495 </span>            :         case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">     496 </span>            :         case '6': case '7': case '8': case '9': case ':':
+<span class="lineNum">     497 </span>            :         case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">     498 </span>            :         case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">     499 </span>            :         case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">     500 </span>            :         case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">     501 </span>            :         case 'Y': case 'Z': case ']': case '_': case 'a': case 'b':
+<span class="lineNum">     502 </span>            :         case 'c': case 'd': case 'e': case 'f': case 'g': case 'h':
+<span class="lineNum">     503 </span>            :         case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
+<span class="lineNum">     504 </span>            :         case 'o': case 'p': case 'q': case 'r': case 's': case 't':
+<span class="lineNum">     505 </span>            :         case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+<span class="lineNum">     506 </span>            :           /* These characters don't cause problems, no matter what the
+<span class="lineNum">     507 </span>            :              quoting style is.  They cannot start multibyte sequences.
+<span class="lineNum">     508 </span>            :              A digit or a special letter would cause trouble if it
+<span class="lineNum">     509 </span>            :              appeared at the beginning of quote_string because we'd then
+<span class="lineNum">     510 </span>            :              escape by prepending a backslash.  However, it's hard to
+<span class="lineNum">     511 </span>            :              imagine any locale that would use digits or letters as
+<span class="lineNum">     512 </span>            :              quotes, and set_custom_quoting is documented not to accept
+<span class="lineNum">     513 </span>            :              them.  Also, a digit or a special letter would cause
+<span class="lineNum">     514 </span>            :              trouble if it appeared in quote_these_too, but that's also
+<span class="lineNum">     515 </span>            :              documented as not accepting them.  */
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     519 </span>            :           /* If we have a multibyte sequence, copy it until we reach
+<span class="lineNum">     520 </span>            :              its end, find an error, or come back to the initial shift
+<span class="lineNum">     521 </span>            :              state.  For C-like styles, if the sequence has
+<span class="lineNum">     522 </span>            :              unprintable characters, escape the whole sequence, since
+<span class="lineNum">     523 </span>            :              we can't easily escape single characters within it.  */
+<span class="lineNum">     524 </span>            :           {
+<span class="lineNum">     525 </span>            :             /* Length of multibyte sequence found so far.  */
+<span class="lineNum">     526 </span>            :             size_t m;
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span>            :             bool printable;
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :             if (unibyte_locale)</span>
+<span class="lineNum">     531 </span>            :               {
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :                 m = 1;</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :                 printable = isprint (c) != 0;</span>
+<span class="lineNum">     534 </span>            :               }
+<span class="lineNum">     535 </span>            :             else
+<span class="lineNum">     536 </span>            :               {
+<span class="lineNum">     537 </span>            :                 mbstate_t mbstate;
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :                 memset (&amp;mbstate, 0, sizeof mbstate);</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :                 m = 0;</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :                 printable = true;</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :                 if (argsize == SIZE_MAX)</span>
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :                   argsize = strlen (arg);</span>
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            :                 do
+<span class="lineNum">     546 </span>            :                   {
+<span class="lineNum">     547 </span>            :                     wchar_t w;
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :                     size_t bytes = mbrtowc (&amp;w, &amp;arg[i + m],</span>
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :                                             argsize - (i + m), &amp;mbstate);</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :                     if (bytes == 0)</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :                       break;</span>
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :                     else if (bytes == (size_t) -1)</span>
+<span class="lineNum">     553 </span>            :                       {
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :                         printable = false;</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     556 </span>            :                       }
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :                     else if (bytes == (size_t) -2)</span>
+<span class="lineNum">     558 </span>            :                       {
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :                         printable = false;</span>
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :                         while (i + m &lt; argsize &amp;&amp; arg[i + m])</span>
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :                           m++;</span>
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     563 </span>            :                       }
+<span class="lineNum">     564 </span>            :                     else
+<span class="lineNum">     565 </span>            :                       {
+<span class="lineNum">     566 </span>            :                         /* Work around a bug with older shells that &quot;see&quot; a '\'
+<span class="lineNum">     567 </span>            :                            that is really the 2nd byte of a multibyte character.
+<span class="lineNum">     568 </span>            :                            In practice the problem is limited to ASCII
+<span class="lineNum">     569 </span>            :                            chars &gt;= '@' that are shell special chars.  */
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :                         if ('[' == 0x5b &amp;&amp; elide_outer_quotes</span>
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :                             &amp;&amp; quoting_style == shell_always_quoting_style)</span>
+<span class="lineNum">     572 </span>            :                           {
+<span class="lineNum">     573 </span>            :                             size_t j;
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :                             for (j = 1; j &lt; bytes; j++)</span>
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :                               switch (arg[i + m + j])</span>
+<span class="lineNum">     576 </span>            :                                 {
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :                                 case '[': case '\\': case '^':</span>
+<span class="lineNum">     578 </span>            :                                 case '`': case '|':
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :                                   goto force_outer_quoting_style;</span>
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :                                 default:</span>
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :                                   break;</span>
+<span class="lineNum">     583 </span>            :                                 }
+<span class="lineNum">     584 </span>            :                           }
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :                         if (! iswprint (w))</span>
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :                           printable = false;</span>
+<span class="lineNum">     588 </span><span class="lineNoCov">          0 :                         m += bytes;</span>
+<span class="lineNum">     589 </span>            :                       }
+<span class="lineNum">     590 </span>            :                   }
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :                 while (! mbsinit (&amp;mbstate));</span>
+<span class="lineNum">     592 </span>            :               }
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :             if (1 &lt; m || (backslash_escapes &amp;&amp; ! printable))</span>
+<span class="lineNum">     595 </span>            :               {
+<span class="lineNum">     596 </span>            :                 /* Output a multibyte sequence, or an escaped
+<span class="lineNum">     597 </span>            :                    unprintable unibyte character.  */
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :                 size_t ilim = i + m;</span>
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span>            :                 for (;;)
+<span class="lineNum">     601 </span>            :                   {
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :                     if (backslash_escapes &amp;&amp; ! printable)</span>
+<span class="lineNum">     603 </span>            :                       {
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 :                         if (elide_outer_quotes)</span>
+<span class="lineNum">     605 </span><span class="lineNoCov">          0 :                           goto force_outer_quoting_style;</span>
+<span class="lineNum">     606 </span><span class="lineNoCov">          0 :                         STORE ('\\');</span>
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 :                         STORE ('0' + (c &gt;&gt; 6));</span>
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :                         STORE ('0' + ((c &gt;&gt; 3) &amp; 7));</span>
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :                         c = '0' + (c &amp; 7);</span>
+<span class="lineNum">     610 </span>            :                       }
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :                     else if (is_right_quote)</span>
+<span class="lineNum">     612 </span>            :                       {
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :                         STORE ('\\');</span>
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :                         is_right_quote = false;</span>
+<span class="lineNum">     615 </span>            :                       }
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :                     if (ilim &lt;= i + 1)</span>
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 :                       break;</span>
+<span class="lineNum">     618 </span><span class="lineNoCov">          0 :                     STORE (c);</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :                     c = arg[++i];</span>
+<span class="lineNum">     620 </span>            :                   }
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :                 goto store_c;</span>
+<span class="lineNum">     623 </span>            :               }
+<span class="lineNum">     624 </span>            :           }
+<span class="lineNum">     625 </span>            :         }
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :       if (! ((backslash_escapes || elide_outer_quotes)</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :              &amp;&amp; quote_these_too</span>
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :              &amp;&amp; quote_these_too[c / INT_BITS] &gt;&gt; (c % INT_BITS) &amp; 1)</span>
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :           &amp;&amp; !is_right_quote)</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :         goto store_c;</span>
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :     store_escape:</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :       if (elide_outer_quotes)</span>
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :         goto force_outer_quoting_style;</span>
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :       STORE ('\\');</span>
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :     store_c:</span>
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :       STORE (c);</span>
+<span class="lineNum">     640 </span>            :     }
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span><span class="lineNoCov">          0 :   if (len == 0 &amp;&amp; quoting_style == shell_always_quoting_style</span>
+<span class="lineNum">     643 </span><span class="lineNoCov">          0 :       &amp;&amp; elide_outer_quotes)</span>
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :     goto force_outer_quoting_style;</span>
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span><span class="lineNoCov">          0 :   if (quote_string &amp;&amp; !elide_outer_quotes)</span>
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :     for (; *quote_string; quote_string++)</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :       STORE (*quote_string);</span>
+<span class="lineNum">     649 </span>            : 
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :   if (len &lt; buffersize)</span>
+<span class="lineNum">     651 </span><span class="lineNoCov">          0 :     buffer[len] = '\0';</span>
+<span class="lineNum">     652 </span><span class="lineNoCov">          0 :   return len;</span>
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :  force_outer_quoting_style:</span>
+<span class="lineNum">     655 </span>            :   /* Don't reuse quote_these_too, since the addition of outer quotes
+<span class="lineNum">     656 </span>            :      sufficiently quotes the specified characters.  */
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 :   return quotearg_buffer_restyled (buffer, buffersize, arg, argsize,</span>
+<span class="lineNum">     658 </span>            :                                    quoting_style,
+<span class="lineNum">     659 </span>            :                                    flags &amp; ~QA_ELIDE_OUTER_QUOTES, NULL,
+<span class="lineNum">     660 </span>            :                                    left_quote, right_quote);
+<span class="lineNum">     661 </span>            : }
+<span class="lineNum">     662 </span>            : 
+<span class="lineNum">     663 </span>            : /* Place into buffer BUFFER (of size BUFFERSIZE) a quoted version of
+<span class="lineNum">     664 </span>            :    argument ARG (of size ARGSIZE), using O to control quoting.
+<span class="lineNum">     665 </span>            :    If O is null, use the default.
+<span class="lineNum">     666 </span>            :    Terminate the output with a null character, and return the written
+<span class="lineNum">     667 </span>            :    size of the output, not counting the terminating null.
+<span class="lineNum">     668 </span>            :    If BUFFERSIZE is too small to store the output string, return the
+<span class="lineNum">     669 </span>            :    value that would have been returned had BUFFERSIZE been large enough.
+<span class="lineNum">     670 </span>            :    If ARGSIZE is SIZE_MAX, use the string length of the argument for
+<a name="671"><span class="lineNum">     671 </span>            :    ARGSIZE.  */</a>
+<span class="lineNum">     672 </span>            : size_t
+<span class="lineNum">     673 </span><span class="lineNoCov">          0 : quotearg_buffer (char *buffer, size_t buffersize,</span>
+<span class="lineNum">     674 </span>            :                  char const *arg, size_t argsize,
+<span class="lineNum">     675 </span>            :                  struct quoting_options const *o)
+<span class="lineNum">     676 </span>            : {
+<span class="lineNum">     677 </span><span class="lineNoCov">          0 :   struct quoting_options const *p = o ? o : &amp;default_quoting_options;</span>
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :   int e = errno;</span>
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 :   size_t r = quotearg_buffer_restyled (buffer, buffersize, arg, argsize,</span>
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :                                        p-&gt;style, p-&gt;flags, p-&gt;quote_these_too,</span>
+<span class="lineNum">     681 </span>            :                                        p-&gt;left_quote, p-&gt;right_quote);
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :   errno = e;</span>
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :   return r;</span>
+<span class="lineNum">     684 </span>            : }
+<span class="lineNum">     685 </span>            : 
+<a name="686"><span class="lineNum">     686 </span>            : /* Equivalent to quotearg_alloc (ARG, ARGSIZE, NULL, O).  */</a>
+<span class="lineNum">     687 </span>            : char *
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 : quotearg_alloc (char const *arg, size_t argsize,</span>
+<span class="lineNum">     689 </span>            :                 struct quoting_options const *o)
+<span class="lineNum">     690 </span>            : {
+<span class="lineNum">     691 </span><span class="lineNoCov">          0 :   return quotearg_alloc_mem (arg, argsize, NULL, o);</span>
+<span class="lineNum">     692 </span>            : }
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span>            : /* Like quotearg_buffer (..., ARG, ARGSIZE, O), except return newly
+<span class="lineNum">     695 </span>            :    allocated storage containing the quoted string, and store the
+<span class="lineNum">     696 </span>            :    resulting size into *SIZE, if non-NULL.  The result can contain
+<span class="lineNum">     697 </span>            :    embedded null bytes only if ARGSIZE is not SIZE_MAX, SIZE is not
+<span class="lineNum">     698 </span>            :    NULL, and set_quoting_flags has not set the null byte elision
+<a name="699"><span class="lineNum">     699 </span>            :    flag.  */</a>
+<span class="lineNum">     700 </span>            : char *
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 : quotearg_alloc_mem (char const *arg, size_t argsize, size_t *size,</span>
+<span class="lineNum">     702 </span>            :                     struct quoting_options const *o)
+<span class="lineNum">     703 </span>            : {
+<span class="lineNum">     704 </span><span class="lineNoCov">          0 :   struct quoting_options const *p = o ? o : &amp;default_quoting_options;</span>
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :   int e = errno;</span>
+<span class="lineNum">     706 </span>            :   /* Elide embedded null bytes if we can't return a size.  */
+<span class="lineNum">     707 </span><span class="lineNoCov">          0 :   int flags = p-&gt;flags | (size ? 0 : QA_ELIDE_NULL_BYTES);</span>
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :   size_t bufsize = quotearg_buffer_restyled (0, 0, arg, argsize, p-&gt;style,</span>
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :                                              flags, p-&gt;quote_these_too,</span>
+<span class="lineNum">     710 </span>            :                                              p-&gt;left_quote,
+<span class="lineNum">     711 </span>            :                                              p-&gt;right_quote) + 1;
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :   char *buf = xcharalloc (bufsize);</span>
+<span class="lineNum">     713 </span><span class="lineNoCov">          0 :   quotearg_buffer_restyled (buf, bufsize, arg, argsize, p-&gt;style, flags,</span>
+<span class="lineNum">     714 </span><span class="lineNoCov">          0 :                             p-&gt;quote_these_too,</span>
+<span class="lineNum">     715 </span>            :                             p-&gt;left_quote, p-&gt;right_quote);
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :   errno = e;</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :   if (size)</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :     *size = bufsize - 1;</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :   return buf;</span>
+<span class="lineNum">     720 </span>            : }
+<span class="lineNum">     721 </span>            : 
+<span class="lineNum">     722 </span>            : /* A storage slot with size and pointer to a value.  */
+<span class="lineNum">     723 </span>            : struct slotvec
+<span class="lineNum">     724 </span>            : {
+<span class="lineNum">     725 </span>            :   size_t size;
+<span class="lineNum">     726 </span>            :   char *val;
+<span class="lineNum">     727 </span>            : };
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            : /* Preallocate a slot 0 buffer, so that the caller can always quote
+<span class="lineNum">     730 </span>            :    one small component of a &quot;memory exhausted&quot; message in slot 0.  */
+<span class="lineNum">     731 </span>            : static char slot0[256];
+<span class="lineNum">     732 </span>            : static unsigned int nslots = 1;
+<span class="lineNum">     733 </span>            : static struct slotvec slotvec0 = {sizeof slot0, slot0};
+<span class="lineNum">     734 </span>            : static struct slotvec *slotvec = &amp;slotvec0;
+<a name="735"><span class="lineNum">     735 </span>            : </a>
+<span class="lineNum">     736 </span>            : void
+<span class="lineNum">     737 </span><span class="lineNoCov">          0 : quotearg_free (void)</span>
+<span class="lineNum">     738 </span>            : {
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :   struct slotvec *sv = slotvec;</span>
+<span class="lineNum">     740 </span>            :   unsigned int i;
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :   for (i = 1; i &lt; nslots; i++)</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 :     free (sv[i].val);</span>
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :   if (sv[0].val != slot0)</span>
+<span class="lineNum">     744 </span>            :     {
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :       free (sv[0].val);</span>
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :       slotvec0.size = sizeof slot0;</span>
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :       slotvec0.val = slot0;</span>
+<span class="lineNum">     748 </span>            :     }
+<span class="lineNum">     749 </span><span class="lineNoCov">          0 :   if (sv != &amp;slotvec0)</span>
+<span class="lineNum">     750 </span>            :     {
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :       free (sv);</span>
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :       slotvec = &amp;slotvec0;</span>
+<span class="lineNum">     753 </span>            :     }
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :   nslots = 1;</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     756 </span>            : 
+<span class="lineNum">     757 </span>            : /* Use storage slot N to return a quoted version of argument ARG.
+<span class="lineNum">     758 </span>            :    ARG is of size ARGSIZE, but if that is SIZE_MAX, ARG is a
+<span class="lineNum">     759 </span>            :    null-terminated string.
+<span class="lineNum">     760 </span>            :    OPTIONS specifies the quoting options.
+<span class="lineNum">     761 </span>            :    The returned value points to static storage that can be
+<span class="lineNum">     762 </span>            :    reused by the next call to this function with the same value of N.
+<span class="lineNum">     763 </span>            :    N must be nonnegative.  N is deliberately declared with type &quot;int&quot;
+<a name="764"><span class="lineNum">     764 </span>            :    to allow for future extensions (using negative values).  */</a>
+<span class="lineNum">     765 </span>            : static char *
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 : quotearg_n_options (int n, char const *arg, size_t argsize,</span>
+<span class="lineNum">     767 </span>            :                     struct quoting_options const *options)
+<span class="lineNum">     768 </span>            : {
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :   int e = errno;</span>
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :   unsigned int n0 = n;</span>
+<span class="lineNum">     772 </span><span class="lineNoCov">          0 :   struct slotvec *sv = slotvec;</span>
+<span class="lineNum">     773 </span>            : 
+<span class="lineNum">     774 </span><span class="lineNoCov">          0 :   if (n &lt; 0)</span>
+<span class="lineNum">     775 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">     776 </span>            : 
+<span class="lineNum">     777 </span><span class="lineNoCov">          0 :   if (nslots &lt;= n0)</span>
+<span class="lineNum">     778 </span>            :     {
+<span class="lineNum">     779 </span>            :       /* FIXME: technically, the type of n1 should be 'unsigned int',
+<span class="lineNum">     780 </span>            :          but that evokes an unsuppressible warning from gcc-4.0.1 and
+<span class="lineNum">     781 </span>            :          older.  If gcc ever provides an option to suppress that warning,
+<span class="lineNum">     782 </span>            :          revert to the original type, so that the test in xalloc_oversized
+<span class="lineNum">     783 </span>            :          is once again performed only at compile time.  */
+<span class="lineNum">     784 </span><span class="lineNoCov">          0 :       size_t n1 = n0 + 1;</span>
+<span class="lineNum">     785 </span><span class="lineNoCov">          0 :       bool preallocated = (sv == &amp;slotvec0);</span>
+<span class="lineNum">     786 </span>            : 
+<span class="lineNum">     787 </span><span class="lineNoCov">          0 :       if (xalloc_oversized (n1, sizeof *sv))</span>
+<span class="lineNum">     788 </span><span class="lineNoCov">          0 :         xalloc_die ();</span>
+<span class="lineNum">     789 </span>            : 
+<span class="lineNum">     790 </span><span class="lineNoCov">          0 :       slotvec = sv = xrealloc (preallocated ? NULL : sv, n1 * sizeof *sv);</span>
+<span class="lineNum">     791 </span><span class="lineNoCov">          0 :       if (preallocated)</span>
+<span class="lineNum">     792 </span><span class="lineNoCov">          0 :         *sv = slotvec0;</span>
+<span class="lineNum">     793 </span><span class="lineNoCov">          0 :       memset (sv + nslots, 0, (n1 - nslots) * sizeof *sv);</span>
+<span class="lineNum">     794 </span><span class="lineNoCov">          0 :       nslots = n1;</span>
+<span class="lineNum">     795 </span>            :     }
+<span class="lineNum">     796 </span>            : 
+<span class="lineNum">     797 </span>            :   {
+<span class="lineNum">     798 </span><span class="lineNoCov">          0 :     size_t size = sv[n].size;</span>
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :     char *val = sv[n].val;</span>
+<span class="lineNum">     800 </span>            :     /* Elide embedded null bytes since we don't return a size.  */
+<span class="lineNum">     801 </span><span class="lineNoCov">          0 :     int flags = options-&gt;flags | QA_ELIDE_NULL_BYTES;</span>
+<span class="lineNum">     802 </span><span class="lineNoCov">          0 :     size_t qsize = quotearg_buffer_restyled (val, size, arg, argsize,</span>
+<span class="lineNum">     803 </span>            :                                              options-&gt;style, flags,
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :                                              options-&gt;quote_these_too,</span>
+<span class="lineNum">     805 </span>            :                                              options-&gt;left_quote,
+<span class="lineNum">     806 </span>            :                                              options-&gt;right_quote);
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span><span class="lineNoCov">          0 :     if (size &lt;= qsize)</span>
+<span class="lineNum">     809 </span>            :       {
+<span class="lineNum">     810 </span><span class="lineNoCov">          0 :         sv[n].size = size = qsize + 1;</span>
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :         if (val != slot0)</span>
+<span class="lineNum">     812 </span><span class="lineNoCov">          0 :           free (val);</span>
+<span class="lineNum">     813 </span><span class="lineNoCov">          0 :         sv[n].val = val = xcharalloc (size);</span>
+<span class="lineNum">     814 </span><span class="lineNoCov">          0 :         quotearg_buffer_restyled (val, size, arg, argsize, options-&gt;style,</span>
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :                                   flags, options-&gt;quote_these_too,</span>
+<span class="lineNum">     816 </span>            :                                   options-&gt;left_quote,
+<span class="lineNum">     817 </span>            :                                   options-&gt;right_quote);
+<span class="lineNum">     818 </span>            :       }
+<span class="lineNum">     819 </span>            : 
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :     errno = e;</span>
+<span class="lineNum">     821 </span><span class="lineNoCov">          0 :     return val;</span>
+<span class="lineNum">     822 </span>            :   }
+<span class="lineNum">     823 </span>            : }
+<a name="824"><span class="lineNum">     824 </span>            : </a>
+<span class="lineNum">     825 </span>            : char *
+<span class="lineNum">     826 </span><span class="lineNoCov">          0 : quotearg_n (int n, char const *arg)</span>
+<span class="lineNum">     827 </span>            : {
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :   return quotearg_n_options (n, arg, SIZE_MAX, &amp;default_quoting_options);</span>
+<span class="lineNum">     829 </span>            : }
+<a name="830"><span class="lineNum">     830 </span>            : </a>
+<span class="lineNum">     831 </span>            : char *
+<span class="lineNum">     832 </span><span class="lineNoCov">          0 : quotearg_n_mem (int n, char const *arg, size_t argsize)</span>
+<span class="lineNum">     833 </span>            : {
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :   return quotearg_n_options (n, arg, argsize, &amp;default_quoting_options);</span>
+<span class="lineNum">     835 </span>            : }
+<a name="836"><span class="lineNum">     836 </span>            : </a>
+<span class="lineNum">     837 </span>            : char *
+<span class="lineNum">     838 </span><span class="lineNoCov">          0 : quotearg (char const *arg)</span>
+<span class="lineNum">     839 </span>            : {
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :   return quotearg_n (0, arg);</span>
+<span class="lineNum">     841 </span>            : }
+<a name="842"><span class="lineNum">     842 </span>            : </a>
+<span class="lineNum">     843 </span>            : char *
+<span class="lineNum">     844 </span><span class="lineNoCov">          0 : quotearg_mem (char const *arg, size_t argsize)</span>
+<span class="lineNum">     845 </span>            : {
+<span class="lineNum">     846 </span><span class="lineNoCov">          0 :   return quotearg_n_mem (0, arg, argsize);</span>
+<span class="lineNum">     847 </span>            : }
+<a name="848"><span class="lineNum">     848 </span>            : </a>
+<span class="lineNum">     849 </span>            : char *
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 : quotearg_n_style (int n, enum quoting_style s, char const *arg)</span>
+<span class="lineNum">     851 </span>            : {
+<span class="lineNum">     852 </span><span class="lineNoCov">          0 :   struct quoting_options const o = quoting_options_from_style (s);</span>
+<span class="lineNum">     853 </span><span class="lineNoCov">          0 :   return quotearg_n_options (n, arg, SIZE_MAX, &amp;o);</span>
+<span class="lineNum">     854 </span>            : }
+<a name="855"><span class="lineNum">     855 </span>            : </a>
+<span class="lineNum">     856 </span>            : char *
+<span class="lineNum">     857 </span><span class="lineNoCov">          0 : quotearg_n_style_mem (int n, enum quoting_style s,</span>
+<span class="lineNum">     858 </span>            :                       char const *arg, size_t argsize)
+<span class="lineNum">     859 </span>            : {
+<span class="lineNum">     860 </span><span class="lineNoCov">          0 :   struct quoting_options const o = quoting_options_from_style (s);</span>
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :   return quotearg_n_options (n, arg, argsize, &amp;o);</span>
+<span class="lineNum">     862 </span>            : }
+<a name="863"><span class="lineNum">     863 </span>            : </a>
+<span class="lineNum">     864 </span>            : char *
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 : quotearg_style (enum quoting_style s, char const *arg)</span>
+<span class="lineNum">     866 </span>            : {
+<span class="lineNum">     867 </span><span class="lineNoCov">          0 :   return quotearg_n_style (0, s, arg);</span>
+<span class="lineNum">     868 </span>            : }
+<a name="869"><span class="lineNum">     869 </span>            : </a>
+<span class="lineNum">     870 </span>            : char *
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 : quotearg_style_mem (enum quoting_style s, char const *arg, size_t argsize)</span>
+<span class="lineNum">     872 </span>            : {
+<span class="lineNum">     873 </span><span class="lineNoCov">          0 :   return quotearg_n_style_mem (0, s, arg, argsize);</span>
+<span class="lineNum">     874 </span>            : }
+<a name="875"><span class="lineNum">     875 </span>            : </a>
+<span class="lineNum">     876 </span>            : char *
+<span class="lineNum">     877 </span><span class="lineNoCov">          0 : quotearg_char_mem (char const *arg, size_t argsize, char ch)</span>
+<span class="lineNum">     878 </span>            : {
+<span class="lineNum">     879 </span>            :   struct quoting_options options;
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :   options = default_quoting_options;</span>
+<span class="lineNum">     881 </span><span class="lineNoCov">          0 :   set_char_quoting (&amp;options, ch, 1);</span>
+<span class="lineNum">     882 </span><span class="lineNoCov">          0 :   return quotearg_n_options (0, arg, argsize, &amp;options);</span>
+<span class="lineNum">     883 </span>            : }
+<a name="884"><span class="lineNum">     884 </span>            : </a>
+<span class="lineNum">     885 </span>            : char *
+<span class="lineNum">     886 </span><span class="lineNoCov">          0 : quotearg_char (char const *arg, char ch)</span>
+<span class="lineNum">     887 </span>            : {
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :   return quotearg_char_mem (arg, SIZE_MAX, ch);</span>
+<span class="lineNum">     889 </span>            : }
+<a name="890"><span class="lineNum">     890 </span>            : </a>
+<span class="lineNum">     891 </span>            : char *
+<span class="lineNum">     892 </span><span class="lineNoCov">          0 : quotearg_colon (char const *arg)</span>
+<span class="lineNum">     893 </span>            : {
+<span class="lineNum">     894 </span><span class="lineNoCov">          0 :   return quotearg_char (arg, ':');</span>
+<span class="lineNum">     895 </span>            : }
+<a name="896"><span class="lineNum">     896 </span>            : </a>
+<span class="lineNum">     897 </span>            : char *
+<span class="lineNum">     898 </span><span class="lineNoCov">          0 : quotearg_colon_mem (char const *arg, size_t argsize)</span>
+<span class="lineNum">     899 </span>            : {
+<span class="lineNum">     900 </span><span class="lineNoCov">          0 :   return quotearg_char_mem (arg, argsize, ':');</span>
+<span class="lineNum">     901 </span>            : }
+<a name="902"><span class="lineNum">     902 </span>            : </a>
+<span class="lineNum">     903 </span>            : char *
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 : quotearg_n_custom (int n, char const *left_quote,</span>
+<span class="lineNum">     905 </span>            :                    char const *right_quote, char const *arg)
+<span class="lineNum">     906 </span>            : {
+<span class="lineNum">     907 </span><span class="lineNoCov">          0 :   return quotearg_n_custom_mem (n, left_quote, right_quote, arg,</span>
+<span class="lineNum">     908 </span>            :                                 SIZE_MAX);
+<span class="lineNum">     909 </span>            : }
+<a name="910"><span class="lineNum">     910 </span>            : </a>
+<span class="lineNum">     911 </span>            : char *
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 : quotearg_n_custom_mem (int n, char const *left_quote,</span>
+<span class="lineNum">     913 </span>            :                        char const *right_quote,
+<span class="lineNum">     914 </span>            :                        char const *arg, size_t argsize)
+<span class="lineNum">     915 </span>            : {
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :   struct quoting_options o = default_quoting_options;</span>
+<span class="lineNum">     917 </span><span class="lineNoCov">          0 :   set_custom_quoting (&amp;o, left_quote, right_quote);</span>
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :   return quotearg_n_options (n, arg, argsize, &amp;o);</span>
+<span class="lineNum">     919 </span>            : }
+<a name="920"><span class="lineNum">     920 </span>            : </a>
+<span class="lineNum">     921 </span>            : char *
+<span class="lineNum">     922 </span><span class="lineNoCov">          0 : quotearg_custom (char const *left_quote, char const *right_quote,</span>
+<span class="lineNum">     923 </span>            :                  char const *arg)
+<span class="lineNum">     924 </span>            : {
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :   return quotearg_n_custom (0, left_quote, right_quote, arg);</span>
+<span class="lineNum">     926 </span>            : }
+<a name="927"><span class="lineNum">     927 </span>            : </a>
+<span class="lineNum">     928 </span>            : char *
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 : quotearg_custom_mem (char const *left_quote, char const *right_quote,</span>
+<span class="lineNum">     930 </span>            :                      char const *arg, size_t argsize)
+<span class="lineNum">     931 </span>            : {
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :   return quotearg_n_custom_mem (0, left_quote, right_quote, arg,</span>
+<span class="lineNum">     933 </span>            :                                 argsize);
+<span class="lineNum">     934 </span>            : }
+<span class="lineNum">     935 </span>            : 
+<span class="lineNum">     936 </span>            : 
+<span class="lineNum">     937 </span>            : /* The quoting option used by the functions of quote.h.  */
+<span class="lineNum">     938 </span>            : struct quoting_options quote_quoting_options =
+<span class="lineNum">     939 </span>            :   {
+<span class="lineNum">     940 </span>            :     locale_quoting_style,
+<span class="lineNum">     941 </span>            :     0,
+<span class="lineNum">     942 </span>            :     { 0 },
+<span class="lineNum">     943 </span>            :     NULL, NULL
+<span class="lineNum">     944 </span>            :   };
+<a name="945"><span class="lineNum">     945 </span>            : </a>
+<span class="lineNum">     946 </span>            : char const *
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 : quote_n_mem (int n, char const *arg, size_t argsize)</span>
+<span class="lineNum">     948 </span>            : {
+<span class="lineNum">     949 </span><span class="lineNoCov">          0 :   return quotearg_n_options (n, arg, argsize, &amp;quote_quoting_options);</span>
+<span class="lineNum">     950 </span>            : }
+<a name="951"><span class="lineNum">     951 </span>            : </a>
+<span class="lineNum">     952 </span>            : char const *
+<span class="lineNum">     953 </span><span class="lineNoCov">          0 : quote_mem (char const *arg, size_t argsize)</span>
+<span class="lineNum">     954 </span>            : {
+<span class="lineNum">     955 </span><span class="lineNoCov">          0 :   return quote_n_mem (0, arg, argsize);</span>
+<span class="lineNum">     956 </span>            : }
+<a name="957"><span class="lineNum">     957 </span>            : </a>
+<span class="lineNum">     958 </span>            : char const *
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 : quote_n (int n, char const *arg)</span>
+<span class="lineNum">     960 </span>            : {
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :   return quote_n_mem (n, arg, SIZE_MAX);</span>
+<span class="lineNum">     962 </span>            : }
+<a name="963"><span class="lineNum">     963 </span>            : </a>
+<span class="lineNum">     964 </span>            : char const *
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 : quote (char const *arg)</span>
+<span class="lineNum">     966 </span>            : {
+<span class="lineNum">     967 </span><span class="lineNoCov">          0 :   return quote_n (0, arg);</span>
+<span class="lineNum">     968 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

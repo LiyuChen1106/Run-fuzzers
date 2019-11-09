@@ -1,0 +1,471 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/c-ctype.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - c-ctype.c<span style="font-size: 80%;"> (source / <a href="c-ctype.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">35</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Character handling in C locale.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright 2000-2003, 2006, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : This program is free software; you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            : it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            : the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            : (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            : but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            : MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            : GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            : along with this program; if not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* Specification.  */
+<span class="lineNum">      21 </span>            : #define NO_C_CTYPE_MACROS
+<span class="lineNum">      22 </span>            : #include &quot;c-ctype.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : /* The function isascii is not locale dependent. Its use in EBCDIC is
+<a name="25"><span class="lineNum">      25 </span>            :    questionable. */</a>
+<span class="lineNum">      26 </span>            : bool
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 : c_isascii (int c)</span>
+<span class="lineNum">      28 </span>            : {
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :   return (c &gt;= 0x00 &amp;&amp; c &lt;= 0x7f);</span>
+<span class="lineNum">      30 </span>            : }
+<a name="31"><span class="lineNum">      31 </span>            : </a>
+<span class="lineNum">      32 </span>            : bool
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 : c_isalnum (int c)</span>
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            : #if C_CTYPE_CONSECUTIVE_DIGITS \
+<span class="lineNum">      36 </span>            :     &amp;&amp; C_CTYPE_CONSECUTIVE_UPPERCASE &amp;&amp; C_CTYPE_CONSECUTIVE_LOWERCASE
+<span class="lineNum">      37 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   return ((c &gt;= '0' &amp;&amp; c &lt;= '9')</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :           || ((c &amp; ~0x20) &gt;= 'A' &amp;&amp; (c &amp; ~0x20) &lt;= 'Z'));</span>
+<span class="lineNum">      40 </span>            : #else
+<span class="lineNum">      41 </span>            :   return ((c &gt;= '0' &amp;&amp; c &lt;= '9')
+<span class="lineNum">      42 </span>            :           || (c &gt;= 'A' &amp;&amp; c &lt;= 'Z')
+<span class="lineNum">      43 </span>            :           || (c &gt;= 'a' &amp;&amp; c &lt;= 'z'));
+<span class="lineNum">      44 </span>            : #endif
+<span class="lineNum">      45 </span>            : #else
+<span class="lineNum">      46 </span>            :   switch (c)
+<span class="lineNum">      47 </span>            :     {
+<span class="lineNum">      48 </span>            :     case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">      49 </span>            :     case '6': case '7': case '8': case '9':
+<span class="lineNum">      50 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">      51 </span>            :     case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">      52 </span>            :     case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">      53 </span>            :     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">      54 </span>            :     case 'Y': case 'Z':
+<span class="lineNum">      55 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">      56 </span>            :     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+<span class="lineNum">      57 </span>            :     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+<span class="lineNum">      58 </span>            :     case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+<span class="lineNum">      59 </span>            :     case 'y': case 'z':
+<span class="lineNum">      60 </span>            :       return 1;
+<span class="lineNum">      61 </span>            :     default:
+<span class="lineNum">      62 </span>            :       return 0;
+<span class="lineNum">      63 </span>            :     }
+<span class="lineNum">      64 </span>            : #endif
+<span class="lineNum">      65 </span>            : }
+<a name="66"><span class="lineNum">      66 </span>            : </a>
+<span class="lineNum">      67 </span>            : bool
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 : c_isalpha (int c)</span>
+<span class="lineNum">      69 </span>            : {
+<span class="lineNum">      70 </span>            : #if C_CTYPE_CONSECUTIVE_UPPERCASE &amp;&amp; C_CTYPE_CONSECUTIVE_LOWERCASE
+<span class="lineNum">      71 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   return ((c &amp; ~0x20) &gt;= 'A' &amp;&amp; (c &amp; ~0x20) &lt;= 'Z');</span>
+<span class="lineNum">      73 </span>            : #else
+<span class="lineNum">      74 </span>            :   return ((c &gt;= 'A' &amp;&amp; c &lt;= 'Z') || (c &gt;= 'a' &amp;&amp; c &lt;= 'z'));
+<span class="lineNum">      75 </span>            : #endif
+<span class="lineNum">      76 </span>            : #else
+<span class="lineNum">      77 </span>            :   switch (c)
+<span class="lineNum">      78 </span>            :     {
+<span class="lineNum">      79 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">      80 </span>            :     case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">      81 </span>            :     case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">      82 </span>            :     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">      83 </span>            :     case 'Y': case 'Z':
+<span class="lineNum">      84 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">      85 </span>            :     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+<span class="lineNum">      86 </span>            :     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+<span class="lineNum">      87 </span>            :     case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+<span class="lineNum">      88 </span>            :     case 'y': case 'z':
+<span class="lineNum">      89 </span>            :       return 1;
+<span class="lineNum">      90 </span>            :     default:
+<span class="lineNum">      91 </span>            :       return 0;
+<span class="lineNum">      92 </span>            :     }
+<span class="lineNum">      93 </span>            : #endif
+<span class="lineNum">      94 </span>            : }
+<a name="95"><span class="lineNum">      95 </span>            : </a>
+<span class="lineNum">      96 </span>            : bool
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 : c_isblank (int c)</span>
+<span class="lineNum">      98 </span>            : {
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :   return (c == ' ' || c == '\t');</span>
+<span class="lineNum">     100 </span>            : }
+<a name="101"><span class="lineNum">     101 </span>            : </a>
+<span class="lineNum">     102 </span>            : bool
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 : c_iscntrl (int c)</span>
+<span class="lineNum">     104 </span>            : {
+<span class="lineNum">     105 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :   return ((c &amp; ~0x1f) == 0 || c == 0x7f);</span>
+<span class="lineNum">     107 </span>            : #else
+<span class="lineNum">     108 </span>            :   switch (c)
+<span class="lineNum">     109 </span>            :     {
+<span class="lineNum">     110 </span>            :     case ' ': case '!': case '&quot;': case '#': case '$': case '%':
+<span class="lineNum">     111 </span>            :     case '&amp;': case '\'': case '(': case ')': case '*': case '+':
+<span class="lineNum">     112 </span>            :     case ',': case '-': case '.': case '/':
+<span class="lineNum">     113 </span>            :     case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">     114 </span>            :     case '6': case '7': case '8': case '9':
+<span class="lineNum">     115 </span>            :     case ':': case ';': case '&lt;': case '=': case '&gt;': case '?':
+<span class="lineNum">     116 </span>            :     case '@':
+<span class="lineNum">     117 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">     118 </span>            :     case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">     119 </span>            :     case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">     120 </span>            :     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">     121 </span>            :     case 'Y': case 'Z':
+<span class="lineNum">     122 </span>            :     case '[': case '\\': case ']': case '^': case '_': case '`':
+<span class="lineNum">     123 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">     124 </span>            :     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+<span class="lineNum">     125 </span>            :     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+<span class="lineNum">     126 </span>            :     case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+<span class="lineNum">     127 </span>            :     case 'y': case 'z':
+<span class="lineNum">     128 </span>            :     case '{': case '|': case '}': case '~':
+<span class="lineNum">     129 </span>            :       return 0;
+<span class="lineNum">     130 </span>            :     default:
+<span class="lineNum">     131 </span>            :       return 1;
+<span class="lineNum">     132 </span>            :     }
+<span class="lineNum">     133 </span>            : #endif
+<span class="lineNum">     134 </span>            : }
+<a name="135"><span class="lineNum">     135 </span>            : </a>
+<span class="lineNum">     136 </span>            : bool
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 : c_isdigit (int c)</span>
+<span class="lineNum">     138 </span>            : {
+<span class="lineNum">     139 </span>            : #if C_CTYPE_CONSECUTIVE_DIGITS
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   return (c &gt;= '0' &amp;&amp; c &lt;= '9');</span>
+<span class="lineNum">     141 </span>            : #else
+<span class="lineNum">     142 </span>            :   switch (c)
+<span class="lineNum">     143 </span>            :     {
+<span class="lineNum">     144 </span>            :     case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">     145 </span>            :     case '6': case '7': case '8': case '9':
+<span class="lineNum">     146 </span>            :       return 1;
+<span class="lineNum">     147 </span>            :     default:
+<span class="lineNum">     148 </span>            :       return 0;
+<span class="lineNum">     149 </span>            :     }
+<span class="lineNum">     150 </span>            : #endif
+<span class="lineNum">     151 </span>            : }
+<a name="152"><span class="lineNum">     152 </span>            : </a>
+<span class="lineNum">     153 </span>            : bool
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 : c_islower (int c)</span>
+<span class="lineNum">     155 </span>            : {
+<span class="lineNum">     156 </span>            : #if C_CTYPE_CONSECUTIVE_LOWERCASE
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   return (c &gt;= 'a' &amp;&amp; c &lt;= 'z');</span>
+<span class="lineNum">     158 </span>            : #else
+<span class="lineNum">     159 </span>            :   switch (c)
+<span class="lineNum">     160 </span>            :     {
+<span class="lineNum">     161 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">     162 </span>            :     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+<span class="lineNum">     163 </span>            :     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+<span class="lineNum">     164 </span>            :     case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+<span class="lineNum">     165 </span>            :     case 'y': case 'z':
+<span class="lineNum">     166 </span>            :       return 1;
+<span class="lineNum">     167 </span>            :     default:
+<span class="lineNum">     168 </span>            :       return 0;
+<span class="lineNum">     169 </span>            :     }
+<span class="lineNum">     170 </span>            : #endif
+<span class="lineNum">     171 </span>            : }
+<a name="172"><span class="lineNum">     172 </span>            : </a>
+<span class="lineNum">     173 </span>            : bool
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 : c_isgraph (int c)</span>
+<span class="lineNum">     175 </span>            : {
+<span class="lineNum">     176 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :   return (c &gt;= '!' &amp;&amp; c &lt;= '~');</span>
+<span class="lineNum">     178 </span>            : #else
+<span class="lineNum">     179 </span>            :   switch (c)
+<span class="lineNum">     180 </span>            :     {
+<span class="lineNum">     181 </span>            :     case '!': case '&quot;': case '#': case '$': case '%': case '&amp;':
+<span class="lineNum">     182 </span>            :     case '\'': case '(': case ')': case '*': case '+': case ',':
+<span class="lineNum">     183 </span>            :     case '-': case '.': case '/':
+<span class="lineNum">     184 </span>            :     case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">     185 </span>            :     case '6': case '7': case '8': case '9':
+<span class="lineNum">     186 </span>            :     case ':': case ';': case '&lt;': case '=': case '&gt;': case '?':
+<span class="lineNum">     187 </span>            :     case '@':
+<span class="lineNum">     188 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">     189 </span>            :     case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">     190 </span>            :     case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">     191 </span>            :     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">     192 </span>            :     case 'Y': case 'Z':
+<span class="lineNum">     193 </span>            :     case '[': case '\\': case ']': case '^': case '_': case '`':
+<span class="lineNum">     194 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">     195 </span>            :     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+<span class="lineNum">     196 </span>            :     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+<span class="lineNum">     197 </span>            :     case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+<span class="lineNum">     198 </span>            :     case 'y': case 'z':
+<span class="lineNum">     199 </span>            :     case '{': case '|': case '}': case '~':
+<span class="lineNum">     200 </span>            :       return 1;
+<span class="lineNum">     201 </span>            :     default:
+<span class="lineNum">     202 </span>            :       return 0;
+<span class="lineNum">     203 </span>            :     }
+<span class="lineNum">     204 </span>            : #endif
+<span class="lineNum">     205 </span>            : }
+<a name="206"><span class="lineNum">     206 </span>            : </a>
+<span class="lineNum">     207 </span>            : bool
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 : c_isprint (int c)</span>
+<span class="lineNum">     209 </span>            : {
+<span class="lineNum">     210 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :   return (c &gt;= ' ' &amp;&amp; c &lt;= '~');</span>
+<span class="lineNum">     212 </span>            : #else
+<span class="lineNum">     213 </span>            :   switch (c)
+<span class="lineNum">     214 </span>            :     {
+<span class="lineNum">     215 </span>            :     case ' ': case '!': case '&quot;': case '#': case '$': case '%':
+<span class="lineNum">     216 </span>            :     case '&amp;': case '\'': case '(': case ')': case '*': case '+':
+<span class="lineNum">     217 </span>            :     case ',': case '-': case '.': case '/':
+<span class="lineNum">     218 </span>            :     case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">     219 </span>            :     case '6': case '7': case '8': case '9':
+<span class="lineNum">     220 </span>            :     case ':': case ';': case '&lt;': case '=': case '&gt;': case '?':
+<span class="lineNum">     221 </span>            :     case '@':
+<span class="lineNum">     222 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">     223 </span>            :     case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">     224 </span>            :     case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">     225 </span>            :     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">     226 </span>            :     case 'Y': case 'Z':
+<span class="lineNum">     227 </span>            :     case '[': case '\\': case ']': case '^': case '_': case '`':
+<span class="lineNum">     228 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">     229 </span>            :     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+<span class="lineNum">     230 </span>            :     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+<span class="lineNum">     231 </span>            :     case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+<span class="lineNum">     232 </span>            :     case 'y': case 'z':
+<span class="lineNum">     233 </span>            :     case '{': case '|': case '}': case '~':
+<span class="lineNum">     234 </span>            :       return 1;
+<span class="lineNum">     235 </span>            :     default:
+<span class="lineNum">     236 </span>            :       return 0;
+<span class="lineNum">     237 </span>            :     }
+<span class="lineNum">     238 </span>            : #endif
+<span class="lineNum">     239 </span>            : }
+<a name="240"><span class="lineNum">     240 </span>            : </a>
+<span class="lineNum">     241 </span>            : bool
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 : c_ispunct (int c)</span>
+<span class="lineNum">     243 </span>            : {
+<span class="lineNum">     244 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :   return ((c &gt;= '!' &amp;&amp; c &lt;= '~')</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :           &amp;&amp; !((c &gt;= '0' &amp;&amp; c &lt;= '9')</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :                || ((c &amp; ~0x20) &gt;= 'A' &amp;&amp; (c &amp; ~0x20) &lt;= 'Z')));</span>
+<span class="lineNum">     248 </span>            : #else
+<span class="lineNum">     249 </span>            :   switch (c)
+<span class="lineNum">     250 </span>            :     {
+<span class="lineNum">     251 </span>            :     case '!': case '&quot;': case '#': case '$': case '%': case '&amp;':
+<span class="lineNum">     252 </span>            :     case '\'': case '(': case ')': case '*': case '+': case ',':
+<span class="lineNum">     253 </span>            :     case '-': case '.': case '/':
+<span class="lineNum">     254 </span>            :     case ':': case ';': case '&lt;': case '=': case '&gt;': case '?':
+<span class="lineNum">     255 </span>            :     case '@':
+<span class="lineNum">     256 </span>            :     case '[': case '\\': case ']': case '^': case '_': case '`':
+<span class="lineNum">     257 </span>            :     case '{': case '|': case '}': case '~':
+<span class="lineNum">     258 </span>            :       return 1;
+<span class="lineNum">     259 </span>            :     default:
+<span class="lineNum">     260 </span>            :       return 0;
+<span class="lineNum">     261 </span>            :     }
+<span class="lineNum">     262 </span>            : #endif
+<span class="lineNum">     263 </span>            : }
+<a name="264"><span class="lineNum">     264 </span>            : </a>
+<span class="lineNum">     265 </span>            : bool
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 : c_isspace (int c)</span>
+<span class="lineNum">     267 </span>            : {
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :   return (c == ' ' || c == '\t'</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :           || c == '\n' || c == '\v' || c == '\f' || c == '\r');</span>
+<span class="lineNum">     270 </span>            : }
+<a name="271"><span class="lineNum">     271 </span>            : </a>
+<span class="lineNum">     272 </span>            : bool
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 : c_isupper (int c)</span>
+<span class="lineNum">     274 </span>            : {
+<span class="lineNum">     275 </span>            : #if C_CTYPE_CONSECUTIVE_UPPERCASE
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :   return (c &gt;= 'A' &amp;&amp; c &lt;= 'Z');</span>
+<span class="lineNum">     277 </span>            : #else
+<span class="lineNum">     278 </span>            :   switch (c)
+<span class="lineNum">     279 </span>            :     {
+<span class="lineNum">     280 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">     281 </span>            :     case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+<span class="lineNum">     282 </span>            :     case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+<span class="lineNum">     283 </span>            :     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+<span class="lineNum">     284 </span>            :     case 'Y': case 'Z':
+<span class="lineNum">     285 </span>            :       return 1;
+<span class="lineNum">     286 </span>            :     default:
+<span class="lineNum">     287 </span>            :       return 0;
+<span class="lineNum">     288 </span>            :     }
+<span class="lineNum">     289 </span>            : #endif
+<span class="lineNum">     290 </span>            : }
+<a name="291"><span class="lineNum">     291 </span>            : </a>
+<span class="lineNum">     292 </span>            : bool
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 : c_isxdigit (int c)</span>
+<span class="lineNum">     294 </span>            : {
+<span class="lineNum">     295 </span>            : #if C_CTYPE_CONSECUTIVE_DIGITS \
+<span class="lineNum">     296 </span>            :     &amp;&amp; C_CTYPE_CONSECUTIVE_UPPERCASE &amp;&amp; C_CTYPE_CONSECUTIVE_LOWERCASE
+<span class="lineNum">     297 </span>            : #if C_CTYPE_ASCII
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   return ((c &gt;= '0' &amp;&amp; c &lt;= '9')</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :           || ((c &amp; ~0x20) &gt;= 'A' &amp;&amp; (c &amp; ~0x20) &lt;= 'F'));</span>
+<span class="lineNum">     300 </span>            : #else
+<span class="lineNum">     301 </span>            :   return ((c &gt;= '0' &amp;&amp; c &lt;= '9')
+<span class="lineNum">     302 </span>            :           || (c &gt;= 'A' &amp;&amp; c &lt;= 'F')
+<span class="lineNum">     303 </span>            :           || (c &gt;= 'a' &amp;&amp; c &lt;= 'f'));
+<span class="lineNum">     304 </span>            : #endif
+<span class="lineNum">     305 </span>            : #else
+<span class="lineNum">     306 </span>            :   switch (c)
+<span class="lineNum">     307 </span>            :     {
+<span class="lineNum">     308 </span>            :     case '0': case '1': case '2': case '3': case '4': case '5':
+<span class="lineNum">     309 </span>            :     case '6': case '7': case '8': case '9':
+<span class="lineNum">     310 </span>            :     case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+<span class="lineNum">     311 </span>            :     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+<span class="lineNum">     312 </span>            :       return 1;
+<span class="lineNum">     313 </span>            :     default:
+<span class="lineNum">     314 </span>            :       return 0;
+<span class="lineNum">     315 </span>            :     }
+<span class="lineNum">     316 </span>            : #endif
+<span class="lineNum">     317 </span>            : }
+<a name="318"><span class="lineNum">     318 </span>            : </a>
+<span class="lineNum">     319 </span>            : int
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 : c_tolower (int c)</span>
+<span class="lineNum">     321 </span>            : {
+<span class="lineNum">     322 </span>            : #if C_CTYPE_CONSECUTIVE_UPPERCASE &amp;&amp; C_CTYPE_CONSECUTIVE_LOWERCASE
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :   return (c &gt;= 'A' &amp;&amp; c &lt;= 'Z' ? c - 'A' + 'a' : c);</span>
+<span class="lineNum">     324 </span>            : #else
+<span class="lineNum">     325 </span>            :   switch (c)
+<span class="lineNum">     326 </span>            :     {
+<span class="lineNum">     327 </span>            :     case 'A': return 'a';
+<span class="lineNum">     328 </span>            :     case 'B': return 'b';
+<span class="lineNum">     329 </span>            :     case 'C': return 'c';
+<span class="lineNum">     330 </span>            :     case 'D': return 'd';
+<span class="lineNum">     331 </span>            :     case 'E': return 'e';
+<span class="lineNum">     332 </span>            :     case 'F': return 'f';
+<span class="lineNum">     333 </span>            :     case 'G': return 'g';
+<span class="lineNum">     334 </span>            :     case 'H': return 'h';
+<span class="lineNum">     335 </span>            :     case 'I': return 'i';
+<span class="lineNum">     336 </span>            :     case 'J': return 'j';
+<span class="lineNum">     337 </span>            :     case 'K': return 'k';
+<span class="lineNum">     338 </span>            :     case 'L': return 'l';
+<span class="lineNum">     339 </span>            :     case 'M': return 'm';
+<span class="lineNum">     340 </span>            :     case 'N': return 'n';
+<span class="lineNum">     341 </span>            :     case 'O': return 'o';
+<span class="lineNum">     342 </span>            :     case 'P': return 'p';
+<span class="lineNum">     343 </span>            :     case 'Q': return 'q';
+<span class="lineNum">     344 </span>            :     case 'R': return 'r';
+<span class="lineNum">     345 </span>            :     case 'S': return 's';
+<span class="lineNum">     346 </span>            :     case 'T': return 't';
+<span class="lineNum">     347 </span>            :     case 'U': return 'u';
+<span class="lineNum">     348 </span>            :     case 'V': return 'v';
+<span class="lineNum">     349 </span>            :     case 'W': return 'w';
+<span class="lineNum">     350 </span>            :     case 'X': return 'x';
+<span class="lineNum">     351 </span>            :     case 'Y': return 'y';
+<span class="lineNum">     352 </span>            :     case 'Z': return 'z';
+<span class="lineNum">     353 </span>            :     default: return c;
+<span class="lineNum">     354 </span>            :     }
+<span class="lineNum">     355 </span>            : #endif
+<span class="lineNum">     356 </span>            : }
+<a name="357"><span class="lineNum">     357 </span>            : </a>
+<span class="lineNum">     358 </span>            : int
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 : c_toupper (int c)</span>
+<span class="lineNum">     360 </span>            : {
+<span class="lineNum">     361 </span>            : #if C_CTYPE_CONSECUTIVE_UPPERCASE &amp;&amp; C_CTYPE_CONSECUTIVE_LOWERCASE
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :   return (c &gt;= 'a' &amp;&amp; c &lt;= 'z' ? c - 'a' + 'A' : c);</span>
+<span class="lineNum">     363 </span>            : #else
+<span class="lineNum">     364 </span>            :   switch (c)
+<span class="lineNum">     365 </span>            :     {
+<span class="lineNum">     366 </span>            :     case 'a': return 'A';
+<span class="lineNum">     367 </span>            :     case 'b': return 'B';
+<span class="lineNum">     368 </span>            :     case 'c': return 'C';
+<span class="lineNum">     369 </span>            :     case 'd': return 'D';
+<span class="lineNum">     370 </span>            :     case 'e': return 'E';
+<span class="lineNum">     371 </span>            :     case 'f': return 'F';
+<span class="lineNum">     372 </span>            :     case 'g': return 'G';
+<span class="lineNum">     373 </span>            :     case 'h': return 'H';
+<span class="lineNum">     374 </span>            :     case 'i': return 'I';
+<span class="lineNum">     375 </span>            :     case 'j': return 'J';
+<span class="lineNum">     376 </span>            :     case 'k': return 'K';
+<span class="lineNum">     377 </span>            :     case 'l': return 'L';
+<span class="lineNum">     378 </span>            :     case 'm': return 'M';
+<span class="lineNum">     379 </span>            :     case 'n': return 'N';
+<span class="lineNum">     380 </span>            :     case 'o': return 'O';
+<span class="lineNum">     381 </span>            :     case 'p': return 'P';
+<span class="lineNum">     382 </span>            :     case 'q': return 'Q';
+<span class="lineNum">     383 </span>            :     case 'r': return 'R';
+<span class="lineNum">     384 </span>            :     case 's': return 'S';
+<span class="lineNum">     385 </span>            :     case 't': return 'T';
+<span class="lineNum">     386 </span>            :     case 'u': return 'U';
+<span class="lineNum">     387 </span>            :     case 'v': return 'V';
+<span class="lineNum">     388 </span>            :     case 'w': return 'W';
+<span class="lineNum">     389 </span>            :     case 'x': return 'X';
+<span class="lineNum">     390 </span>            :     case 'y': return 'Y';
+<span class="lineNum">     391 </span>            :     case 'z': return 'Z';
+<span class="lineNum">     392 </span>            :     default: return c;
+<span class="lineNum">     393 </span>            :     }
+<span class="lineNum">     394 </span>            : #endif
+<span class="lineNum">     395 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

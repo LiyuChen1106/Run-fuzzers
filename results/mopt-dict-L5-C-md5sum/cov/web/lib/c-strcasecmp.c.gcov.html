@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/c-strcasecmp.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - c-strcasecmp.c<span style="font-size: 80%;"> (source / <a href="c-strcasecmp.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* c-strcasecmp.c -- case insensitive string comparator in C locale</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 1998-1999, 2005-2006, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software; you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       7 </span>            :    any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program; if not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Specification.  */
+<span class="lineNum">      20 </span>            : #include &quot;c-strcase.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &quot;c-ctype.h&quot;
+<a name="25"><span class="lineNum">      25 </span>            : </a>
+<span class="lineNum">      26 </span>            : int
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 : c_strcasecmp (const char *s1, const char *s2)</span>
+<span class="lineNum">      28 </span>            : {
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :   register const unsigned char *p1 = (const unsigned char *) s1;</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   register const unsigned char *p2 = (const unsigned char *) s2;</span>
+<span class="lineNum">      31 </span>            :   unsigned char c1, c2;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :   if (p1 == p2)</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :   do
+<span class="lineNum">      37 </span>            :     {
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :       c1 = c_tolower (*p1);</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :       c2 = c_tolower (*p2);</span>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       if (c1 == '\0')</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :       ++p1;</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :       ++p2;</span>
+<span class="lineNum">      46 </span>            :     }
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   while (c1 == c2);</span>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   if (UCHAR_MAX &lt;= INT_MAX)
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     return c1 - c2;</span>
+<span class="lineNum">      51 </span>            :   else
+<span class="lineNum">      52 </span>            :     /* On machines where 'char' and 'int' are types of the same size, the
+<span class="lineNum">      53 </span>            :        difference of two 'unsigned char' values - including the sign bit -
+<span class="lineNum">      54 </span>            :        doesn't fit in an 'int'.  */
+<span class="lineNum">      55 </span>            :     return (c1 &gt; c2 ? 1 : c1 &lt; c2 ? -1 : 0);
+<span class="lineNum">      56 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

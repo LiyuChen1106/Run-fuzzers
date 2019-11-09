@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/fsusage.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - fsusage.c<span style="font-size: 80%;"> (source / <a href="fsusage.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* fsusage.c -- return space usage of mounted file systems</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1991-1992, 1996, 1998-1999, 2002-2006, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &quot;fsusage.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #if STAT_STATVFS || STAT_STATVFS64 /* POSIX 1003.1-2001 (and later) with XSI */
+<span class="lineNum">      27 </span>            : # include &lt;sys/statvfs.h&gt;
+<span class="lineNum">      28 </span>            : #else
+<span class="lineNum">      29 </span>            : /* Don't include backward-compatibility files unless they're needed.
+<span class="lineNum">      30 </span>            :    Eventually we'd like to remove all this cruft.  */
+<span class="lineNum">      31 </span>            : # include &lt;fcntl.h&gt;
+<span class="lineNum">      32 </span>            : # include &lt;unistd.h&gt;
+<span class="lineNum">      33 </span>            : # include &lt;sys/stat.h&gt;
+<span class="lineNum">      34 </span>            : #if HAVE_SYS_PARAM_H
+<span class="lineNum">      35 </span>            : # include &lt;sys/param.h&gt;
+<span class="lineNum">      36 </span>            : #endif
+<span class="lineNum">      37 </span>            : #if HAVE_SYS_MOUNT_H
+<span class="lineNum">      38 </span>            : # include &lt;sys/mount.h&gt;
+<span class="lineNum">      39 </span>            : #endif
+<span class="lineNum">      40 </span>            : #if HAVE_SYS_VFS_H
+<span class="lineNum">      41 </span>            : # include &lt;sys/vfs.h&gt;
+<span class="lineNum">      42 </span>            : #endif
+<span class="lineNum">      43 </span>            : # if HAVE_SYS_FS_S5PARAM_H      /* Fujitsu UXP/V */
+<span class="lineNum">      44 </span>            : #  include &lt;sys/fs/s5param.h&gt;
+<span class="lineNum">      45 </span>            : # endif
+<span class="lineNum">      46 </span>            : # if defined HAVE_SYS_FILSYS_H &amp;&amp; !defined _CRAY
+<span class="lineNum">      47 </span>            : #  include &lt;sys/filsys.h&gt;       /* SVR2 */
+<span class="lineNum">      48 </span>            : # endif
+<span class="lineNum">      49 </span>            : # if HAVE_SYS_STATFS_H
+<span class="lineNum">      50 </span>            : #  include &lt;sys/statfs.h&gt;
+<span class="lineNum">      51 </span>            : # endif
+<span class="lineNum">      52 </span>            : # if HAVE_DUSTAT_H              /* AIX PS/2 */
+<span class="lineNum">      53 </span>            : #  include &lt;sys/dustat.h&gt;
+<span class="lineNum">      54 </span>            : # endif
+<span class="lineNum">      55 </span>            : # include &quot;full-read.h&quot;
+<span class="lineNum">      56 </span>            : #endif
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : /* Many space usage primitives use all 1 bits to denote a value that is
+<span class="lineNum">      59 </span>            :    not applicable or unknown.  Propagate this information by returning
+<span class="lineNum">      60 </span>            :    a uintmax_t value that is all 1 bits if X is all 1 bits, even if X
+<span class="lineNum">      61 </span>            :    is unsigned and narrower than uintmax_t.  */
+<span class="lineNum">      62 </span>            : #define PROPAGATE_ALL_ONES(x) \
+<span class="lineNum">      63 </span>            :   ((sizeof (x) &lt; sizeof (uintmax_t) \
+<span class="lineNum">      64 </span>            :     &amp;&amp; (~ (x) == (sizeof (x) &lt; sizeof (int) \
+<span class="lineNum">      65 </span>            :                   ? - (1 &lt;&lt; (sizeof (x) * CHAR_BIT)) \
+<span class="lineNum">      66 </span>            :                   : 0))) \
+<span class="lineNum">      67 </span>            :    ? UINTMAX_MAX : (uintmax_t) (x))
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : /* Extract the top bit of X as an uintmax_t value.  */
+<span class="lineNum">      70 </span>            : #define EXTRACT_TOP_BIT(x) ((x) \
+<span class="lineNum">      71 </span>            :                             &amp; ((uintmax_t) 1 &lt;&lt; (sizeof (x) * CHAR_BIT - 1)))
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : /* If a value is negative, many space usage primitives store it into an
+<span class="lineNum">      74 </span>            :    integer variable by assignment, even if the variable's type is unsigned.
+<span class="lineNum">      75 </span>            :    So, if a space usage variable X's top bit is set, convert X to the
+<span class="lineNum">      76 </span>            :    uintmax_t value V such that (- (uintmax_t) V) is the negative of
+<span class="lineNum">      77 </span>            :    the original value.  If X's top bit is clear, just yield X.
+<span class="lineNum">      78 </span>            :    Use PROPAGATE_TOP_BIT if the original value might be negative;
+<span class="lineNum">      79 </span>            :    otherwise, use PROPAGATE_ALL_ONES.  */
+<span class="lineNum">      80 </span>            : #define PROPAGATE_TOP_BIT(x) ((x) | ~ (EXTRACT_TOP_BIT (x) - 1))
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            : #ifdef STAT_STATVFS
+<span class="lineNum">      83 </span>            : /* Return true if statvfs works.  This is false for statvfs on systems
+<span class="lineNum">      84 </span>            :    with GNU libc on Linux kernels before 2.6.36, which stats all
+<span class="lineNum">      85 </span>            :    preceding entries in /proc/mounts; that makes df hang if even one
+<span class="lineNum">      86 </span>            :    of the corresponding file systems is hard-mounted but not available.  */
+<span class="lineNum">      87 </span>            : # if ! (__linux__ &amp;&amp; (__GLIBC__ || __UCLIBC__))
+<span class="lineNum">      88 </span>            : /* The FRSIZE fallback is not required in this case.  */
+<span class="lineNum">      89 </span>            : #  undef STAT_STATFS2_FRSIZE
+<span class="lineNum">      90 </span>            : static int statvfs_works (void) { return 1; }
+<span class="lineNum">      91 </span>            : # else
+<span class="lineNum">      92 </span>            : #  include &lt;string.h&gt; /* for strverscmp */
+<span class="lineNum">      93 </span>            : #  include &lt;sys/utsname.h&gt;
+<span class="lineNum">      94 </span>            : #  include &lt;sys/statfs.h&gt;
+<span class="lineNum">      95 </span>            : #  define STAT_STATFS2_BSIZE 1
+<a name="96"><span class="lineNum">      96 </span>            : </a>
+<span class="lineNum">      97 </span>            : static int
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 : statvfs_works (void)</span>
+<span class="lineNum">      99 </span>            : {
+<span class="lineNum">     100 </span>            :   static int statvfs_works_cache = -1;
+<span class="lineNum">     101 </span>            :   struct utsname name;
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :   if (statvfs_works_cache &lt; 0)</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :     statvfs_works_cache = (uname (&amp;name) == 0</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :                            &amp;&amp; 0 &lt;= strverscmp (name.release, &quot;2.6.36&quot;));</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   return statvfs_works_cache;</span>
+<span class="lineNum">     106 </span>            : }
+<span class="lineNum">     107 </span>            : # endif
+<span class="lineNum">     108 </span>            : #endif
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : /* Fill in the fields of FSP with information about space usage for
+<span class="lineNum">     112 </span>            :    the file system on which FILE resides.
+<span class="lineNum">     113 </span>            :    DISK is the device on which FILE is mounted, for space-getting
+<span class="lineNum">     114 </span>            :    methods that need to know it.
+<span class="lineNum">     115 </span>            :    Return 0 if successful, -1 if not.  When returning -1, ensure that
+<span class="lineNum">     116 </span>            :    ERRNO is either a system error value, or zero if DISK is NULL
+<a name="117"><span class="lineNum">     117 </span>            :    on a system that requires a non-NULL value.  */</a>
+<span class="lineNum">     118 </span>            : int
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 : get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)</span>
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span>            : #ifdef STAT_STATVFS     /* POSIX, except pre-2.6.36 glibc/Linux */
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :   if (statvfs_works ())</span>
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span>            :       struct statvfs vfsd;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :       if (statvfs (file, &amp;vfsd) &lt; 0)</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :       /* f_frsize isn't guaranteed to be supported.  */
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_blocksize = (vfsd.f_frsize</span>
+<span class="lineNum">     132 </span>            :                             ? PROPAGATE_ALL_ONES (vfsd.f_frsize)
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                             : PROPAGATE_ALL_ONES (vfsd.f_bsize));</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_blocks = PROPAGATE_ALL_ONES (vfsd.f_blocks);</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_bfree = PROPAGATE_ALL_ONES (vfsd.f_bfree);</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_bavail = PROPAGATE_TOP_BIT (vfsd.f_bavail);</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_bavail_top_bit_set = EXTRACT_TOP_BIT (vfsd.f_bavail) != 0;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_files = PROPAGATE_ALL_ONES (vfsd.f_files);</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       fsp-&gt;fsu_ffree = PROPAGATE_ALL_ONES (vfsd.f_ffree);</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       return 0;</span>
+<span class="lineNum">     142 </span>            :     }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            : #endif
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : #if defined STAT_STATVFS64            /* AIX */
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :   struct statvfs64 fsd;
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :   if (statvfs64 (file, &amp;fsd) &lt; 0)
+<span class="lineNum">     151 </span>            :     return -1;
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   /* f_frsize isn't guaranteed to be supported.  */
+<span class="lineNum">     154 </span>            :   fsp-&gt;fsu_blocksize = (fsd.f_frsize
+<span class="lineNum">     155 </span>            :                         ? PROPAGATE_ALL_ONES (fsd.f_frsize)
+<span class="lineNum">     156 </span>            :                         : PROPAGATE_ALL_ONES (fsd.f_bsize));
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : #elif defined STAT_STATFS2_FS_DATA      /* Ultrix */
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :   struct fs_data fsd;
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :   if (statfs (file, &amp;fsd) != 1)
+<span class="lineNum">     163 </span>            :     return -1;
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   fsp-&gt;fsu_blocksize = 1024;
+<span class="lineNum">     166 </span>            :   fsp-&gt;fsu_blocks = PROPAGATE_ALL_ONES (fsd.fd_req.btot);
+<span class="lineNum">     167 </span>            :   fsp-&gt;fsu_bfree = PROPAGATE_ALL_ONES (fsd.fd_req.bfree);
+<span class="lineNum">     168 </span>            :   fsp-&gt;fsu_bavail = PROPAGATE_TOP_BIT (fsd.fd_req.bfreen);
+<span class="lineNum">     169 </span>            :   fsp-&gt;fsu_bavail_top_bit_set = EXTRACT_TOP_BIT (fsd.fd_req.bfreen) != 0;
+<span class="lineNum">     170 </span>            :   fsp-&gt;fsu_files = PROPAGATE_ALL_ONES (fsd.fd_req.gtot);
+<span class="lineNum">     171 </span>            :   fsp-&gt;fsu_ffree = PROPAGATE_ALL_ONES (fsd.fd_req.gfree);
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            : #elif defined STAT_READ_FILSYS          /* SVR2 */
+<span class="lineNum">     174 </span>            : # ifndef SUPERBOFF
+<span class="lineNum">     175 </span>            : #  define SUPERBOFF (SUPERB * 512)
+<span class="lineNum">     176 </span>            : # endif
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :   struct filsys fsd;
+<span class="lineNum">     179 </span>            :   int fd;
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   if (! disk)
+<span class="lineNum">     182 </span>            :     {
+<span class="lineNum">     183 </span>            :       errno = 0;
+<span class="lineNum">     184 </span>            :       return -1;
+<span class="lineNum">     185 </span>            :     }
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :   fd = open (disk, O_RDONLY);
+<span class="lineNum">     188 </span>            :   if (fd &lt; 0)
+<span class="lineNum">     189 </span>            :     return -1;
+<span class="lineNum">     190 </span>            :   lseek (fd, (off_t) SUPERBOFF, 0);
+<span class="lineNum">     191 </span>            :   if (full_read (fd, (char *) &amp;fsd, sizeof fsd) != sizeof fsd)
+<span class="lineNum">     192 </span>            :     {
+<span class="lineNum">     193 </span>            :       close (fd);
+<span class="lineNum">     194 </span>            :       return -1;
+<span class="lineNum">     195 </span>            :     }
+<span class="lineNum">     196 </span>            :   close (fd);
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   fsp-&gt;fsu_blocksize = (fsd.s_type == Fs2b ? 1024 : 512);
+<span class="lineNum">     199 </span>            :   fsp-&gt;fsu_blocks = PROPAGATE_ALL_ONES (fsd.s_fsize);
+<span class="lineNum">     200 </span>            :   fsp-&gt;fsu_bfree = PROPAGATE_ALL_ONES (fsd.s_tfree);
+<span class="lineNum">     201 </span>            :   fsp-&gt;fsu_bavail = PROPAGATE_TOP_BIT (fsd.s_tfree);
+<span class="lineNum">     202 </span>            :   fsp-&gt;fsu_bavail_top_bit_set = EXTRACT_TOP_BIT (fsd.s_tfree) != 0;
+<span class="lineNum">     203 </span>            :   fsp-&gt;fsu_files = (fsd.s_isize == -1
+<span class="lineNum">     204 </span>            :                     ? UINTMAX_MAX
+<span class="lineNum">     205 </span>            :                     : (fsd.s_isize - 2) * INOPB * (fsd.s_type == Fs2b ? 2 : 1));
+<span class="lineNum">     206 </span>            :   fsp-&gt;fsu_ffree = PROPAGATE_ALL_ONES (fsd.s_tinode);
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            : #elif defined STAT_STATFS3_OSF1         /* OSF/1 */
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   struct statfs fsd;
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :   if (statfs (file, &amp;fsd, sizeof (struct statfs)) != 0)
+<span class="lineNum">     213 </span>            :     return -1;
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :   fsp-&gt;fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_fsize);
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            : #elif defined STAT_STATFS2_FRSIZE        /* 2.6 &lt; glibc/Linux &lt; 2.6.36 */
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :   struct statfs fsd;
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :   if (statfs (file, &amp;fsd) &lt; 0)</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_frsize);</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            : #elif defined STAT_STATFS2_BSIZE        /* glibc/Linux &lt; 2.6, 4.3BSD, SunOS 4, \
+<span class="lineNum">     227 </span>            :                                            Mac OS X &lt; 10.4, FreeBSD &lt; 5.0, \
+<span class="lineNum">     228 </span>            :                                            NetBSD &lt; 3.0, OpenBSD &lt; 4.4 */
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :   struct statfs fsd;
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :   if (statfs (file, &amp;fsd) &lt; 0)
+<span class="lineNum">     233 </span>            :     return -1;
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :   fsp-&gt;fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_bsize);
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : # ifdef STATFS_TRUNCATES_BLOCK_COUNTS
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :   /* In SunOS 4.1.2, 4.1.3, and 4.1.3_U1, the block counts in the
+<span class="lineNum">     240 </span>            :      struct statfs are truncated to 2GB.  These conditions detect that
+<span class="lineNum">     241 </span>            :      truncation, presumably without botching the 4.1.1 case, in which
+<span class="lineNum">     242 </span>            :      the values are not truncated.  The correct counts are stored in
+<span class="lineNum">     243 </span>            :      undocumented spare fields.  */
+<span class="lineNum">     244 </span>            :   if (fsd.f_blocks == 0x7fffffff / fsd.f_bsize &amp;&amp; fsd.f_spare[0] &gt; 0)
+<span class="lineNum">     245 </span>            :     {
+<span class="lineNum">     246 </span>            :       fsd.f_blocks = fsd.f_spare[0];
+<span class="lineNum">     247 </span>            :       fsd.f_bfree = fsd.f_spare[1];
+<span class="lineNum">     248 </span>            :       fsd.f_bavail = fsd.f_spare[2];
+<span class="lineNum">     249 </span>            :     }
+<span class="lineNum">     250 </span>            : # endif /* STATFS_TRUNCATES_BLOCK_COUNTS */
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            : #elif defined STAT_STATFS2_FSIZE        /* 4.4BSD and older NetBSD */
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :   struct statfs fsd;
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   if (statfs (file, &amp;fsd) &lt; 0)
+<span class="lineNum">     257 </span>            :     return -1;
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   fsp-&gt;fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_fsize);
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            : #elif defined STAT_STATFS4              /* SVR3, Dynix, old Irix, old AIX, \
+<span class="lineNum">     262 </span>            :                                            Dolphin */
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            : # if !_AIX &amp;&amp; !defined _SEQUENT_ &amp;&amp; !defined DOLPHIN
+<span class="lineNum">     265 </span>            : #  define f_bavail f_bfree
+<span class="lineNum">     266 </span>            : # endif
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :   struct statfs fsd;
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            :   if (statfs (file, &amp;fsd, sizeof fsd, 0) &lt; 0)
+<span class="lineNum">     271 </span>            :     return -1;
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :   /* Empirically, the block counts on most SVR3 and SVR3-derived
+<span class="lineNum">     274 </span>            :      systems seem to always be in terms of 512-byte blocks,
+<span class="lineNum">     275 </span>            :      no matter what value f_bsize has.  */
+<span class="lineNum">     276 </span>            : # if _AIX || defined _CRAY
+<span class="lineNum">     277 </span>            :    fsp-&gt;fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_bsize);
+<span class="lineNum">     278 </span>            : # else
+<span class="lineNum">     279 </span>            :    fsp-&gt;fsu_blocksize = 512;
+<span class="lineNum">     280 </span>            : # endif
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            : #endif
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            : #if (defined STAT_STATVFS64 || defined STAT_STATFS3_OSF1                \
+<span class="lineNum">     285 </span>            :      || defined STAT_STATFS2_FRSIZE || defined STAT_STATFS2_BSIZE       \
+<span class="lineNum">     286 </span>            :      || defined STAT_STATFS2_FSIZE || defined STAT_STATFS4)
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_blocks = PROPAGATE_ALL_ONES (fsd.f_blocks);</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_bfree = PROPAGATE_ALL_ONES (fsd.f_bfree);</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_bavail = PROPAGATE_TOP_BIT (fsd.f_bavail);</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_bavail_top_bit_set = EXTRACT_TOP_BIT (fsd.f_bavail) != 0;</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_files = PROPAGATE_ALL_ONES (fsd.f_files);</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :   fsp-&gt;fsu_ffree = PROPAGATE_ALL_ONES (fsd.f_ffree);</span>
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            : #endif
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :   (void) disk;  /* avoid argument-unused warning */
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     299 </span>            : }
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            : #if defined _AIX &amp;&amp; defined _I386
+<span class="lineNum">     302 </span>            : /* AIX PS/2 does not supply statfs.  */
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            : int
+<span class="lineNum">     305 </span>            : statfs (char *file, struct statfs *fsb)
+<span class="lineNum">     306 </span>            : {
+<span class="lineNum">     307 </span>            :   struct stat stats;
+<span class="lineNum">     308 </span>            :   struct dustat fsd;
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :   if (stat (file, &amp;stats) != 0)
+<span class="lineNum">     311 </span>            :     return -1;
+<span class="lineNum">     312 </span>            :   if (dustat (stats.st_dev, 0, &amp;fsd, sizeof (fsd)))
+<span class="lineNum">     313 </span>            :     return -1;
+<span class="lineNum">     314 </span>            :   fsb-&gt;f_type   = 0;
+<span class="lineNum">     315 </span>            :   fsb-&gt;f_bsize  = fsd.du_bsize;
+<span class="lineNum">     316 </span>            :   fsb-&gt;f_blocks = fsd.du_fsize - fsd.du_isize;
+<span class="lineNum">     317 </span>            :   fsb-&gt;f_bfree  = fsd.du_tfree;
+<span class="lineNum">     318 </span>            :   fsb-&gt;f_bavail = fsd.du_tfree;
+<span class="lineNum">     319 </span>            :   fsb-&gt;f_files  = (fsd.du_isize - 2) * fsd.du_inopb;
+<span class="lineNum">     320 </span>            :   fsb-&gt;f_ffree  = fsd.du_tinode;
+<span class="lineNum">     321 </span>            :   fsb-&gt;f_fsid.val[0] = fsd.du_site;
+<span class="lineNum">     322 </span>            :   fsb-&gt;f_fsid.val[1] = fsd.du_pckno;
+<span class="lineNum">     323 </span>            :   return 0;
+<span class="lineNum">     324 </span>            : }
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span>            : #endif /* _AIX &amp;&amp; _I386 */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

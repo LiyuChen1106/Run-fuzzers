@@ -1,0 +1,361 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/get-permissions.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - get-permissions.c<span style="font-size: 80%;"> (source / <a href="get-permissions.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* get-permissions.c - get permissions of a file</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2002-2003, 2005-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :    Written by Paul Eggert, Andreas Grünbacher, and Bruno Haible.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      23 </span>            : #include &quot;acl.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &quot;acl-internal.h&quot;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : /* Read the permissions of a file into CTX. If DESC is a valid file descriptor,
+<span class="lineNum">      28 </span>            :    use file descriptor operations, else use filename based operations on NAME.
+<span class="lineNum">      29 </span>            :    MODE is the file mode obtained from a previous stat call.
+<span class="lineNum">      30 </span>            :    Return 0 if successful.  Return -1 and set errno upon failure.  */
+<a name="31"><span class="lineNum">      31 </span>            : </a>
+<span class="lineNum">      32 </span>            : int
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 : get_permissions (const char *name, int desc, mode_t mode,</span>
+<span class="lineNum">      34 </span>            :                  struct permission_context *ctx)
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   memset (ctx, 0, sizeof *ctx);</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   ctx-&gt;mode = mode;</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #if USE_ACL &amp;&amp; HAVE_ACL_GET_FILE
+<span class="lineNum">      40 </span>            :   /* POSIX 1003.1e (draft 17 -- abandoned) specific version.  */
+<span class="lineNum">      41 </span>            :   /* Linux, FreeBSD, Mac OS X, IRIX, Tru64 */
+<span class="lineNum">      42 </span>            : # if !HAVE_ACL_TYPE_EXTENDED
+<span class="lineNum">      43 </span>            :   /* Linux, FreeBSD, IRIX, Tru64 */
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   if (HAVE_ACL_GET_FD &amp;&amp; desc != -1)</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     ctx-&gt;acl = acl_get_fd (desc);</span>
+<span class="lineNum">      47 </span>            :   else
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     ctx-&gt;acl = acl_get_file (name, ACL_TYPE_ACCESS);</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :   if (ctx-&gt;acl == NULL)</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     return acl_errno_valid (errno) ? -1 : 0;</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :   /* With POSIX ACLs, a file cannot have &quot;no&quot; acl; a file without
+<span class="lineNum">      53 </span>            :      extended permissions has a &quot;minimal&quot; acl which is equivalent to the
+<span class="lineNum">      54 </span>            :      file mode.  */
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   if (S_ISDIR (mode))</span>
+<span class="lineNum">      57 </span>            :     {
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       ctx-&gt;default_acl = acl_get_file (name, ACL_TYPE_DEFAULT);</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       if (ctx-&gt;default_acl == NULL)</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">      61 </span>            :     }
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : #  else /* HAVE_ACL_TYPE_EXTENDED */
+<span class="lineNum">      64 </span>            :   /* Mac OS X */
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   /* On Mac OS X,  acl_get_file (name, ACL_TYPE_ACCESS)
+<span class="lineNum">      67 </span>            :      and           acl_get_file (name, ACL_TYPE_DEFAULT)
+<span class="lineNum">      68 </span>            :      always return NULL / EINVAL.  You have to use
+<span class="lineNum">      69 </span>            :                    acl_get_file (name, ACL_TYPE_EXTENDED)
+<span class="lineNum">      70 </span>            :      or            acl_get_fd (open (name, ...))
+<span class="lineNum">      71 </span>            :      to retrieve an ACL.
+<span class="lineNum">      72 </span>            :      On the other hand,
+<span class="lineNum">      73 </span>            :                    acl_set_file (name, ACL_TYPE_ACCESS, acl)
+<span class="lineNum">      74 </span>            :      and           acl_set_file (name, ACL_TYPE_DEFAULT, acl)
+<span class="lineNum">      75 </span>            :      have the same effect as
+<span class="lineNum">      76 </span>            :                    acl_set_file (name, ACL_TYPE_EXTENDED, acl):
+<span class="lineNum">      77 </span>            :      Each of these calls sets the file's ACL.  */
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   if (HAVE_ACL_GET_FD &amp;&amp; desc != -1)
+<span class="lineNum">      80 </span>            :     ctx-&gt;acl = acl_get_fd (desc);
+<span class="lineNum">      81 </span>            :   else
+<span class="lineNum">      82 </span>            :     ctx-&gt;acl = acl_get_file (name, ACL_TYPE_EXTENDED);
+<span class="lineNum">      83 </span>            :   if (ctx-&gt;acl == NULL)
+<span class="lineNum">      84 </span>            :     return acl_errno_valid (errno) ? -1 : 0;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : # endif
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            : #elif USE_ACL &amp;&amp; defined GETACL /* Solaris, Cygwin, not HP-UX */
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :   /* Solaris 2.5 through Solaris 10, Cygwin, and contemporaneous versions
+<span class="lineNum">      91 </span>            :      of Unixware.  The acl() call returns the access and default ACL both
+<span class="lineNum">      92 </span>            :      at once.  */
+<span class="lineNum">      93 </span>            : # ifdef ACE_GETACL
+<span class="lineNum">      94 </span>            :   /* Solaris also has a different variant of ACLs, used in ZFS and NFSv4
+<span class="lineNum">      95 </span>            :      file systems (whereas the other ones are used in UFS file systems).
+<span class="lineNum">      96 </span>            :      There is an API
+<span class="lineNum">      97 </span>            :        pathconf (name, _PC_ACL_ENABLED)
+<span class="lineNum">      98 </span>            :        fpathconf (desc, _PC_ACL_ENABLED)
+<span class="lineNum">      99 </span>            :      that allows to determine which of the two kinds of ACLs is supported
+<span class="lineNum">     100 </span>            :      for the given file.  But some file systems may implement this call
+<span class="lineNum">     101 </span>            :      incorrectly, so better not use it.
+<span class="lineNum">     102 </span>            :      When fetching the source ACL, we simply fetch both ACL types.
+<span class="lineNum">     103 </span>            :      When setting the destination ACL, we try either ACL types, assuming
+<span class="lineNum">     104 </span>            :      that the kernel will translate the ACL from one form to the other.
+<span class="lineNum">     105 </span>            :      (See in &lt;http://docs.sun.com/app/docs/doc/819-2241/6n4huc7ia?l=en&amp;a=view&gt;
+<span class="lineNum">     106 </span>            :      the description of ENOTSUP.)  */
+<span class="lineNum">     107 </span>            :   for (;;)
+<span class="lineNum">     108 </span>            :     {
+<span class="lineNum">     109 </span>            :       int ret;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :       if (desc != -1)
+<span class="lineNum">     112 </span>            :         ret = facl (desc, ACE_GETACLCNT, 0, NULL);
+<span class="lineNum">     113 </span>            :       else
+<span class="lineNum">     114 </span>            :         ret = acl (name, ACE_GETACLCNT, 0, NULL);
+<span class="lineNum">     115 </span>            :       if (ret &lt; 0)
+<span class="lineNum">     116 </span>            :         {
+<span class="lineNum">     117 </span>            :           if (errno == ENOSYS || errno == EINVAL)
+<span class="lineNum">     118 </span>            :             ret = 0;
+<span class="lineNum">     119 </span>            :           else
+<span class="lineNum">     120 </span>            :             return -1;
+<span class="lineNum">     121 </span>            :         }
+<span class="lineNum">     122 </span>            :       ctx-&gt;ace_count = ret;
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :       if (ctx-&gt;ace_count == 0)
+<span class="lineNum">     125 </span>            :         break;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :       ctx-&gt;ace_entries = (ace_t *) malloc (ctx-&gt;ace_count * sizeof (ace_t));
+<span class="lineNum">     128 </span>            :       if (ctx-&gt;ace_entries == NULL)
+<span class="lineNum">     129 </span>            :         {
+<span class="lineNum">     130 </span>            :           errno = ENOMEM;
+<span class="lineNum">     131 </span>            :           return -1;
+<span class="lineNum">     132 </span>            :         }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :       if (desc != -1)
+<span class="lineNum">     135 </span>            :         ret = facl (desc, ACE_GETACL, ctx-&gt;ace_count, ctx-&gt;ace_entries);
+<span class="lineNum">     136 </span>            :       else
+<span class="lineNum">     137 </span>            :         ret = acl (name, ACE_GETACL, ctx-&gt;ace_count, ctx-&gt;ace_entries);
+<span class="lineNum">     138 </span>            :       if (ret &lt; 0)
+<span class="lineNum">     139 </span>            :         {
+<span class="lineNum">     140 </span>            :           if (errno == ENOSYS || errno == EINVAL)
+<span class="lineNum">     141 </span>            :             {
+<span class="lineNum">     142 </span>            :               free (ctx-&gt;ace_entries);
+<span class="lineNum">     143 </span>            :               ctx-&gt;ace_entries = NULL;
+<span class="lineNum">     144 </span>            :               ctx-&gt;ace_count = 0;
+<span class="lineNum">     145 </span>            :               break;
+<span class="lineNum">     146 </span>            :             }
+<span class="lineNum">     147 </span>            :           else
+<span class="lineNum">     148 </span>            :             return -1;
+<span class="lineNum">     149 </span>            :         }
+<span class="lineNum">     150 </span>            :       if (ret &lt;= ctx-&gt;ace_count)
+<span class="lineNum">     151 </span>            :         {
+<span class="lineNum">     152 </span>            :           ctx-&gt;ace_count = ret;
+<span class="lineNum">     153 </span>            :           break;
+<span class="lineNum">     154 </span>            :         }
+<span class="lineNum">     155 </span>            :       /* Huh? The number of ACL entries has increased since the last call.
+<span class="lineNum">     156 </span>            :          Repeat.  */
+<span class="lineNum">     157 </span>            :       free (ctx-&gt;ace_entries);
+<span class="lineNum">     158 </span>            :       ctx-&gt;ace_entries = NULL;
+<span class="lineNum">     159 </span>            :     }
+<span class="lineNum">     160 </span>            : # endif
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :   for (;;)
+<span class="lineNum">     163 </span>            :     {
+<span class="lineNum">     164 </span>            :       int ret;
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :       if (desc != -1)
+<span class="lineNum">     167 </span>            :         ret = facl (desc, GETACLCNT, 0, NULL);
+<span class="lineNum">     168 </span>            :       else
+<span class="lineNum">     169 </span>            :         ret = acl (name, GETACLCNT, 0, NULL);
+<span class="lineNum">     170 </span>            :       if (ret &lt; 0)
+<span class="lineNum">     171 </span>            :         {
+<span class="lineNum">     172 </span>            :           if (errno == ENOSYS || errno == ENOTSUP || errno == EOPNOTSUPP)
+<span class="lineNum">     173 </span>            :             ret = 0;
+<span class="lineNum">     174 </span>            :           else
+<span class="lineNum">     175 </span>            :             return -1;
+<span class="lineNum">     176 </span>            :         }
+<span class="lineNum">     177 </span>            :       ctx-&gt;count = ret;
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :       if (ctx-&gt;count == 0)
+<span class="lineNum">     180 </span>            :         break;
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :       ctx-&gt;entries = (aclent_t *) malloc (ctx-&gt;count * sizeof (aclent_t));
+<span class="lineNum">     183 </span>            :       if (ctx-&gt;entries == NULL)
+<span class="lineNum">     184 </span>            :         {
+<span class="lineNum">     185 </span>            :           errno = ENOMEM;
+<span class="lineNum">     186 </span>            :           return -1;
+<span class="lineNum">     187 </span>            :         }
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :       if (desc != -1)
+<span class="lineNum">     190 </span>            :         ret = facl (desc, GETACL, ctx-&gt;count, ctx-&gt;entries);
+<span class="lineNum">     191 </span>            :       else
+<span class="lineNum">     192 </span>            :         ret = acl (name, GETACL, ctx-&gt;count, ctx-&gt;entries);
+<span class="lineNum">     193 </span>            :       if (ret &lt; 0)
+<span class="lineNum">     194 </span>            :         {
+<span class="lineNum">     195 </span>            :           if (errno == ENOSYS || errno == ENOTSUP || errno == EOPNOTSUPP)
+<span class="lineNum">     196 </span>            :             {
+<span class="lineNum">     197 </span>            :               free (ctx-&gt;entries);
+<span class="lineNum">     198 </span>            :               ctx-&gt;entries = NULL;
+<span class="lineNum">     199 </span>            :               ctx-&gt;count = 0;
+<span class="lineNum">     200 </span>            :               break;
+<span class="lineNum">     201 </span>            :             }
+<span class="lineNum">     202 </span>            :           else
+<span class="lineNum">     203 </span>            :             return -1;
+<span class="lineNum">     204 </span>            :         }
+<span class="lineNum">     205 </span>            :       if (ret &lt;= ctx-&gt;count)
+<span class="lineNum">     206 </span>            :         {
+<span class="lineNum">     207 </span>            :           ctx-&gt;count = ret;
+<span class="lineNum">     208 </span>            :           break;
+<span class="lineNum">     209 </span>            :         }
+<span class="lineNum">     210 </span>            :       /* Huh? The number of ACL entries has increased since the last call.
+<span class="lineNum">     211 </span>            :          Repeat.  */
+<span class="lineNum">     212 </span>            :       free (ctx-&gt;entries);
+<span class="lineNum">     213 </span>            :       ctx-&gt;entries = NULL;
+<span class="lineNum">     214 </span>            :     }
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : #elif USE_ACL &amp;&amp; HAVE_GETACL /* HP-UX */
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :   {
+<span class="lineNum">     219 </span>            :     int ret;
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :     if (desc != -1)
+<span class="lineNum">     222 </span>            :       ret = fgetacl (desc, NACLENTRIES, ctx-&gt;entries);
+<span class="lineNum">     223 </span>            :     else
+<span class="lineNum">     224 </span>            :       ret = getacl (name, NACLENTRIES, ctx-&gt;entries);
+<span class="lineNum">     225 </span>            :     if (ret &lt; 0)
+<span class="lineNum">     226 </span>            :       {
+<span class="lineNum">     227 </span>            :         if (errno == ENOSYS || errno == EOPNOTSUPP || errno == ENOTSUP)
+<span class="lineNum">     228 </span>            :           ret = 0;
+<span class="lineNum">     229 </span>            :         else
+<span class="lineNum">     230 </span>            :           return -1;
+<span class="lineNum">     231 </span>            :       }
+<span class="lineNum">     232 </span>            :     else if (ret &gt; NACLENTRIES)
+<span class="lineNum">     233 </span>            :       /* If NACLENTRIES cannot be trusted, use dynamic memory allocation.  */
+<span class="lineNum">     234 </span>            :       abort ();
+<span class="lineNum">     235 </span>            :     ctx-&gt;count = ret;
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : # if HAVE_ACLV_H
+<span class="lineNum">     238 </span>            :     ret = acl ((char *) name, ACL_GET, NACLVENTRIES, ctx-&gt;aclv_entries);
+<span class="lineNum">     239 </span>            :     if (ret &lt; 0)
+<span class="lineNum">     240 </span>            :       {
+<span class="lineNum">     241 </span>            :         if (errno == ENOSYS || errno == EOPNOTSUPP || errno == EINVAL)
+<span class="lineNum">     242 </span>            :           ret = 0;
+<span class="lineNum">     243 </span>            :         else
+<span class="lineNum">     244 </span>            :           return -2;
+<span class="lineNum">     245 </span>            :       }
+<span class="lineNum">     246 </span>            :     else if (ret &gt; NACLVENTRIES)
+<span class="lineNum">     247 </span>            :       /* If NACLVENTRIES cannot be trusted, use dynamic memory allocation.  */
+<span class="lineNum">     248 </span>            :       abort ();
+<span class="lineNum">     249 </span>            :     ctx-&gt;aclv_count = ret;
+<span class="lineNum">     250 </span>            : # endif
+<span class="lineNum">     251 </span>            :   }
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            : #elif USE_ACL &amp;&amp; HAVE_ACLX_GET &amp;&amp; ACL_AIX_WIP /* AIX */
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :   /* TODO (see set_permissions). */
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : #elif USE_ACL &amp;&amp; HAVE_STATACL /* older AIX */
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   {
+<span class="lineNum">     260 </span>            :     int ret;
+<span class="lineNum">     261 </span>            :     if (desc != -1)
+<span class="lineNum">     262 </span>            :       ret = fstatacl (desc, STX_NORMAL, &amp;ctx-&gt;u.a, sizeof ctx-&gt;u);
+<span class="lineNum">     263 </span>            :     else
+<span class="lineNum">     264 </span>            :       ret = statacl ((char *) name, STX_NORMAL, &amp;ctx-&gt;u.a, sizeof ctx-&gt;u);
+<span class="lineNum">     265 </span>            :     if (ret == 0)
+<span class="lineNum">     266 </span>            :       ctx-&gt;have_u = true;
+<span class="lineNum">     267 </span>            :   }
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            : #elif USE_ACL &amp;&amp; HAVE_ACLSORT /* NonStop Kernel */
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :   {
+<span class="lineNum">     272 </span>            :     int ret = acl ((char *) name, ACL_GET, NACLENTRIES, ctx-&gt;entries);
+<span class="lineNum">     273 </span>            :     if (ret &lt; 0)
+<span class="lineNum">     274 </span>            :       return -1;
+<span class="lineNum">     275 </span>            :     else if (ret &gt; NACLENTRIES)
+<span class="lineNum">     276 </span>            :       /* If NACLENTRIES cannot be trusted, use dynamic memory allocation.  */
+<span class="lineNum">     277 </span>            :       abort ();
+<span class="lineNum">     278 </span>            :     ctx-&gt;count = ret;
+<span class="lineNum">     279 </span>            :   }
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            : #endif
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

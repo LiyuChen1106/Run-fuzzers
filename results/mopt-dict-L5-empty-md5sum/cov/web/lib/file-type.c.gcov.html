@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/file-type.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - file-type.c<span style="font-size: 80%;"> (source / <a href="file-type.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Return a string describing the type of a file.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1993-1994, 2001-2002, 2004-2006, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &quot;file-type.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;gettext.h&gt;
+<span class="lineNum">      26 </span>            : #define _(text) gettext (text)
+<a name="27"><span class="lineNum">      27 </span>            : </a>
+<span class="lineNum">      28 </span>            : char const *
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 : file_type (struct stat const *st)</span>
+<span class="lineNum">      30 </span>            : {
+<span class="lineNum">      31 </span>            :   /* See POSIX 1003.1-2001 XCU Table 4-8 lines 17093-17107 for some of
+<span class="lineNum">      32 </span>            :      these formats.
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :      To keep diagnostics grammatical in English, the returned string
+<span class="lineNum">      35 </span>            :      must start with a consonant.  */
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   /* Do these three first, as they're the most common.  */
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :   if (S_ISREG (st-&gt;st_mode))</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     return st-&gt;st_size == 0 ? _(&quot;regular empty file&quot;) : _(&quot;regular file&quot;);</span>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :   if (S_ISDIR (st-&gt;st_mode))</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :     return _(&quot;directory&quot;);</span>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   if (S_ISLNK (st-&gt;st_mode))</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     return _(&quot;symbolic link&quot;);</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   /* Do the S_TYPEIS* macros next, as they may be implemented in terms
+<span class="lineNum">      49 </span>            :      of S_ISNAM, and we want the more-specialized interpretation.  */
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :   if (S_TYPEISMQ (st))
+<span class="lineNum">      52 </span>            :     return _(&quot;message queue&quot;);
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :   if (S_TYPEISSEM (st))
+<span class="lineNum">      55 </span>            :     return _(&quot;semaphore&quot;);
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :   if (S_TYPEISSHM (st))
+<span class="lineNum">      58 </span>            :     return _(&quot;shared memory object&quot;);
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :   if (S_TYPEISTMO (st))
+<span class="lineNum">      61 </span>            :     return _(&quot;typed memory object&quot;);
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :   /* The remaining are in alphabetical order.  */
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   if (S_ISBLK (st-&gt;st_mode))</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     return _(&quot;block special file&quot;);</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   if (S_ISCHR (st-&gt;st_mode))</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :     return _(&quot;character special file&quot;);</span>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   if (S_ISCTG (st-&gt;st_mode))
+<span class="lineNum">      72 </span>            :     return _(&quot;contiguous data&quot;);
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :   if (S_ISFIFO (st-&gt;st_mode))</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :     return _(&quot;fifo&quot;);</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   if (S_ISDOOR (st-&gt;st_mode))
+<span class="lineNum">      78 </span>            :     return _(&quot;door&quot;);
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :   if (S_ISMPB (st-&gt;st_mode))
+<span class="lineNum">      81 </span>            :     return _(&quot;multiplexed block special file&quot;);
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :   if (S_ISMPC (st-&gt;st_mode))
+<span class="lineNum">      84 </span>            :     return _(&quot;multiplexed character special file&quot;);
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :   if (S_ISMPX (st-&gt;st_mode))
+<span class="lineNum">      87 </span>            :     return _(&quot;multiplexed file&quot;);
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :   if (S_ISNAM (st-&gt;st_mode))
+<span class="lineNum">      90 </span>            :     return _(&quot;named file&quot;);
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :   if (S_ISNWK (st-&gt;st_mode))
+<span class="lineNum">      93 </span>            :     return _(&quot;network special file&quot;);
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   if (S_ISOFD (st-&gt;st_mode))
+<span class="lineNum">      96 </span>            :     return _(&quot;migrated file with data&quot;);
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :   if (S_ISOFL (st-&gt;st_mode))
+<span class="lineNum">      99 </span>            :     return _(&quot;migrated file without data&quot;);
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :   if (S_ISPORT (st-&gt;st_mode))
+<span class="lineNum">     102 </span>            :     return _(&quot;port&quot;);
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :   if (S_ISSOCK (st-&gt;st_mode))</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :     return _(&quot;socket&quot;);</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   if (S_ISWHT (st-&gt;st_mode))
+<span class="lineNum">     108 </span>            :     return _(&quot;whiteout&quot;);
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   return _(&quot;weird file&quot;);</span>
+<span class="lineNum">     111 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
