@@ -1,0 +1,54 @@
+    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --initial --directory .. --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
+Capturing coverage data from ..
+Found gcov version: 5.4.0
+Scanning .. for .gcno files ...
+Out of memory!
+Found 361 graph files in ..
+Processing lib/se-context.gcno
+
+*** Imported 1 new test cases from: ../../mopt-dict-L5-empty-md5sum//queue
+
+[+] AFL test case: id:000000,orig:giantpanda-bin-md5s (0 / 1), cycle: 0
+    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --directory .. --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info
+Capturing coverage data from ..
+Found gcov version: 5.4.0
+Scanning .. for .gcda files ...
+Out of memory!
+Found 22 data files in ..
+Processing lib/quotearg.gcda
+    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info --output-file /tmp/tmpf7SoX5
+lcov: ERROR: no valid records found in tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
+Combining tracefiles.
+Reading tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
+    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -r /tmp/tmpf7SoX5 /usr/include/\*  --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
+lcov: ERROR: no valid records found in tracefile /tmp/tmpf7SoX5
+Reading tracefile /tmp/tmpf7SoX5
+[-] Coverage file '../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final' does not exist, skipping.
+
+
+++++++ BEGIN - first exec output for CMD: /bin/cat ../../mopt-dict-L5-empty-md5sum//queue/id:000000,orig:giantpanda-bin-md5s | ./md5sum 
+    d784fa8b6d98d27699781bd9a7cf19f0  -
+++++++ END
+
+[+] Processed 1 / 1 test cases.
+
+[+] Final zero coverage report: ../../mopt-dict-L5-empty-md5sum//cov/zero-cov
+[+] Final positive coverage report: ../../mopt-dict-L5-empty-md5sum//cov/pos-cov
+    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --directory .. --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info
+Capturing coverage data from ..
+Found gcov version: 5.4.0
+Scanning .. for .gcda files ...
+Out of memory!
+Found 22 data files in ..
+Processing lib/quotearg.gcda
+    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info --output-file /tmp/tmpgoP6Rm
+lcov: ERROR: no valid records found in tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
+Combining tracefiles.
+Reading tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
+    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -r /tmp/tmpgoP6Rm /usr/include/\*  --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
+lcov: ERROR: no valid records found in tracefile /tmp/tmpgoP6Rm
+Reading tracefile /tmp/tmpgoP6Rm
+    Non-zero exit status '2' for CMD: /usr/bin/genhtml --output-directory ../../mopt-dict-L5-empty-md5sum//cov/web ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
+genhtml: ERROR: cannot read file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final!
+Reading data file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
+[+] Final lcov web report: ../../mopt-dict-L5-empty-md5sum//cov/web/index.html
