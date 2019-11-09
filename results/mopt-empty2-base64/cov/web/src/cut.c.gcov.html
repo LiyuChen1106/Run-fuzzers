@@ -1,0 +1,911 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - src/cut.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - cut.c<span style="font-size: 80%;"> (source / <a href="cut.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">318</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:44:49</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : static unsigned int lava_val[1000000]; static int lava_first=1;</a>
+<span class="lineNum">       2 </span>            : void lava_set(unsigned int bug_num, unsigned int val);
+<a name="3"><span class="lineNum">       3 </span><span class="lineNoCov">          0 : void lava_set(unsigned int bug_num, unsigned int val) { if (lava_first) {int i; lava_first=0; for (i=0; i&lt;1000000; i++) lava_val[i]=0; }  lava_val[bug_num] = val; }</span></a>
+<span class="lineNum">       4 </span>            : unsigned int lava_get(unsigned int bug_num);
+<span class="lineNum">       5 </span><span class="lineNoCov">          0 : unsigned int lava_get(unsigned int bug_num) { return lava_val[bug_num]; }</span>
+<span class="lineNum">       6 </span>            : /* cut - remove parts of lines of files
+<span class="lineNum">       7 </span>            :    Copyright (C) 1997-2015 Free Software Foundation, Inc.
+<span class="lineNum">       8 </span>            :    Copyright (C) 1984 David M. Ihnat
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">      12 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">      13 </span>            :    (at your option) any later version.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      21 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : /* Written by David Ihnat.  */
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /* POSIX changes, bug fixes, long-named options, and cleanup
+<span class="lineNum">      26 </span>            :    by David MacKenzie &lt;djm@gnu.ai.mit.edu&gt;.
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :    Rewrite cut_fields and cut_bytes -- Jim Meyering.  */
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;assert.h&gt;
+<span class="lineNum">      34 </span>            : #include &lt;getopt.h&gt;
+<span class="lineNum">      35 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      36 </span>            : #include &quot;system.h&quot;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #include &quot;error.h&quot;
+<span class="lineNum">      39 </span>            : #include &quot;fadvise.h&quot;
+<span class="lineNum">      40 </span>            : #include &quot;getndelim2.h&quot;
+<span class="lineNum">      41 </span>            : #include &quot;hash.h&quot;
+<span class="lineNum">      42 </span>            : #include &quot;quote.h&quot;
+<span class="lineNum">      43 </span>            : #include &quot;xstrndup.h&quot;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : /* The official name of this program (e.g., no 'g' prefix).  */
+<span class="lineNum">      46 </span>            : #define PROGRAM_NAME &quot;cut&quot;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #define AUTHORS \
+<span class="lineNum">      49 </span>            :   proper_name (&quot;David M. Ihnat&quot;), \
+<span class="lineNum">      50 </span>            :   proper_name (&quot;David MacKenzie&quot;), \
+<span class="lineNum">      51 </span>            :   proper_name (&quot;Jim Meyering&quot;)
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : #define FATAL_ERROR(Message)                                            \
+<span class="lineNum">      54 </span>            :   do                                                                    \
+<span class="lineNum">      55 </span>            :     {                                                                   \
+<span class="lineNum">      56 </span>            :       error (0, 0, (Message));                                          \
+<span class="lineNum">      57 </span>            :       usage (EXIT_FAILURE);                                             \
+<span class="lineNum">      58 </span>            :     }                                                                   \
+<span class="lineNum">      59 </span>            :   while (0)
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : struct range_pair
+<span class="lineNum">      63 </span>            :   {
+<span class="lineNum">      64 </span>            :     size_t lo;
+<span class="lineNum">      65 </span>            :     size_t hi;
+<span class="lineNum">      66 </span>            :   };
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            : /* Array of `struct range_pair' holding all the finite ranges. */
+<span class="lineNum">      69 </span>            : static struct range_pair *rp;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : /* Pointer inside RP.  When checking if a byte or field is selected
+<span class="lineNum">      72 </span>            :    by a finite range, we check if it is between CURRENT_RP.LO
+<span class="lineNum">      73 </span>            :    and CURRENT_RP.HI.  If the byte or field index is greater than
+<span class="lineNum">      74 </span>            :    CURRENT_RP.HI then we make CURRENT_RP to point to the next range pair. */
+<span class="lineNum">      75 </span>            : static struct range_pair *current_rp;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : /* Number of finite ranges specified by the user. */
+<span class="lineNum">      78 </span>            : static size_t n_rp;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : /* Number of `struct range_pair's allocated. */
+<span class="lineNum">      81 </span>            : static size_t n_rp_allocated;
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : /* Append LOW, HIGH to the list RP of range pairs, allocating additional
+<span class="lineNum">      85 </span>            :    space if necessary.  Update global variable N_RP.  When allocating,
+<span class="lineNum">      86 </span>            :    update global variable N_RP_ALLOCATED.  */
+<a name="87"><span class="lineNum">      87 </span>            : </a>
+<span class="lineNum">      88 </span>            : static void
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 : add_range_pair (size_t lo, size_t hi)</span>
+<span class="lineNum">      90 </span>            : {
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   if (n_rp == n_rp_allocated)</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     rp = X2NREALLOC (rp, &amp;n_rp_allocated);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :   rp[n_rp].lo = lo;</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   rp[n_rp].hi = hi;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :   ++n_rp;</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : /* This buffer is used to support the semantics of the -s option
+<span class="lineNum">      99 </span>            :    (or lack of same) when the specified field list includes (does
+<span class="lineNum">     100 </span>            :    not include) the first field.  In both of those cases, the entire
+<span class="lineNum">     101 </span>            :    first field must be read into this buffer to determine whether it
+<span class="lineNum">     102 </span>            :    is followed by a delimiter or a newline before any of it may be
+<span class="lineNum">     103 </span>            :    output.  Otherwise, cut_fields can do the job without using this
+<span class="lineNum">     104 </span>            :    buffer.  */
+<span class="lineNum">     105 </span>            : static char *field_1_buffer;
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : /* The number of bytes allocated for FIELD_1_BUFFER.  */
+<span class="lineNum">     108 </span>            : static size_t field_1_bufsize;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : enum operating_mode
+<span class="lineNum">     111 </span>            :   {
+<span class="lineNum">     112 </span>            :     undefined_mode,
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /* Output characters that are in the given bytes. */
+<span class="lineNum">     115 </span>            :     byte_mode,
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     /* Output the given delimiter-separated fields. */
+<span class="lineNum">     118 </span>            :     field_mode
+<span class="lineNum">     119 </span>            :   };
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : static enum operating_mode operating_mode;
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            : /* If true do not output lines containing no delimiter characters.
+<span class="lineNum">     124 </span>            :    Otherwise, all such lines are printed.  This option is valid only
+<span class="lineNum">     125 </span>            :    with field mode.  */
+<span class="lineNum">     126 </span>            : static bool suppress_non_delimited;
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            : /* If true, print all bytes, characters, or fields _except_
+<span class="lineNum">     129 </span>            :    those that were specified.  */
+<span class="lineNum">     130 </span>            : static bool complement;
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : /* The delimiter character for field mode. */
+<span class="lineNum">     133 </span>            : static unsigned char delim;
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : /* True if the --output-delimiter=STRING option was specified.  */
+<span class="lineNum">     136 </span>            : static bool output_delimiter_specified;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : /* The length of output_delimiter_string.  */
+<span class="lineNum">     139 </span>            : static size_t output_delimiter_length;
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : /* The output field separator string.  Defaults to the 1-character
+<span class="lineNum">     142 </span>            :    string consisting of the input delimiter.  */
+<span class="lineNum">     143 </span>            : static char *output_delimiter_string;
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : /* True if we have ever read standard input. */
+<span class="lineNum">     146 </span>            : static bool have_read_stdin;
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : /* For long options that have no equivalent short option, use a
+<span class="lineNum">     149 </span>            :    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
+<span class="lineNum">     150 </span>            : enum
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span>            :   OUTPUT_DELIMITER_OPTION = CHAR_MAX + 1,
+<span class="lineNum">     153 </span>            :   COMPLEMENT_OPTION
+<span class="lineNum">     154 </span>            : };
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : static struct option const longopts[] =
+<span class="lineNum">     157 </span>            : {
+<span class="lineNum">     158 </span>            :   {&quot;bytes&quot;, required_argument, NULL, 'b'},
+<span class="lineNum">     159 </span>            :   {&quot;characters&quot;, required_argument, NULL, 'c'},
+<span class="lineNum">     160 </span>            :   {&quot;fields&quot;, required_argument, NULL, 'f'},
+<span class="lineNum">     161 </span>            :   {&quot;delimiter&quot;, required_argument, NULL, 'd'},
+<span class="lineNum">     162 </span>            :   {&quot;only-delimited&quot;, no_argument, NULL, 's'},
+<span class="lineNum">     163 </span>            :   {&quot;output-delimiter&quot;, required_argument, NULL, OUTPUT_DELIMITER_OPTION},
+<span class="lineNum">     164 </span>            :   {&quot;complement&quot;, no_argument, NULL, COMPLEMENT_OPTION},
+<span class="lineNum">     165 </span>            :   {GETOPT_HELP_OPTION_DECL},
+<span class="lineNum">     166 </span>            :   {GETOPT_VERSION_OPTION_DECL},
+<span class="lineNum">     167 </span>            :   {NULL, 0, NULL, 0}
+<span class="lineNum">     168 </span>            : };
+<a name="169"><span class="lineNum">     169 </span>            : </a>
+<span class="lineNum">     170 </span>            : void
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 : usage (int status)</span>
+<span class="lineNum">     172 </span>            : {
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   if (status != EXIT_SUCCESS)</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :     emit_try_help ();</span>
+<span class="lineNum">     175 </span>            :   else
+<span class="lineNum">     176 </span>            :     {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       printf (_(&quot;\</span>
+<span class="lineNum">     178 </span>            : Usage: %s OPTION... [FILE]...\n\
+<span class="lineNum">     179 </span>            : &quot;),
+<span class="lineNum">     180 </span>            :               program_name);
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     182 </span>            : Print selected parts of lines from each FILE to standard output.\n\
+<span class="lineNum">     183 </span>            : &quot;), stdout);
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :       emit_stdin_note ();</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :       emit_mandatory_arg_note ();</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     189 </span>            :   -b, --bytes=LIST        select only these bytes\n\
+<span class="lineNum">     190 </span>            :   -c, --characters=LIST   select only these characters\n\
+<span class="lineNum">     191 </span>            :   -d, --delimiter=DELIM   use DELIM instead of TAB for field delimiter\n\
+<span class="lineNum">     192 </span>            : &quot;), stdout);
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     194 </span>            :   -f, --fields=LIST       select only these fields;  also print any line\n\
+<span class="lineNum">     195 </span>            :                             that contains no delimiter character, unless\n\
+<span class="lineNum">     196 </span>            :                             the -s option is specified\n\
+<span class="lineNum">     197 </span>            :   -n                      (ignored)\n\
+<span class="lineNum">     198 </span>            : &quot;), stdout);
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     200 </span>            :       --complement        complement the set of selected bytes, characters\n\
+<span class="lineNum">     201 </span>            :                             or fields\n\
+<span class="lineNum">     202 </span>            : &quot;), stdout);
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     204 </span>            :   -s, --only-delimited    do not print lines not containing delimiters\n\
+<span class="lineNum">     205 </span>            :       --output-delimiter=STRING  use STRING as the output delimiter\n\
+<span class="lineNum">     206 </span>            :                             the default is to use the input delimiter\n\
+<span class="lineNum">     207 </span>            : &quot;), stdout);
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :       fputs (HELP_OPTION_DESCRIPTION, stdout);</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :       fputs (VERSION_OPTION_DESCRIPTION, stdout);</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     211 </span>            : \n\
+<span class="lineNum">     212 </span>            : Use one, and only one of -b, -c or -f.  Each LIST is made up of one\n\
+<span class="lineNum">     213 </span>            : range, or many ranges separated by commas.  Selected input is written\n\
+<span class="lineNum">     214 </span>            : in the same order that it is read, and is written exactly once.\n\
+<span class="lineNum">     215 </span>            : &quot;), stdout);
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">     217 </span>            : Each range is one of:\n\
+<span class="lineNum">     218 </span>            : \n\
+<span class="lineNum">     219 </span>            :   N     N'th byte, character or field, counted from 1\n\
+<span class="lineNum">     220 </span>            :   N-    from N'th byte, character or field, to end of line\n\
+<span class="lineNum">     221 </span>            :   N-M   from N'th to M'th (included) byte, character or field\n\
+<span class="lineNum">     222 </span>            :   -M    from first to M'th (included) byte, character or field\n\
+<span class="lineNum">     223 </span>            : &quot;), stdout);
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :       emit_ancillary_info (PROGRAM_NAME);</span>
+<span class="lineNum">     225 </span>            :     }
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :   exit (status);</span>
+<span class="lineNum">     227 </span>            : }
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            : /* Comparison function for qsort to order the list of
+<a name="230"><span class="lineNum">     230 </span>            :    struct range_pairs.  */</a>
+<span class="lineNum">     231 </span>            : static int
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 : compare_ranges (const void *a, const void *b)</span>
+<span class="lineNum">     233 </span>            : {
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :   int a_start = ((const struct range_pair *) a)-&gt;lo;</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :   int b_start = ((const struct range_pair *) b)-&gt;lo;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :   return a_start &lt; b_start ? -1 : a_start &gt; b_start;</span>
+<span class="lineNum">     237 </span>            : }
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : /* Reallocate Range Pair entries, with corresponding
+<span class="lineNum">     240 </span>            :    entries outside the range of each specified entry.  */
+<a name="241"><span class="lineNum">     241 </span>            : </a>
+<span class="lineNum">     242 </span>            : static void
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 : complement_rp (void)</span>
+<span class="lineNum">     244 </span>            : {
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :   if (complement)</span>
+<span class="lineNum">     246 </span>            :     {
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :       struct range_pair *c = rp;</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :       size_t n = n_rp;</span>
+<span class="lineNum">     249 </span>            :       size_t i;
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :       rp = NULL;</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :       n_rp = 0;</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :       n_rp_allocated = 0;</span>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :       if (c[0].lo &gt; 1)</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         add_range_pair (1, c[0].lo - 1);</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :       for (i = 1; i &lt; n; ++i)</span>
+<span class="lineNum">     259 </span>            :         {
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :           if (c[i-1].hi + 1 == c[i].lo)</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :           add_range_pair (c[i-1].hi + 1, c[i].lo - 1);</span>
+<span class="lineNum">     264 </span>            :         }
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       if (c[n-1].hi &lt; SIZE_MAX)</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :         add_range_pair (c[n-1].hi + 1, SIZE_MAX);</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       free (c);</span>
+<span class="lineNum">     270 </span>            :     }
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            : /* Given the list of field or byte range specifications FIELDSTR,
+<span class="lineNum">     274 </span>            :    allocate and initialize the RP array. FIELDSTR should
+<span class="lineNum">     275 </span>            :    be composed of one or more numbers or ranges of numbers, separated
+<span class="lineNum">     276 </span>            :    by blanks or commas.  Incomplete ranges may be given: '-m' means '1-m';
+<span class="lineNum">     277 </span>            :    'n-' means 'n' through end of line.
+<span class="lineNum">     278 </span>            :    Return true if FIELDSTR contains at least one field specification,
+<span class="lineNum">     279 </span>            :    false otherwise.  */
+<a name="280"><span class="lineNum">     280 </span>            : </a>
+<span class="lineNum">     281 </span>            : static bool
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 : set_fields (const char *fieldstr)</span>
+<span class="lineNum">     283 </span>            : {
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :   size_t initial = 1;           /* Value of first number in a range.  */</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :   size_t value = 0;             /* If nonzero, a number being accumulated.  */</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :   bool lhs_specified = false;</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :   bool rhs_specified = false;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :   bool dash_found = false;      /* True if a '-' is found in this field.  */</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :   bool field_found = false;     /* True if at least one field spec</span>
+<span class="lineNum">     290 </span>            :                                    has been processed.  */
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :   size_t i;
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :   bool in_digits = false;</span>
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :   /* Collect and store in RP the range end points. */
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :   while (true)
+<span class="lineNum">     298 </span>            :     {
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :       if (*fieldstr == '-')</span>
+<span class="lineNum">     300 </span>            :         {
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :           in_digits = false;</span>
+<span class="lineNum">     302 </span>            :           /* Starting a range. */
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :           if (dash_found)</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :             FATAL_ERROR (_(&quot;invalid byte, character or field list&quot;));</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :           dash_found = true;</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :           fieldstr++;</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :           if (lhs_specified &amp;&amp; !value)</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :             FATAL_ERROR (_(&quot;fields and positions are numbered from 1&quot;));</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :           initial = (lhs_specified ? value : 1);</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :           value = 0;</span>
+<span class="lineNum">     313 </span>            :         }
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :       else if (*fieldstr == ','</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                || isblank (to_uchar (*fieldstr)) || *fieldstr == '\0')</span>
+<span class="lineNum">     316 </span>            :         {
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :           in_digits = false;</span>
+<span class="lineNum">     318 </span>            :           /* Ending the string, or this field/byte sublist. */
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :           if (dash_found)</span>
+<span class="lineNum">     320 </span>            :             {
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :               dash_found = false;</span>
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :               if (!lhs_specified &amp;&amp; !rhs_specified)</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                 FATAL_ERROR (_(&quot;invalid range with no endpoint: -&quot;));</span>
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span>            :               /* A range.  Possibilities: -n, m-n, n-.
+<span class="lineNum">     327 </span>            :                  In any case, 'initial' contains the start of the range. */
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :               if (!rhs_specified)</span>
+<span class="lineNum">     329 </span>            :                 {
+<span class="lineNum">     330 </span>            :                   /* 'n-'.  From 'initial' to end of line. */
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :                   add_range_pair (initial, SIZE_MAX);</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :                   field_found = true;</span>
+<span class="lineNum">     333 </span>            :                 }
+<span class="lineNum">     334 </span>            :               else
+<span class="lineNum">     335 </span>            :                 {
+<span class="lineNum">     336 </span>            :                   /* 'm-n' or '-n' (1-n). */
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :                   if (value &lt; initial)</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                     FATAL_ERROR (_(&quot;invalid decreasing range&quot;));</span>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                   add_range_pair (initial, value);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                   field_found = true;</span>
+<span class="lineNum">     342 </span>            :                 }
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :               value = 0;</span>
+<span class="lineNum">     344 </span>            :             }
+<span class="lineNum">     345 </span>            :           else
+<span class="lineNum">     346 </span>            :             {
+<span class="lineNum">     347 </span>            :               /* A simple field number, not a range. */
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :               if (value == 0)</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                 FATAL_ERROR (_(&quot;fields and positions are numbered from 1&quot;));</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :               add_range_pair (value, value);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :               value = 0;</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :               field_found = true;</span>
+<span class="lineNum">     353 </span>            :             }
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :           if (*fieldstr == '\0')</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :           fieldstr++;</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :           lhs_specified = false;</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :           rhs_specified = false;</span>
+<span class="lineNum">     361 </span>            :         }
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :       else if (ISDIGIT (*fieldstr))</span>
+<span class="lineNum">     363 </span>            :         {
+<span class="lineNum">     364 </span>            :           /* Record beginning of digit string, in case we have to
+<span class="lineNum">     365 </span>            :              complain about it.  */
+<span class="lineNum">     366 </span>            :           static char const *num_start;
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :           if (!in_digits || !num_start)</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :             num_start = fieldstr;</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :           in_digits = true;</span>
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :           if (dash_found)</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :             rhs_specified = 1;</span>
+<span class="lineNum">     373 </span>            :           else
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :             lhs_specified = 1;</span>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :           /* Detect overflow.  */
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :           if (!DECIMAL_DIGIT_ACCUMULATE (value, *fieldstr - '0', size_t)</span>
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :               || value == SIZE_MAX)</span>
+<span class="lineNum">     379 </span>            :             {
+<span class="lineNum">     380 </span>            :               /* In case the user specified -c$(echo 2^64|bc),22,
+<span class="lineNum">     381 </span>            :                  complain only about the first number.  */
+<span class="lineNum">     382 </span>            :               /* Determine the length of the offending number.  */
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :               size_t len = strspn (num_start, &quot;0123456789&quot;);</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :               char *bad_num = xstrndup (num_start, len);</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :               if (operating_mode == byte_mode)</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :                 error (0, 0,</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :                        _(&quot;byte offset %s is too large&quot;), quote (bad_num));</span>
+<span class="lineNum">     388 </span>            :               else
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :                 error (0, 0,</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :                        _(&quot;field number %s is too large&quot;), quote (bad_num));</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :               free (bad_num);</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :               exit (EXIT_FAILURE);</span>
+<span class="lineNum">     393 </span>            :             }
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :           fieldstr++;</span>
+<span class="lineNum">     396 </span>            :         }
+<span class="lineNum">     397 </span>            :       else
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :         FATAL_ERROR (_(&quot;invalid byte, character or field list&quot;));</span>
+<span class="lineNum">     399 </span>            :     }
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :   qsort (rp, n_rp, sizeof (rp[0]), compare_ranges);</span>
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            :   /* Merge range pairs (e.g. `2-5,3-4' becomes `2-5'). */
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :   for (i = 0; i &lt; n_rp; ++i)</span>
+<span class="lineNum">     405 </span>            :     {
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :       for (size_t j = i + 1; j &lt; n_rp; ++j)</span>
+<span class="lineNum">     407 </span>            :         {
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :           if (rp[j].lo &lt;= rp[i].hi)</span>
+<span class="lineNum">     409 </span>            :             {
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :               rp[i].hi = MAX (rp[j].hi, rp[i].hi);</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :               memmove (rp + j, rp + j + 1, (n_rp - j - 1) * sizeof *rp);</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :               n_rp--;</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :               j--;</span>
+<span class="lineNum">     414 </span>            :             }
+<span class="lineNum">     415 </span>            :           else
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     417 </span>            :         }
+<span class="lineNum">     418 </span>            :     }
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :   complement_rp ();</span>
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            :   /* After merging, reallocate RP so we release memory to the system.
+<span class="lineNum">     423 </span>            :      Also add a sentinel at the end of RP, to avoid out of bounds access
+<span class="lineNum">     424 </span>            :      and for performance reasons.  */
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :   ++n_rp;</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :   rp = xrealloc (rp, n_rp * sizeof (struct range_pair));</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :   rp[n_rp - 1].lo = rp[n_rp - 1].hi = SIZE_MAX;</span>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :   return field_found;</span>
+<span class="lineNum">     430 </span>            : }
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            : /* Increment *ITEM_IDX (i.e., a field or byte index),
+<span class="lineNum">     433 </span>            :    and if required CURRENT_RP.  */
+<a name="434"><span class="lineNum">     434 </span>            : </a>
+<span class="lineNum">     435 </span>            : static inline void
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 : next_item (size_t *item_idx)</span>
+<span class="lineNum">     437 </span>            : {
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :   (*item_idx)++;</span>
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :   if ((*item_idx) &gt; current_rp-&gt;hi)</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :     current_rp++;</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            : /* Return nonzero if the K'th field or byte is printable. */
+<a name="444"><span class="lineNum">     444 </span>            : </a>
+<span class="lineNum">     445 </span>            : static inline bool
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 : print_kth (size_t k)</span>
+<span class="lineNum">     447 </span>            : {
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :   return current_rp-&gt;lo &lt;= k;</span>
+<span class="lineNum">     449 </span>            : }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            : /* Return nonzero if K'th byte is the beginning of a range. */
+<a name="452"><span class="lineNum">     452 </span>            : </a>
+<span class="lineNum">     453 </span>            : static inline bool
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 : is_range_start_index (size_t k)</span>
+<span class="lineNum">     455 </span>            : {
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :   return k == current_rp-&gt;lo;</span>
+<span class="lineNum">     457 </span>            : }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            : /* Read from stream STREAM, printing to standard output any selected bytes.  */
+<a name="460"><span class="lineNum">     460 </span>            : </a>
+<span class="lineNum">     461 </span>            : static void
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 : cut_bytes (FILE *stream)</span>
+<span class="lineNum">     463 </span>            : {
+<span class="lineNum">     464 </span>            :   size_t byte_idx;      /* Number of bytes in the line so far. */
+<span class="lineNum">     465 </span>            :   /* Whether to begin printing delimiters between ranges for the current line.
+<span class="lineNum">     466 </span>            :      Set after we've begun printing data corresponding to the first range.  */
+<span class="lineNum">     467 </span>            :   bool print_delimiter;
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :   byte_idx = 0;</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :   print_delimiter = false;</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :   current_rp = rp;</span>
+<span class="lineNum">     472 </span>            :   while (true)
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     474 </span>            :       int c;            /* Each character from the file. */
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :       c = getc (stream);</span>
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :       if (c == '\n')</span>
+<span class="lineNum">     479 </span>            :         {
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :           putchar ('\n');</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :           byte_idx = 0;</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :           print_delimiter = false;</span>
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :           current_rp = rp;</span>
+<span class="lineNum">     484 </span>            :         }
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :       else if (c == EOF)</span>
+<span class="lineNum">     486 </span>            :         {
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :           if (byte_idx &gt; 0)</span>
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :             putchar ('\n');</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     490 </span>            :         }
+<span class="lineNum">     491 </span>            :       else
+<span class="lineNum">     492 </span>            :         {
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :           next_item (&amp;byte_idx);</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :           if (print_kth (byte_idx))</span>
+<span class="lineNum">     495 </span>            :             {
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :               if (output_delimiter_specified)</span>
+<span class="lineNum">     497 </span>            :                 {
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                   if (print_delimiter &amp;&amp; is_range_start_index (byte_idx))</span>
+<span class="lineNum">     499 </span>            :                     {
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :                       fwrite (output_delimiter_string, sizeof (char),</span>
+<span class="lineNum">     501 </span>            :                               output_delimiter_length, stdout);
+<span class="lineNum">     502 </span>            :                     }
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :                   print_delimiter = true;</span>
+<span class="lineNum">     504 </span>            :                 }
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :               putchar (c);</span>
+<span class="lineNum">     507 </span>            :             }
+<span class="lineNum">     508 </span>            :         }
+<span class="lineNum">     509 </span>            :     }
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span>            : /* Read from stream STREAM, printing to standard output any selected fields.  */
+<a name="513"><span class="lineNum">     513 </span>            : </a>
+<span class="lineNum">     514 </span>            : static void
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 : cut_fields (FILE *stream)</span>
+<span class="lineNum">     516 </span>            : {
+<span class="lineNum">     517 </span>            :   int c;
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :   size_t field_idx = 1;</span>
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :   bool found_any_selected_field = false;</span>
+<span class="lineNum">     520 </span>            :   bool buffer_first_field;
+<span class="lineNum">     521 </span>            : 
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :   current_rp = rp;</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :   c = getc (stream);</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :   if (c == EOF)</span>
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :   ungetc (c, stream);</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :   c = 0;</span>
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            :   /* To support the semantics of the -s flag, we may have to buffer
+<span class="lineNum">     532 </span>            :      all of the first field to determine whether it is 'delimited.'
+<span class="lineNum">     533 </span>            :      But that is unnecessary if all non-delimited lines must be printed
+<span class="lineNum">     534 </span>            :      and the first field has been selected, or if non-delimited lines
+<span class="lineNum">     535 </span>            :      must be suppressed and the first field has *not* been selected.
+<span class="lineNum">     536 </span>            :      That is because a non-delimited line has exactly one field.  */
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :   buffer_first_field = (suppress_non_delimited ^ !print_kth (1));</span>
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span>            :   while (1)
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :       if (field_idx == 1 &amp;&amp; buffer_first_field)</span>
+<span class="lineNum">     542 </span>            :         {
+<span class="lineNum">     543 </span>            :           ssize_t len;
+<span class="lineNum">     544 </span>            :           size_t n_bytes;
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :           len = getndelim2 (&amp;field_1_buffer, &amp;field_1_bufsize, 0,</span>
+<span class="lineNum">     547 </span>            :                             GETNLINE_NO_LIMIT, delim, '\n', stream);
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :           if (len &lt; 0)</span>
+<span class="lineNum">     549 </span>            :             {
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :               free (field_1_buffer);</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :               field_1_buffer = NULL;</span>
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :               if (ferror (stream) || feof (stream))</span>
+<span class="lineNum">     553 </span>            :                 break;
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :               xalloc_die ();</span>
+<span class="lineNum">     555 </span>            :             }
+<span class="lineNum">     556 </span>            : 
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :           n_bytes = len;</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :           assert (n_bytes != 0);</span>
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :           c = 0;</span>
+<span class="lineNum">     561 </span>            : 
+<span class="lineNum">     562 </span>            :           /* If the first field extends to the end of line (it is not
+<span class="lineNum">     563 </span>            :              delimited) and we are printing all non-delimited lines,
+<span class="lineNum">     564 </span>            :              print this one.  */
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :           if (to_uchar (field_1_buffer[n_bytes - 1]) != delim)</span>
+<span class="lineNum">     566 </span>            :             {
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :               if (suppress_non_delimited)</span>
+<span class="lineNum">     568 </span>            :                 {
+<span class="lineNum">     569 </span>            :                   /* Empty.  */
+<span class="lineNum">     570 </span>            :                 }
+<span class="lineNum">     571 </span>            :               else
+<span class="lineNum">     572 </span>            :                 {
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                   fwrite (field_1_buffer, sizeof (char), n_bytes, stdout);</span>
+<span class="lineNum">     574 </span>            :                   /* Make sure the output line is newline terminated.  */
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :                   if (field_1_buffer[n_bytes - 1] != '\n')</span>
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :                     putchar ('\n');</span>
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :                   c = '\n';</span>
+<span class="lineNum">     578 </span>            :                 }
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :               continue;</span>
+<span class="lineNum">     580 </span>            :             }
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :           if (print_kth (1))</span>
+<span class="lineNum">     582 </span>            :             {
+<span class="lineNum">     583 </span>            :               /* Print the field, but not the trailing delimiter.  */
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :               fwrite (field_1_buffer, sizeof (char), n_bytes - 1, stdout);</span>
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span>            :               /* With -d$'\n' don't treat the last '\n' as a delimiter.  */
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :               if (delim == '\n')</span>
+<span class="lineNum">     588 </span>            :                 {
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :                   int last_c = getc (stream);</span>
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :                   if (last_c != EOF)</span>
+<span class="lineNum">     591 </span>            :                     {
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                       ungetc (last_c, stream);</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                       found_any_selected_field = true;</span>
+<span class="lineNum">     594 </span>            :                     }
+<span class="lineNum">     595 </span>            :                 }
+<span class="lineNum">     596 </span>            :               else
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :                 found_any_selected_field = true;</span>
+<span class="lineNum">     598 </span>            :             }
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :           next_item (&amp;field_idx);</span>
+<span class="lineNum">     600 </span>            :         }
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :       int prev_c = c;</span>
+<span class="lineNum">     603 </span>            : 
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 :       if (print_kth (field_idx))</span>
+<span class="lineNum">     605 </span>            :         {
+<span class="lineNum">     606 </span><span class="lineNoCov">          0 :           if (found_any_selected_field)</span>
+<span class="lineNum">     607 </span>            :             {
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :               fwrite (output_delimiter_string, sizeof (char),</span>
+<span class="lineNum">     609 </span>            :                       output_delimiter_length, stdout);
+<span class="lineNum">     610 </span>            :             }
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :           found_any_selected_field = true;</span>
+<span class="lineNum">     612 </span>            : 
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :           while ((c = getc (stream)) != delim &amp;&amp; c != '\n' &amp;&amp; c != EOF)</span>
+<span class="lineNum">     614 </span>            :             {
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :               putchar (c);</span>
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :               prev_c = c;</span>
+<span class="lineNum">     617 </span>            :             }
+<span class="lineNum">     618 </span>            :         }
+<span class="lineNum">     619 </span>            :       else
+<span class="lineNum">     620 </span>            :         {
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :           while ((c = getc (stream)) != delim &amp;&amp; c != '\n' &amp;&amp; c != EOF)</span>
+<span class="lineNum">     622 </span>            :             {
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :               prev_c = c;</span>
+<span class="lineNum">     624 </span>            :             }
+<span class="lineNum">     625 </span>            :         }
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span>            :       /* With -d$'\n' don't treat the last '\n' as a delimiter.  */
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :       if (delim == '\n' &amp;&amp; c == delim)</span>
+<span class="lineNum">     629 </span>            :         {
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :           int last_c = getc (stream);</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :           if (last_c != EOF)</span>
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :             ungetc (last_c, stream);</span>
+<span class="lineNum">     633 </span>            :           else
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :             c = last_c;</span>
+<span class="lineNum">     635 </span>            :         }
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :       if (c == delim)</span>
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :         next_item (&amp;field_idx);</span>
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :       else if (c == '\n' || c == EOF)</span>
+<span class="lineNum">     640 </span>            :         {
+<span class="lineNum">     641 </span><span class="lineNoCov">          0 :           if (found_any_selected_field</span>
+<span class="lineNum">     642 </span><span class="lineNoCov">          0 :               || !(suppress_non_delimited &amp;&amp; field_idx == 1))</span>
+<span class="lineNum">     643 </span>            :             {
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :               if (c == '\n' || prev_c != '\n' || delim == '\n')</span>
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :                 putchar ('\n');</span>
+<span class="lineNum">     646 </span>            :             }
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :           if (c == EOF)</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :           field_idx = 1;</span>
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :           current_rp = rp;</span>
+<span class="lineNum">     651 </span><span class="lineNoCov">          0 :           found_any_selected_field = false;</span>
+<span class="lineNum">     652 </span>            :         }
+<span class="lineNum">     653 </span>            :     }
+<span class="lineNum">     654 </span>            : }
+<a name="655"><span class="lineNum">     655 </span>            : </a>
+<span class="lineNum">     656 </span>            : static void
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 : cut_stream (FILE *stream)</span>
+<span class="lineNum">     658 </span>            : {
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :   if (operating_mode == byte_mode)</span>
+<span class="lineNum">     660 </span><span class="lineNoCov">          0 :     cut_bytes (stream);</span>
+<span class="lineNum">     661 </span>            :   else
+<span class="lineNum">     662 </span><span class="lineNoCov">          0 :     cut_fields (stream);</span>
+<span class="lineNum">     663 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            : /* Process file FILE to standard output.
+<span class="lineNum">     666 </span>            :    Return true if successful.  */
+<a name="667"><span class="lineNum">     667 </span>            : </a>
+<span class="lineNum">     668 </span>            : static bool
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 : cut_file (char const *file)</span>
+<span class="lineNum">     670 </span>            : {
+<span class="lineNum">     671 </span>            :   FILE *stream;
+<span class="lineNum">     672 </span>            : 
+<span class="lineNum">     673 </span><span class="lineNoCov">          0 :   if (STREQ (file, &quot;-&quot;))</span>
+<span class="lineNum">     674 </span>            :     {
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :       have_read_stdin = true;</span>
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :       stream = stdin;</span>
+<span class="lineNum">     677 </span>            :     }
+<span class="lineNum">     678 </span>            :   else
+<span class="lineNum">     679 </span>            :     {
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :       stream = fopen (file, &quot;r&quot;);</span>
+<span class="lineNum">     681 </span><span class="lineNoCov">          0 :       if (stream == NULL)</span>
+<span class="lineNum">     682 </span>            :         {
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :           error (0, errno, &quot;%s&quot;, file);</span>
+<span class="lineNum">     684 </span><span class="lineNoCov">          0 :           return false;</span>
+<span class="lineNum">     685 </span>            :         }
+<span class="lineNum">     686 </span>            :     }
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :   fadvise (stream, FADVISE_SEQUENTIAL);</span>
+<span class="lineNum">     689 </span>            : 
+<span class="lineNum">     690 </span><span class="lineNoCov">          0 :   cut_stream (stream);</span>
+<span class="lineNum">     691 </span>            : 
+<span class="lineNum">     692 </span><span class="lineNoCov">          0 :   if (ferror (stream))</span>
+<span class="lineNum">     693 </span>            :     {
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :       error (0, errno, &quot;%s&quot;, file);</span>
+<span class="lineNum">     695 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     696 </span>            :     }
+<span class="lineNum">     697 </span><span class="lineNoCov">          0 :   if (STREQ (file, &quot;-&quot;))</span>
+<span class="lineNum">     698 </span><span class="lineNoCov">          0 :     clearerr (stream);          /* Also clear EOF. */</span>
+<span class="lineNum">     699 </span><span class="lineNoCov">          0 :   else if (fclose (stream) == EOF)</span>
+<span class="lineNum">     700 </span>            :     {
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 :       error (0, errno, &quot;%s&quot;, file);</span>
+<span class="lineNum">     702 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     703 </span>            :     }
+<span class="lineNum">     704 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     705 </span>            : }
+<a name="706"><span class="lineNum">     706 </span>            : </a>
+<span class="lineNum">     707 </span>            : int
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 : main (int argc, char **argv)</span>
+<span class="lineNum">     709 </span>            : {
+<span class="lineNum">     710 </span>            :   int optc;
+<span class="lineNum">     711 </span>            :   bool ok;
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :   bool delim_specified = false;</span>
+<span class="lineNum">     713 </span>            :   char *spec_list_string IF_LINT ( = NULL);
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span>            :   initialize_main (&amp;argc, &amp;argv);
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :   set_program_name (argv[0]);</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :   setlocale (LC_ALL, &quot;&quot;);</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :   bindtextdomain (PACKAGE, LOCALEDIR);</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :   textdomain (PACKAGE);</span>
+<span class="lineNum">     720 </span>            : 
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 :   atexit (close_stdout);</span>
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :   operating_mode = undefined_mode;</span>
+<span class="lineNum">     724 </span>            : 
+<span class="lineNum">     725 </span>            :   /* By default, all non-delimited lines are printed.  */
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :   suppress_non_delimited = false;</span>
+<span class="lineNum">     727 </span>            : 
+<span class="lineNum">     728 </span><span class="lineNoCov">          0 :   delim = '\0';</span>
+<span class="lineNum">     729 </span><span class="lineNoCov">          0 :   have_read_stdin = false;</span>
+<span class="lineNum">     730 </span>            : 
+<span class="lineNum">     731 </span><span class="lineNoCov">          0 :   while ((optc = getopt_long (argc, argv, &quot;b:c:d:f:ns&quot;, longopts, NULL)) != -1)</span>
+<span class="lineNum">     732 </span>            :     {
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 :       switch (optc)</span>
+<span class="lineNum">     734 </span>            :         {
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :         case 'b':</span>
+<span class="lineNum">     736 </span>            :         case 'c':
+<span class="lineNum">     737 </span>            :           /* Build the byte list. */
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :           if (operating_mode != undefined_mode)</span>
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :             FATAL_ERROR (_(&quot;only one type of list may be specified&quot;));</span>
+<span class="lineNum">     740 </span><span class="lineNoCov">          0 :           operating_mode = byte_mode;</span>
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :           spec_list_string = optarg;</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span><span class="lineNoCov">          0 :         case 'f':</span>
+<span class="lineNum">     745 </span>            :           /* Build the field list. */
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :           if (operating_mode != undefined_mode)</span>
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :             FATAL_ERROR (_(&quot;only one type of list may be specified&quot;));</span>
+<span class="lineNum">     748 </span><span class="lineNoCov">          0 :           operating_mode = field_mode;</span>
+<span class="lineNum">     749 </span><span class="lineNoCov">          0 :           spec_list_string = optarg;</span>
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :         case 'd':</span>
+<span class="lineNum">     753 </span>            :           /* New delimiter. */
+<span class="lineNum">     754 </span>            :           /* Interpret -d '' to mean 'use the NUL byte as the delimiter.'  */
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :           if (optarg[0] != '\0' &amp;&amp; optarg[1] != '\0')</span>
+<span class="lineNum">     756 </span><span class="lineNoCov">          0 :             FATAL_ERROR (_(&quot;the delimiter must be a single character&quot;));</span>
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :           delim = optarg[0];</span>
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :           delim_specified = true;</span>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     760 </span>            : 
+<span class="lineNum">     761 </span><span class="lineNoCov">          0 :         case OUTPUT_DELIMITER_OPTION:</span>
+<span class="lineNum">     762 </span><span class="lineNoCov">          0 :           output_delimiter_specified = true;</span>
+<span class="lineNum">     763 </span>            :           /* Interpret --output-delimiter='' to mean
+<span class="lineNum">     764 </span>            :              'use the NUL byte as the delimiter.'  */
+<span class="lineNum">     765 </span><span class="lineNoCov">          0 :           output_delimiter_length = (optarg[0] == '\0'</span>
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 :                                      ? 1 : strlen (optarg));</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :           output_delimiter_string = xstrdup (optarg);</span>
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     769 </span>            : 
+<span class="lineNum">     770 </span><span class="lineNoCov">          0 :         case 'n':</span>
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     772 </span>            : 
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 :         case 's':</span>
+<span class="lineNum">     774 </span><span class="lineNoCov">          0 :           suppress_non_delimited = true;</span>
+<span class="lineNum">     775 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     776 </span>            : 
+<span class="lineNum">     777 </span><span class="lineNoCov">          0 :         case COMPLEMENT_OPTION:</span>
+<span class="lineNum">     778 </span><span class="lineNoCov">          0 :           complement = true;</span>
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span><span class="lineNoCov">          0 :         case_GETOPT_HELP_CHAR;</span>
+<span class="lineNum">     782 </span>            : 
+<span class="lineNum">     783 </span><span class="lineNoCov">          0 :         case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);</span>
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     786 </span><span class="lineNoCov">          0 :           usage (EXIT_FAILURE);</span>
+<span class="lineNum">     787 </span>            :         }
+<span class="lineNum">     788 </span>            :     }
+<span class="lineNum">     789 </span>            : 
+<span class="lineNum">     790 </span><span class="lineNoCov">          0 :   if (operating_mode == undefined_mode)</span>
+<span class="lineNum">     791 </span><span class="lineNoCov">          0 :     FATAL_ERROR (_(&quot;you must specify a list of bytes, characters, or fields&quot;));</span>
+<span class="lineNum">     792 </span>            : 
+<span class="lineNum">     793 </span><span class="lineNoCov">          0 :   if (delim_specified &amp;&amp; operating_mode != field_mode)</span>
+<span class="lineNum">     794 </span><span class="lineNoCov">          0 :     FATAL_ERROR (_(&quot;an input delimiter may be specified only\</span>
+<span class="lineNum">     795 </span>            :  when operating on fields&quot;));
+<span class="lineNum">     796 </span>            : 
+<span class="lineNum">     797 </span><span class="lineNoCov">          0 :   if (suppress_non_delimited &amp;&amp; operating_mode != field_mode)</span>
+<span class="lineNum">     798 </span><span class="lineNoCov">          0 :     FATAL_ERROR (_(&quot;suppressing non-delimited lines makes sense\n\</span>
+<span class="lineNum">     799 </span>            : \tonly when operating on fields&quot;));
+<span class="lineNum">     800 </span>            : 
+<span class="lineNum">     801 </span><span class="lineNoCov">          0 :   if (! set_fields (spec_list_string))</span>
+<span class="lineNum">     802 </span>            :     {
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :       if (operating_mode == field_mode)</span>
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :         FATAL_ERROR (_(&quot;missing list of fields&quot;));</span>
+<span class="lineNum">     805 </span>            :       else
+<span class="lineNum">     806 </span><span class="lineNoCov">          0 :         FATAL_ERROR (_(&quot;missing list of positions&quot;));</span>
+<span class="lineNum">     807 </span>            :     }
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :   if (!delim_specified)</span>
+<span class="lineNum">     810 </span><span class="lineNoCov">          0 :     delim = '\t';</span>
+<span class="lineNum">     811 </span>            : 
+<span class="lineNum">     812 </span><span class="lineNoCov">          0 :   if (output_delimiter_string == NULL)</span>
+<span class="lineNum">     813 </span>            :     {
+<span class="lineNum">     814 </span>            :       static char dummy[2];
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :       dummy[0] = delim;</span>
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :       dummy[1] = '\0';</span>
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :       output_delimiter_string = dummy;</span>
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 :       output_delimiter_length = 1;</span>
+<span class="lineNum">     819 </span>            :     }
+<span class="lineNum">     820 </span>            : 
+<span class="lineNum">     821 </span><span class="lineNoCov">          0 :   if (optind == argc)</span>
+<span class="lineNum">     822 </span><span class="lineNoCov">          0 :     ok = cut_file (&quot;-&quot;);</span>
+<span class="lineNum">     823 </span>            :   else
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :     for (ok = true; optind &lt; argc; optind++)</span>
+<span class="lineNum">     825 </span><span class="lineNoCov">          0 :       ok &amp;= cut_file (argv[optind]);</span>
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            : 
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :   if (have_read_stdin &amp;&amp; fclose (stdin) == EOF)</span>
+<span class="lineNum">     829 </span>            :     {
+<span class="lineNum">     830 </span><span class="lineNoCov">          0 :       error (0, errno, &quot;-&quot;);</span>
+<span class="lineNum">     831 </span><span class="lineNoCov">          0 :       ok = false;</span>
+<span class="lineNum">     832 </span>            :     }
+<span class="lineNum">     833 </span>            : 
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :   return ok ? EXIT_SUCCESS : EXIT_FAILURE;</span>
+<span class="lineNum">     835 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

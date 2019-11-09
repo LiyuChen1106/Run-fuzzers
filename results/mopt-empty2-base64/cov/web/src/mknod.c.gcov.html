@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - src/mknod.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - mknod.c<span style="font-size: 80%;"> (source / <a href="mknod.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">117</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-08 15:44:49</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : static unsigned int lava_val[1000000]; static int lava_first=1;</a>
+<span class="lineNum">       2 </span>            : void lava_set(unsigned int bug_num, unsigned int val);
+<a name="3"><span class="lineNum">       3 </span><span class="lineNoCov">          0 : void lava_set(unsigned int bug_num, unsigned int val) { if (lava_first) {int i; lava_first=0; for (i=0; i&lt;1000000; i++) lava_val[i]=0; }  lava_val[bug_num] = val; }</span></a>
+<span class="lineNum">       4 </span>            : unsigned int lava_get(unsigned int bug_num);
+<span class="lineNum">       5 </span><span class="lineNoCov">          0 : unsigned int lava_get(unsigned int bug_num) { return lava_val[bug_num]; }</span>
+<span class="lineNum">       6 </span>            : /* mknod -- make special files
+<span class="lineNum">       7 </span>            :    Copyright (C) 1990-2015 Free Software Foundation, Inc.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">      10 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">      11 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">      12 </span>            :    (at your option) any later version.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      15 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      16 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      17 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      20 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : /* Written by David MacKenzie &lt;djm@ai.mit.edu&gt;  */
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;getopt.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;selinux/selinux.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;system.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;error.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;modechange.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;quote.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;selinux.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;smack.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;xstrtol.h&quot;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : /* The official name of this program (e.g., no 'g' prefix).  */
+<span class="lineNum">      39 </span>            : #define PROGRAM_NAME &quot;mknod&quot;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #define AUTHORS proper_name (&quot;David MacKenzie&quot;)
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : static struct option const longopts[] =
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span>            :   {GETOPT_SELINUX_CONTEXT_OPTION_DECL},
+<span class="lineNum">      46 </span>            :   {&quot;mode&quot;, required_argument, NULL, 'm'},
+<span class="lineNum">      47 </span>            :   {GETOPT_HELP_OPTION_DECL},
+<span class="lineNum">      48 </span>            :   {GETOPT_VERSION_OPTION_DECL},
+<span class="lineNum">      49 </span>            :   {NULL, 0, NULL, 0}
+<span class="lineNum">      50 </span>            : };
+<a name="51"><span class="lineNum">      51 </span>            : </a>
+<span class="lineNum">      52 </span>            : void
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 : usage (int status)</span>
+<span class="lineNum">      54 </span>            : {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   if (status != EXIT_SUCCESS)</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     emit_try_help ();</span>
+<span class="lineNum">      57 </span>            :   else
+<span class="lineNum">      58 </span>            :     {
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       printf (_(&quot;Usage: %s [OPTION]... NAME TYPE [MAJOR MINOR]\n&quot;),</span>
+<span class="lineNum">      60 </span>            :               program_name);
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">      62 </span>            : Create the special file NAME of the given TYPE.\n\
+<span class="lineNum">      63 </span>            : &quot;), stdout);
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       emit_mandatory_arg_note ();</span>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">      68 </span>            :   -m, --mode=MODE    set file permission bits to MODE, not a=rw - umask\n\
+<span class="lineNum">      69 </span>            : &quot;), stdout);
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">      71 </span>            :   -Z                   set the SELinux security context to default type\n\
+<span class="lineNum">      72 </span>            :       --context[=CTX]  like -Z, or if CTX is specified then set the SELinux\n\
+<span class="lineNum">      73 </span>            :                          or SMACK security context to CTX\n\
+<span class="lineNum">      74 </span>            : &quot;), stdout);
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       fputs (HELP_OPTION_DESCRIPTION, stdout);</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       fputs (VERSION_OPTION_DESCRIPTION, stdout);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">      78 </span>            : \n\
+<span class="lineNum">      79 </span>            : Both MAJOR and MINOR must be specified when TYPE is b, c, or u, and they\n\
+<span class="lineNum">      80 </span>            : must be omitted when TYPE is p.  If MAJOR or MINOR begins with 0x or 0X,\n\
+<span class="lineNum">      81 </span>            : it is interpreted as hexadecimal; otherwise, if it begins with 0, as octal;\n\
+<span class="lineNum">      82 </span>            : otherwise, as decimal.  TYPE may be:\n\
+<span class="lineNum">      83 </span>            : &quot;), stdout);
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       fputs (_(&quot;\</span>
+<span class="lineNum">      85 </span>            : \n\
+<span class="lineNum">      86 </span>            :   b      create a block (buffered) special file\n\
+<span class="lineNum">      87 </span>            :   c, u   create a character (unbuffered) special file\n\
+<span class="lineNum">      88 </span>            :   p      create a FIFO\n\
+<span class="lineNum">      89 </span>            : &quot;), stdout);
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       emit_ancillary_info (PROGRAM_NAME);</span>
+<span class="lineNum">      92 </span>            :     }
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :   exit (status);</span>
+<span class="lineNum">      94 </span>            : }
+<a name="95"><span class="lineNum">      95 </span>            : </a>
+<span class="lineNum">      96 </span>            : int
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 : main (int argc, char **argv)</span>
+<span class="lineNum">      98 </span>            : {
+<span class="lineNum">      99 </span>            :   mode_t newmode;
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   char const *specified_mode = NULL;</span>
+<span class="lineNum">     101 </span>            :   int optc;
+<span class="lineNum">     102 </span>            :   size_t expected_operands;
+<span class="lineNum">     103 </span>            :   mode_t node_type;
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :   char const *scontext = NULL;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   bool set_security_context = false;</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   initialize_main (&amp;argc, &amp;argv);
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :   set_program_name (argv[0]);</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   setlocale (LC_ALL, &quot;&quot;);</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   bindtextdomain (PACKAGE, LOCALEDIR);</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   textdomain (PACKAGE);</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   atexit (close_stdout);</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :   while ((optc = getopt_long (argc, argv, &quot;m:Z&quot;, longopts, NULL)) != -1)</span>
+<span class="lineNum">     116 </span>            :     {
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :       switch (optc)</span>
+<span class="lineNum">     118 </span>            :         {
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :         case 'm':</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :           specified_mode = optarg;</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :         case 'Z':</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :           if (is_smack_enabled ())</span>
+<span class="lineNum">     124 </span>            :             {
+<span class="lineNum">     125 </span>            :               /* We don't yet support -Z to restore context with SMACK.  */
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :               scontext = optarg;</span>
+<span class="lineNum">     127 </span>            :             }
+<span class="lineNum">     128 </span>            :           else if (is_selinux_enabled () &gt; 0)
+<span class="lineNum">     129 </span>            :             {
+<span class="lineNum">     130 </span>            :               if (optarg)
+<span class="lineNum">     131 </span>            :                 scontext = optarg;
+<span class="lineNum">     132 </span>            :               else
+<span class="lineNum">     133 </span>            :                 set_security_context = true;
+<span class="lineNum">     134 </span>            :             }
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :           else if (optarg)</span>
+<span class="lineNum">     136 </span>            :             {
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :               error (0, 0,</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                      _(&quot;warning: ignoring --context; &quot;</span>
+<span class="lineNum">     139 </span>            :                        &quot;it requires an SELinux/SMACK-enabled kernel&quot;));
+<span class="lineNum">     140 </span>            :             }
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         case_GETOPT_HELP_CHAR;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :         case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :           usage (EXIT_FAILURE);</span>
+<span class="lineNum">     146 </span>            :         }
+<span class="lineNum">     147 </span>            :     }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   newmode = MODE_RW_UGO;</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :   if (specified_mode)</span>
+<span class="lineNum">     151 </span>            :     {
+<span class="lineNum">     152 </span>            :       mode_t umask_value;
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       struct mode_change *change = mode_compile (specified_mode);</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       if (!change)</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :         error (EXIT_FAILURE, 0, _(&quot;invalid mode&quot;));</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       umask_value = umask (0);</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :       umask (umask_value);</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       newmode = mode_adjust (newmode, false, umask_value, change, NULL);</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       free (change);</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       if (newmode &amp; ~S_IRWXUGO)</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :         error (EXIT_FAILURE, 0,</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :                _(&quot;mode must specify only file permission bits&quot;));</span>
+<span class="lineNum">     163 </span>            :     }
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   /* If the number of arguments is 0 or 1,
+<span class="lineNum">     166 </span>            :      or (if it's 2 or more and the second one starts with 'p'), then there
+<span class="lineNum">     167 </span>            :      must be exactly two operands.  Otherwise, there must be four.  */
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   expected_operands = (argc &lt;= optind</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                        || (optind + 1 &lt; argc &amp;&amp; argv[optind + 1][0] == 'p')</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                        ? 2 : 4);</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   if (argc - optind &lt; expected_operands)</span>
+<span class="lineNum">     173 </span>            :     {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :       if (argc &lt;= optind)</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :         error (0, 0, _(&quot;missing operand&quot;));</span>
+<span class="lineNum">     176 </span>            :       else
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :         error (0, 0, _(&quot;missing operand after %s&quot;), quote (argv[argc - 1]));</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       if (expected_operands == 4 &amp;&amp; argc - optind == 2)</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :         fprintf (stderr, &quot;%s\n&quot;,</span>
+<span class="lineNum">     180 </span>            :                  _(&quot;Special files require major and minor device numbers.&quot;));
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :       usage (EXIT_FAILURE);</span>
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :   if (expected_operands &lt; argc - optind)</span>
+<span class="lineNum">     185 </span>            :     {
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :       error (0, 0, _(&quot;extra operand %s&quot;),</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :              quote (argv[optind + expected_operands]));</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :       if (expected_operands == 2 &amp;&amp; argc - optind == 4)</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         fprintf (stderr, &quot;%s\n&quot;,</span>
+<span class="lineNum">     190 </span>            :                  _(&quot;Fifos do not have major and minor device numbers.&quot;));
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       usage (EXIT_FAILURE);</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :   if (scontext)</span>
+<span class="lineNum">     195 </span>            :     {
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :       int ret = 0;</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :       if (is_smack_enabled ())</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         ret = smack_set_label_for_self (scontext);</span>
+<span class="lineNum">     199 </span>            :       else
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :         ret = setfscreatecon (se_const (scontext));</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :       if (ret &lt; 0)</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :         error (EXIT_FAILURE, errno,</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :                _(&quot;failed to set default file creation context to %s&quot;),</span>
+<span class="lineNum">     205 </span>            :                quote (scontext));
+<span class="lineNum">     206 </span>            :     }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   /* Only check the first character, to allow mnemonic usage like
+<span class="lineNum">     209 </span>            :      'mknod /dev/rst0 character 18 0'. */
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :   switch (argv[optind + 1][0])</span>
+<span class="lineNum">     212 </span>            :     {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :     case 'b':                   /* 'block' or 'buffered' */</span>
+<span class="lineNum">     214 </span>            : #ifndef S_IFBLK
+<span class="lineNum">     215 </span>            :       error (EXIT_FAILURE, 0, _(&quot;block special files not supported&quot;));
+<span class="lineNum">     216 </span>            : #else
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :       node_type = S_IFBLK;</span>
+<span class="lineNum">     218 </span>            : #endif
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :       goto block_or_character;</span>
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :     case 'c':                   /* 'character' */</span>
+<span class="lineNum">     222 </span>            :     case 'u':                   /* 'unbuffered' */
+<span class="lineNum">     223 </span>            : #ifndef S_IFCHR
+<span class="lineNum">     224 </span>            :       error (EXIT_FAILURE, 0, _(&quot;character special files not supported&quot;));
+<span class="lineNum">     225 </span>            : #else
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :       node_type = S_IFCHR;</span>
+<span class="lineNum">     227 </span>            : #endif
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :       goto block_or_character;</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :     block_or_character:</span>
+<span class="lineNum">     231 </span>            :       {
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :         char const *s_major = argv[optind + 2];</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         char const *s_minor = argv[optind + 3];</span>
+<span class="lineNum">     234 </span>            :         uintmax_t i_major, i_minor;
+<span class="lineNum">     235 </span>            :         dev_t device;
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         if (xstrtoumax (s_major, NULL, 0, &amp;i_major, NULL) != LONGINT_OK</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :             || i_major != (major_t) i_major)</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :           error (EXIT_FAILURE, 0,</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                  _(&quot;invalid major device number %s&quot;), quote (s_major));</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :         if (xstrtoumax (s_minor, NULL, 0, &amp;i_minor, NULL) != LONGINT_OK</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :             || i_minor != (minor_t) i_minor)</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :           error (EXIT_FAILURE, 0,</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                  _(&quot;invalid minor device number %s&quot;), quote (s_minor));</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :         device = makedev (i_major, i_minor);</span>
+<span class="lineNum">     248 </span>            : #ifdef NODEV
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :         if (device == NODEV)</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :           error (EXIT_FAILURE, 0, _(&quot;invalid device %s %s&quot;), s_major, s_minor);</span>
+<span class="lineNum">     251 </span>            : #endif
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :         if (set_security_context)</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :           defaultcon (argv[optind], node_type);</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         if (mknod (argv[optind], newmode | node_type, device) != 0)</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :           error (EXIT_FAILURE, errno, &quot;%s&quot;, quote (argv[optind]));</span>
+<span class="lineNum">     258 </span>            :       }
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :     case 'p':                   /* 'pipe' */</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       if (set_security_context)</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :         defaultcon (argv[optind], S_IFIFO);</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :       if (mkfifo (argv[optind], newmode) != 0)</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         error (EXIT_FAILURE, errno, &quot;%s&quot;, quote (argv[optind]));</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :     default:</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       error (0, 0, _(&quot;invalid device type %s&quot;), quote (argv[optind + 1]));</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :       usage (EXIT_FAILURE);</span>
+<span class="lineNum">     271 </span>            :     }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :   if (specified_mode &amp;&amp; lchmod (argv[optind], newmode) != 0)</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :     error (EXIT_FAILURE, errno, _(&quot;cannot set permissions of %s&quot;),</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :            quote (argv[optind]));</span>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :   return EXIT_SUCCESS;</span>
+<span class="lineNum">     278 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

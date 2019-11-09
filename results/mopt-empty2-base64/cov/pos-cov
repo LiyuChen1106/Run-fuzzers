@@ -1,0 +1,186 @@
+# All functions / lines in this file were executed by at
+# least one AFL test case. See the cov/id-delta-cov file
+# for more information.
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/true.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/dirname.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/du.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/head.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/closeout.c
+    function: close_stdout()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/dirname-lgpl.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/mkfifo.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/date.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/install.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/relpath.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/chgrp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/getlimits.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/dirname.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/uptime.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/fmt.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/cut.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/malloca.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/xalloc-die.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fcntl.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fcntl.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fpurge.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/chmod.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/sleep.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/extent-scan.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/hostid.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/extent-scan.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/c-ctype.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/base64.c
+    function: base64_decode_ctx()
+    function: base64_decode_ctx_init()
+    function: decode_4()
+    function: get_4()
+    function: isbase64()
+    function: to_uchar()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/pwd.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/users.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/shred.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/areadlink-with-size.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/strnumcmp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/nl.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/df.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/csplit.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/c-strcasecmp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/memcasecmp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/nohup.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/shuf.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/xvasprintf.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/join.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/seq.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/filemode.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/fold.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/lbracket.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fseek.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/base64.c
+    function: do_decode()
+    function: lava_get()
+    function: lava_set()
+    function: main()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/quotearg.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/chown-core.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/smack.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/pathchk.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/comm.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/runcon.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/ptx.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/yes.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fseeko.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/uniq.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/test.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/ls.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/close-stream.c
+    function: close_stream()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/stdio.h
+    function: rpl_fclose()
+    function: rpl_fflush()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/touch.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/uname.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/readlink.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fclose.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/unexpand.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/xstrtol.copy3.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/env.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/fs-is-local.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/wc.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/nice.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/stat.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/groups.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fadvise.c
+    function: fadvise()
+    function: fdadvise()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/cp-hash.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/chcon.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/chown.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/sum.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/chroot.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/tty.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/cp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/full-write.copy.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/idcache.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/pinky.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/mgetgroups.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/progname.c
+    function: set_program_name()
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/split.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/anytostr.copy2.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/unlink.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/true.copy.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/dd.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/memchr2.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/tac.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/dtotimespec.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/cksum.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/find-mount-point.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/ioblksize.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/who.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/xmalloc.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/numfmt.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/cat.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/ln.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/echo.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/readutmp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/truncate.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/basename.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/rmdir.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/sync.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/mv.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/randint.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/copy.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/realpath.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/xstrtol.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/dup-safer-flag.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/printenv.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/tee.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/sort.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/ftoastr.copy2.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/tr.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/nproc.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/false.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/timeout.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/xalloc.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/expr.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/printf.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/mktemp.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/glthread/lock.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/stty.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/version-etc.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/mknod.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/paste.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/mkdir.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/group-list.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/prog-fprintf.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/fflush.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/id.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/qcopy-acl.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/rm.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/libstdbuf.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/selinux.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/strnumcmp-in.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/factor.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/expand.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/stdbuf.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/tsort.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/sha1.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/cloexec.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/whoami.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/md5sum.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/system.h
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/hash-pjw.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/file-set.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/make-prime-list.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/operand2sig.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/tail.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/logname.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/link.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/dircolors.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/remove.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/kill.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/localcharset.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/lib/cycle-check.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/pr.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/od.c
+File: /home/ubuntu/lava_corpus/LAVA-M/base64/coreutils-8.24-lava-safe-gcov/src/test.copy.c
