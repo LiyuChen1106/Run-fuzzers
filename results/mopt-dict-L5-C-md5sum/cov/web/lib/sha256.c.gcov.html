@@ -1,0 +1,652 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/sha256.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - sha256.c<span style="font-size: 80%;"> (source / <a href="sha256.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">238</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* sha256.c - Functions to compute SHA256 and SHA224 message digest of files or</a>
+<span class="lineNum">       2 </span>            :    memory blocks according to the NIST specification FIPS-180-2.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    Copyright (C) 2005-2006, 2008-2015 Free Software Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by David Madore, considerably copypasting from
+<span class="lineNum">      20 </span>            :    Scott G. Miller's sha1.c
+<span class="lineNum">      21 </span>            : */
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #if HAVE_OPENSSL_SHA256
+<span class="lineNum">      26 </span>            : # define GL_OPENSSL_INLINE _GL_EXTERN_INLINE
+<span class="lineNum">      27 </span>            : #endif
+<span class="lineNum">      28 </span>            : #include &quot;sha256.h&quot;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &lt;stdalign.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #if USE_UNLOCKED_IO
+<span class="lineNum">      36 </span>            : # include &quot;unlocked-io.h&quot;
+<span class="lineNum">      37 </span>            : #endif
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #ifdef WORDS_BIGENDIAN
+<span class="lineNum">      40 </span>            : # define SWAP(n) (n)
+<span class="lineNum">      41 </span>            : #else
+<span class="lineNum">      42 </span>            : # define SWAP(n) \
+<span class="lineNum">      43 </span>            :     (((n) &lt;&lt; 24) | (((n) &amp; 0xff00) &lt;&lt; 8) | (((n) &gt;&gt; 8) &amp; 0xff00) | ((n) &gt;&gt; 24))
+<span class="lineNum">      44 </span>            : #endif
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : #define BLOCKSIZE 32768
+<span class="lineNum">      47 </span>            : #if BLOCKSIZE % 64 != 0
+<span class="lineNum">      48 </span>            : # error &quot;invalid BLOCKSIZE&quot;
+<span class="lineNum">      49 </span>            : #endif
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : #if ! HAVE_OPENSSL_SHA256
+<span class="lineNum">      52 </span>            : /* This array contains the bytes used to pad the buffer to the next
+<span class="lineNum">      53 </span>            :    64-byte boundary.  */
+<span class="lineNum">      54 </span>            : static const unsigned char fillbuf[64] = { 0x80, 0 /* , 0, 0, ...  */ };
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : /*
+<span class="lineNum">      58 </span>            :   Takes a pointer to a 256 bit block of data (eight 32 bit ints) and
+<span class="lineNum">      59 </span>            :   initializes it to the start constants of the SHA256 algorithm.  This
+<span class="lineNum">      60 </span>            :   must be called before using hash in the call to sha256_hash
+<a name="61"><span class="lineNum">      61 </span>            : */</a>
+<span class="lineNum">      62 </span>            : void
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 : sha256_init_ctx (struct sha256_ctx *ctx)</span>
+<span class="lineNum">      64 </span>            : {
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   ctx-&gt;state[0] = 0x6a09e667UL;</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   ctx-&gt;state[1] = 0xbb67ae85UL;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   ctx-&gt;state[2] = 0x3c6ef372UL;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   ctx-&gt;state[3] = 0xa54ff53aUL;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :   ctx-&gt;state[4] = 0x510e527fUL;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   ctx-&gt;state[5] = 0x9b05688cUL;</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :   ctx-&gt;state[6] = 0x1f83d9abUL;</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   ctx-&gt;state[7] = 0x5be0cd19UL;</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :   ctx-&gt;total[0] = ctx-&gt;total[1] = 0;</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :   ctx-&gt;buflen = 0;</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 : }</span>
+<a name="77"><span class="lineNum">      77 </span>            : </a>
+<span class="lineNum">      78 </span>            : void
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 : sha224_init_ctx (struct sha256_ctx *ctx)</span>
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   ctx-&gt;state[0] = 0xc1059ed8UL;</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   ctx-&gt;state[1] = 0x367cd507UL;</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :   ctx-&gt;state[2] = 0x3070dd17UL;</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :   ctx-&gt;state[3] = 0xf70e5939UL;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :   ctx-&gt;state[4] = 0xffc00b31UL;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   ctx-&gt;state[5] = 0x68581511UL;</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   ctx-&gt;state[6] = 0x64f98fa7UL;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   ctx-&gt;state[7] = 0xbefa4fa4UL;</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :   ctx-&gt;total[0] = ctx-&gt;total[1] = 0;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   ctx-&gt;buflen = 0;</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : /* Copy the value from v into the memory location pointed to by *cp,
+<span class="lineNum">      95 </span>            :    If your architecture allows unaligned access this is equivalent to
+<a name="96"><span class="lineNum">      96 </span>            :    * (uint32_t *) cp = v  */</a>
+<span class="lineNum">      97 </span>            : static void
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 : set_uint32 (char *cp, uint32_t v)</span>
+<span class="lineNum">      99 </span>            : {
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   memcpy (cp, &amp;v, sizeof v);</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : /* Put result from CTX in first 32 bytes following RESBUF.  The result
+<a name="104"><span class="lineNum">     104 </span>            :    must be in little endian byte order.  */</a>
+<span class="lineNum">     105 </span>            : void *
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 : sha256_read_ctx (const struct sha256_ctx *ctx, void *resbuf)</span>
+<span class="lineNum">     107 </span>            : {
+<span class="lineNum">     108 </span>            :   int i;
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   char *r = resbuf;</span>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   for (i = 0; i &lt; 8; i++)</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :     set_uint32 (r + i * sizeof ctx-&gt;state[0], SWAP (ctx-&gt;state[i]));</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   return resbuf;</span>
+<span class="lineNum">     115 </span>            : }
+<a name="116"><span class="lineNum">     116 </span>            : </a>
+<span class="lineNum">     117 </span>            : void *
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 : sha224_read_ctx (const struct sha256_ctx *ctx, void *resbuf)</span>
+<span class="lineNum">     119 </span>            : {
+<span class="lineNum">     120 </span>            :   int i;
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   char *r = resbuf;</span>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :   for (i = 0; i &lt; 7; i++)</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :     set_uint32 (r + i * sizeof ctx-&gt;state[0], SWAP (ctx-&gt;state[i]));</span>
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :   return resbuf;</span>
+<span class="lineNum">     127 </span>            : }
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            : /* Process the remaining bytes in the internal buffer and the usual
+<a name="130"><span class="lineNum">     130 </span>            :    prolog according to the standard and write the result to RESBUF.  */</a>
+<span class="lineNum">     131 </span>            : static void
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 : sha256_conclude_ctx (struct sha256_ctx *ctx)</span>
+<span class="lineNum">     133 </span>            : {
+<span class="lineNum">     134 </span>            :   /* Take yet unprocessed bytes into account.  */
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :   size_t bytes = ctx-&gt;buflen;</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :   size_t size = (bytes &lt; 56) ? 64 / 4 : 64 * 2 / 4;</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :   /* Now count remaining bytes.  */
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   ctx-&gt;total[0] += bytes;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   if (ctx-&gt;total[0] &lt; bytes)</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :     ++ctx-&gt;total[1];</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :   /* Put the 64-bit file length in *bits* at the end of the buffer.
+<span class="lineNum">     144 </span>            :      Use set_uint32 rather than a simple assignment, to avoid risk of
+<span class="lineNum">     145 </span>            :      unaligned access.  */
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   set_uint32 ((char *) &amp;ctx-&gt;buffer[size - 2],</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :               SWAP ((ctx-&gt;total[1] &lt;&lt; 3) | (ctx-&gt;total[0] &gt;&gt; 29)));</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :   set_uint32 ((char *) &amp;ctx-&gt;buffer[size - 1],</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :               SWAP (ctx-&gt;total[0] &lt;&lt; 3));</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   memcpy (&amp;((char *) ctx-&gt;buffer)[bytes], fillbuf, (size - 2) * 4 - bytes);</span>
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   /* Process last bytes.  */
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   sha256_process_block (ctx-&gt;buffer, size * 4, ctx);</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 : }</span>
+<a name="156"><span class="lineNum">     156 </span>            : </a>
+<span class="lineNum">     157 </span>            : void *
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 : sha256_finish_ctx (struct sha256_ctx *ctx, void *resbuf)</span>
+<span class="lineNum">     159 </span>            : {
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :   sha256_conclude_ctx (ctx);</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :   return sha256_read_ctx (ctx, resbuf);</span>
+<span class="lineNum">     162 </span>            : }
+<a name="163"><span class="lineNum">     163 </span>            : </a>
+<span class="lineNum">     164 </span>            : void *
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 : sha224_finish_ctx (struct sha256_ctx *ctx, void *resbuf)</span>
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   sha256_conclude_ctx (ctx);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   return sha224_read_ctx (ctx, resbuf);</span>
+<span class="lineNum">     169 </span>            : }
+<span class="lineNum">     170 </span>            : #endif
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : /* Compute SHA256 message digest for bytes read from STREAM.  The
+<span class="lineNum">     173 </span>            :    resulting message digest number will be written into the 32 bytes
+<a name="174"><span class="lineNum">     174 </span>            :    beginning at RESBLOCK.  */</a>
+<span class="lineNum">     175 </span>            : int
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 : sha256_stream (FILE *stream, void *resblock)</span>
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span>            :   struct sha256_ctx ctx;
+<span class="lineNum">     179 </span>            :   size_t sum;
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   char *buffer = malloc (BLOCKSIZE + 72);</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :   if (!buffer)</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :   /* Initialize the computation context.  */
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :   sha256_init_ctx (&amp;ctx);</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :   /* Iterate over full file contents.  */
+<span class="lineNum">     189 </span>            :   while (1)
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     191 </span>            :       /* We read the file in blocks of BLOCKSIZE bytes.  One call of the
+<span class="lineNum">     192 </span>            :          computation function processes the whole buffer so that with the
+<span class="lineNum">     193 </span>            :          next round of the loop another block can be read.  */
+<span class="lineNum">     194 </span>            :       size_t n;
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       sum = 0;</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            :       /* Read block.  Take care for partial reads.  */
+<span class="lineNum">     198 </span>            :       while (1)
+<span class="lineNum">     199 </span>            :         {
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :           n = fread (buffer + sum, 1, BLOCKSIZE - sum, stream);</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :           sum += n;</span>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :           if (sum == BLOCKSIZE)</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :           if (n == 0)</span>
+<span class="lineNum">     208 </span>            :             {
+<span class="lineNum">     209 </span>            :               /* Check for the error flag IFF N == 0, so that we don't
+<span class="lineNum">     210 </span>            :                  exit the loop after a partial read due to e.g., EAGAIN
+<span class="lineNum">     211 </span>            :                  or EWOULDBLOCK.  */
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :               if (ferror (stream))</span>
+<span class="lineNum">     213 </span>            :                 {
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                   free (buffer);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                   return 1;</span>
+<span class="lineNum">     216 </span>            :                 }
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :               goto process_partial_block;</span>
+<span class="lineNum">     218 </span>            :             }
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            :           /* We've read at least one byte, so ignore errors.  But always
+<span class="lineNum">     221 </span>            :              check for EOF, since feof may be true even though N &gt; 0.
+<span class="lineNum">     222 </span>            :              Otherwise, we could end up calling fread after EOF.  */
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :           if (feof (stream))</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :             goto process_partial_block;</span>
+<span class="lineNum">     225 </span>            :         }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :       /* Process buffer with BLOCKSIZE bytes.  Note that
+<span class="lineNum">     228 </span>            :                         BLOCKSIZE % 64 == 0
+<span class="lineNum">     229 </span>            :        */
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :       sha256_process_block (buffer, BLOCKSIZE, &amp;ctx);</span>
+<span class="lineNum">     231 </span>            :     }
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :  process_partial_block:;</span>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :   /* Process any remaining bytes.  */
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :   if (sum &gt; 0)</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :     sha256_process_bytes (buffer, sum, &amp;ctx);</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :   /* Construct result in desired memory.  */
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :   sha256_finish_ctx (&amp;ctx, resblock);</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :   free (buffer);</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     243 </span>            : }
+<span class="lineNum">     244 </span>            : 
+<a name="245"><span class="lineNum">     245 </span>            : /* FIXME: Avoid code duplication */</a>
+<span class="lineNum">     246 </span>            : int
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 : sha224_stream (FILE *stream, void *resblock)</span>
+<span class="lineNum">     248 </span>            : {
+<span class="lineNum">     249 </span>            :   struct sha256_ctx ctx;
+<span class="lineNum">     250 </span>            :   size_t sum;
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :   char *buffer = malloc (BLOCKSIZE + 72);</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :   if (!buffer)</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   /* Initialize the computation context.  */
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :   sha224_init_ctx (&amp;ctx);</span>
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   /* Iterate over full file contents.  */
+<span class="lineNum">     260 </span>            :   while (1)
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     262 </span>            :       /* We read the file in blocks of BLOCKSIZE bytes.  One call of the
+<span class="lineNum">     263 </span>            :          computation function processes the whole buffer so that with the
+<span class="lineNum">     264 </span>            :          next round of the loop another block can be read.  */
+<span class="lineNum">     265 </span>            :       size_t n;
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       sum = 0;</span>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :       /* Read block.  Take care for partial reads.  */
+<span class="lineNum">     269 </span>            :       while (1)
+<span class="lineNum">     270 </span>            :         {
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :           n = fread (buffer + sum, 1, BLOCKSIZE - sum, stream);</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :           sum += n;</span>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :           if (sum == BLOCKSIZE)</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :           if (n == 0)</span>
+<span class="lineNum">     279 </span>            :             {
+<span class="lineNum">     280 </span>            :               /* Check for the error flag IFF N == 0, so that we don't
+<span class="lineNum">     281 </span>            :                  exit the loop after a partial read due to e.g., EAGAIN
+<span class="lineNum">     282 </span>            :                  or EWOULDBLOCK.  */
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :               if (ferror (stream))</span>
+<span class="lineNum">     284 </span>            :                 {
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :                   free (buffer);</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                   return 1;</span>
+<span class="lineNum">     287 </span>            :                 }
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :               goto process_partial_block;</span>
+<span class="lineNum">     289 </span>            :             }
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            :           /* We've read at least one byte, so ignore errors.  But always
+<span class="lineNum">     292 </span>            :              check for EOF, since feof may be true even though N &gt; 0.
+<span class="lineNum">     293 </span>            :              Otherwise, we could end up calling fread after EOF.  */
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :           if (feof (stream))</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :             goto process_partial_block;</span>
+<span class="lineNum">     296 </span>            :         }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :       /* Process buffer with BLOCKSIZE bytes.  Note that
+<span class="lineNum">     299 </span>            :                         BLOCKSIZE % 64 == 0
+<span class="lineNum">     300 </span>            :        */
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :       sha256_process_block (buffer, BLOCKSIZE, &amp;ctx);</span>
+<span class="lineNum">     302 </span>            :     }
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :  process_partial_block:;</span>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :   /* Process any remaining bytes.  */
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :   if (sum &gt; 0)</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :     sha256_process_bytes (buffer, sum, &amp;ctx);</span>
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :   /* Construct result in desired memory.  */
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :   sha224_finish_ctx (&amp;ctx, resblock);</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :   free (buffer);</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     314 </span>            : }
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            : #if ! HAVE_OPENSSL_SHA256
+<span class="lineNum">     317 </span>            : /* Compute SHA512 message digest for LEN bytes beginning at BUFFER.  The
+<span class="lineNum">     318 </span>            :    result is always in little endian byte order, so that a byte-wise
+<span class="lineNum">     319 </span>            :    output yields to the wanted ASCII representation of the message
+<a name="320"><span class="lineNum">     320 </span>            :    digest.  */</a>
+<span class="lineNum">     321 </span>            : void *
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 : sha256_buffer (const char *buffer, size_t len, void *resblock)</span>
+<span class="lineNum">     323 </span>            : {
+<span class="lineNum">     324 </span>            :   struct sha256_ctx ctx;
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span>            :   /* Initialize the computation context.  */
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :   sha256_init_ctx (&amp;ctx);</span>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :   /* Process whole buffer but last len % 64 bytes.  */
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :   sha256_process_bytes (buffer, len, &amp;ctx);</span>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :   /* Put result in desired memory area.  */
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :   return sha256_finish_ctx (&amp;ctx, resblock);</span>
+<span class="lineNum">     334 </span>            : }
+<a name="335"><span class="lineNum">     335 </span>            : </a>
+<span class="lineNum">     336 </span>            : void *
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 : sha224_buffer (const char *buffer, size_t len, void *resblock)</span>
+<span class="lineNum">     338 </span>            : {
+<span class="lineNum">     339 </span>            :   struct sha256_ctx ctx;
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span>            :   /* Initialize the computation context.  */
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :   sha224_init_ctx (&amp;ctx);</span>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   /* Process whole buffer but last len % 64 bytes.  */
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :   sha256_process_bytes (buffer, len, &amp;ctx);</span>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :   /* Put result in desired memory area.  */
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :   return sha224_finish_ctx (&amp;ctx, resblock);</span>
+<span class="lineNum">     349 </span>            : }
+<a name="350"><span class="lineNum">     350 </span>            : </a>
+<span class="lineNum">     351 </span>            : void
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 : sha256_process_bytes (const void *buffer, size_t len, struct sha256_ctx *ctx)</span>
+<span class="lineNum">     353 </span>            : {
+<span class="lineNum">     354 </span>            :   /* When we already have some bits in our internal buffer concatenate
+<span class="lineNum">     355 </span>            :      both inputs first.  */
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :   if (ctx-&gt;buflen != 0)</span>
+<span class="lineNum">     357 </span>            :     {
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :       size_t left_over = ctx-&gt;buflen;</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :       size_t add = 128 - left_over &gt; len ? len : 128 - left_over;</span>
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :       memcpy (&amp;((char *) ctx-&gt;buffer)[left_over], buffer, add);</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :       ctx-&gt;buflen += add;</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :       if (ctx-&gt;buflen &gt; 64)</span>
+<span class="lineNum">     365 </span>            :         {
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :           sha256_process_block (ctx-&gt;buffer, ctx-&gt;buflen &amp; ~63, ctx);</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :           ctx-&gt;buflen &amp;= 63;</span>
+<span class="lineNum">     369 </span>            :           /* The regions in the following copy operation cannot overlap.  */
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :           memcpy (ctx-&gt;buffer,</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                   &amp;((char *) ctx-&gt;buffer)[(left_over + add) &amp; ~63],</span>
+<span class="lineNum">     372 </span>            :                   ctx-&gt;buflen);
+<span class="lineNum">     373 </span>            :         }
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :       buffer = (const char *) buffer + add;</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :       len -= add;</span>
+<span class="lineNum">     377 </span>            :     }
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            :   /* Process available complete blocks.  */
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :   if (len &gt;= 64)</span>
+<span class="lineNum">     381 </span>            :     {
+<span class="lineNum">     382 </span>            : #if !_STRING_ARCH_unaligned
+<span class="lineNum">     383 </span>            : # define UNALIGNED_P(p) ((uintptr_t) (p) % alignof (uint32_t) != 0)
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :       if (UNALIGNED_P (buffer))</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :         while (len &gt; 64)</span>
+<span class="lineNum">     386 </span>            :           {
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :             sha256_process_block (memcpy (ctx-&gt;buffer, buffer, 64), 64, ctx);</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :             buffer = (const char *) buffer + 64;</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :             len -= 64;</span>
+<span class="lineNum">     390 </span>            :           }
+<span class="lineNum">     391 </span>            :       else
+<span class="lineNum">     392 </span>            : #endif
+<span class="lineNum">     393 </span>            :         {
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :           sha256_process_block (buffer, len &amp; ~63, ctx);</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :           buffer = (const char *) buffer + (len &amp; ~63);</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :           len &amp;= 63;</span>
+<span class="lineNum">     397 </span>            :         }
+<span class="lineNum">     398 </span>            :     }
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            :   /* Move remaining bytes in internal buffer.  */
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :   if (len &gt; 0)</span>
+<span class="lineNum">     402 </span>            :     {
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :       size_t left_over = ctx-&gt;buflen;</span>
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :       memcpy (&amp;((char *) ctx-&gt;buffer)[left_over], buffer, len);</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :       left_over += len;</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :       if (left_over &gt;= 64)</span>
+<span class="lineNum">     408 </span>            :         {
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :           sha256_process_block (ctx-&gt;buffer, 64, ctx);</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :           left_over -= 64;</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :           memcpy (ctx-&gt;buffer, &amp;ctx-&gt;buffer[16], left_over);</span>
+<span class="lineNum">     412 </span>            :         }
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :       ctx-&gt;buflen = left_over;</span>
+<span class="lineNum">     414 </span>            :     }
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            : /* --- Code below is the primary difference between sha1.c and sha256.c --- */
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            : /* SHA256 round constants */
+<span class="lineNum">     420 </span>            : #define K(I) sha256_round_constants[I]
+<span class="lineNum">     421 </span>            : static const uint32_t sha256_round_constants[64] = {
+<span class="lineNum">     422 </span>            :   0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL,
+<span class="lineNum">     423 </span>            :   0x3956c25bUL, 0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL,
+<span class="lineNum">     424 </span>            :   0xd807aa98UL, 0x12835b01UL, 0x243185beUL, 0x550c7dc3UL,
+<span class="lineNum">     425 </span>            :   0x72be5d74UL, 0x80deb1feUL, 0x9bdc06a7UL, 0xc19bf174UL,
+<span class="lineNum">     426 </span>            :   0xe49b69c1UL, 0xefbe4786UL, 0x0fc19dc6UL, 0x240ca1ccUL,
+<span class="lineNum">     427 </span>            :   0x2de92c6fUL, 0x4a7484aaUL, 0x5cb0a9dcUL, 0x76f988daUL,
+<span class="lineNum">     428 </span>            :   0x983e5152UL, 0xa831c66dUL, 0xb00327c8UL, 0xbf597fc7UL,
+<span class="lineNum">     429 </span>            :   0xc6e00bf3UL, 0xd5a79147UL, 0x06ca6351UL, 0x14292967UL,
+<span class="lineNum">     430 </span>            :   0x27b70a85UL, 0x2e1b2138UL, 0x4d2c6dfcUL, 0x53380d13UL,
+<span class="lineNum">     431 </span>            :   0x650a7354UL, 0x766a0abbUL, 0x81c2c92eUL, 0x92722c85UL,
+<span class="lineNum">     432 </span>            :   0xa2bfe8a1UL, 0xa81a664bUL, 0xc24b8b70UL, 0xc76c51a3UL,
+<span class="lineNum">     433 </span>            :   0xd192e819UL, 0xd6990624UL, 0xf40e3585UL, 0x106aa070UL,
+<span class="lineNum">     434 </span>            :   0x19a4c116UL, 0x1e376c08UL, 0x2748774cUL, 0x34b0bcb5UL,
+<span class="lineNum">     435 </span>            :   0x391c0cb3UL, 0x4ed8aa4aUL, 0x5b9cca4fUL, 0x682e6ff3UL,
+<span class="lineNum">     436 </span>            :   0x748f82eeUL, 0x78a5636fUL, 0x84c87814UL, 0x8cc70208UL,
+<span class="lineNum">     437 </span>            :   0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL,
+<span class="lineNum">     438 </span>            : };
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            : /* Round functions.  */
+<span class="lineNum">     441 </span>            : #define F2(A,B,C) ( ( A &amp; B ) | ( C &amp; ( A | B ) ) )
+<span class="lineNum">     442 </span>            : #define F1(E,F,G) ( G ^ ( E &amp; ( F ^ G ) ) )
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            : /* Process LEN bytes of BUFFER, accumulating context into CTX.
+<span class="lineNum">     445 </span>            :    It is assumed that LEN % 64 == 0.
+<span class="lineNum">     446 </span>            :    Most of this code comes from GnuPG's cipher/sha1.c.  */
+<a name="447"><span class="lineNum">     447 </span>            : </a>
+<span class="lineNum">     448 </span>            : void
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 : sha256_process_block (const void *buffer, size_t len, struct sha256_ctx *ctx)</span>
+<span class="lineNum">     450 </span>            : {
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :   const uint32_t *words = buffer;</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :   size_t nwords = len / sizeof (uint32_t);</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :   const uint32_t *endp = words + nwords;</span>
+<span class="lineNum">     454 </span>            :   uint32_t x[16];
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :   uint32_t a = ctx-&gt;state[0];</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :   uint32_t b = ctx-&gt;state[1];</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :   uint32_t c = ctx-&gt;state[2];</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :   uint32_t d = ctx-&gt;state[3];</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :   uint32_t e = ctx-&gt;state[4];</span>
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :   uint32_t f = ctx-&gt;state[5];</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :   uint32_t g = ctx-&gt;state[6];</span>
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :   uint32_t h = ctx-&gt;state[7];</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :   uint32_t lolen = len;</span>
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :   /* First increment the byte count.  FIPS PUB 180-2 specifies the possible
+<span class="lineNum">     466 </span>            :      length of the file up to 2^64 bits.  Here we only compute the
+<span class="lineNum">     467 </span>            :      number of bytes.  Do a double word increment.  */
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :   ctx-&gt;total[0] += lolen;</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :   ctx-&gt;total[1] += (len &gt;&gt; 31 &gt;&gt; 1) + (ctx-&gt;total[0] &lt; lolen);</span>
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : #define rol(x, n) (((x) &lt;&lt; (n)) | ((x) &gt;&gt; (32 - (n))))
+<span class="lineNum">     472 </span>            : #define S0(x) (rol(x,25)^rol(x,14)^(x&gt;&gt;3))
+<span class="lineNum">     473 </span>            : #define S1(x) (rol(x,15)^rol(x,13)^(x&gt;&gt;10))
+<span class="lineNum">     474 </span>            : #define SS0(x) (rol(x,30)^rol(x,19)^rol(x,10))
+<span class="lineNum">     475 </span>            : #define SS1(x) (rol(x,26)^rol(x,21)^rol(x,7))
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            : #define M(I) ( tm =   S1(x[(I-2)&amp;0x0f]) + x[(I-7)&amp;0x0f] \
+<span class="lineNum">     478 </span>            :                     + S0(x[(I-15)&amp;0x0f]) + x[I&amp;0x0f]    \
+<span class="lineNum">     479 </span>            :                , x[I&amp;0x0f] = tm )
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            : #define R(A,B,C,D,E,F,G,H,K,M)  do { t0 = SS0(A) + F2(A,B,C); \
+<span class="lineNum">     482 </span>            :                                      t1 = H + SS1(E)  \
+<span class="lineNum">     483 </span>            :                                       + F1(E,F,G)     \
+<span class="lineNum">     484 </span>            :                                       + K             \
+<span class="lineNum">     485 </span>            :                                       + M;            \
+<span class="lineNum">     486 </span>            :                                      D += t1;  H = t0 + t1; \
+<span class="lineNum">     487 </span>            :                                } while(0)
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :   while (words &lt; endp)</span>
+<span class="lineNum">     490 </span>            :     {
+<span class="lineNum">     491 </span>            :       uint32_t tm;
+<span class="lineNum">     492 </span>            :       uint32_t t0, t1;
+<span class="lineNum">     493 </span>            :       int t;
+<span class="lineNum">     494 </span>            :       /* FIXME: see sha1.c for a better implementation.  */
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :       for (t = 0; t &lt; 16; t++)</span>
+<span class="lineNum">     496 </span>            :         {
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :           x[t] = SWAP (*words);</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :           words++;</span>
+<span class="lineNum">     499 </span>            :         }
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K( 0), x[ 0] );</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K( 1), x[ 1] );</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K( 2), x[ 2] );</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K( 3), x[ 3] );</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K( 4), x[ 4] );</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K( 5), x[ 5] );</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K( 6), x[ 6] );</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K( 7), x[ 7] );</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K( 8), x[ 8] );</span>
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K( 9), x[ 9] );</span>
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(10), x[10] );</span>
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(11), x[11] );</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(12), x[12] );</span>
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(13), x[13] );</span>
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(14), x[14] );</span>
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(15), x[15] );</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K(16), M(16) );</span>
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K(17), M(17) );</span>
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(18), M(18) );</span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(19), M(19) );</span>
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(20), M(20) );</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(21), M(21) );</span>
+<span class="lineNum">     523 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(22), M(22) );</span>
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(23), M(23) );</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K(24), M(24) );</span>
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K(25), M(25) );</span>
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(26), M(26) );</span>
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(27), M(27) );</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(28), M(28) );</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(29), M(29) );</span>
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(30), M(30) );</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(31), M(31) );</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K(32), M(32) );</span>
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K(33), M(33) );</span>
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(34), M(34) );</span>
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(35), M(35) );</span>
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(36), M(36) );</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(37), M(37) );</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(38), M(38) );</span>
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(39), M(39) );</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K(40), M(40) );</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K(41), M(41) );</span>
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(42), M(42) );</span>
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(43), M(43) );</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(44), M(44) );</span>
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(45), M(45) );</span>
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(46), M(46) );</span>
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(47), M(47) );</span>
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K(48), M(48) );</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K(49), M(49) );</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(50), M(50) );</span>
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(51), M(51) );</span>
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(52), M(52) );</span>
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(53), M(53) );</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(54), M(54) );</span>
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(55), M(55) );</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :       R( a, b, c, d, e, f, g, h, K(56), M(56) );</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :       R( h, a, b, c, d, e, f, g, K(57), M(57) );</span>
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :       R( g, h, a, b, c, d, e, f, K(58), M(58) );</span>
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :       R( f, g, h, a, b, c, d, e, K(59), M(59) );</span>
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :       R( e, f, g, h, a, b, c, d, K(60), M(60) );</span>
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :       R( d, e, f, g, h, a, b, c, K(61), M(61) );</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :       R( c, d, e, f, g, h, a, b, K(62), M(62) );</span>
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :       R( b, c, d, e, f, g, h, a, K(63), M(63) );</span>
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 :       a = ctx-&gt;state[0] += a;</span>
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :       b = ctx-&gt;state[1] += b;</span>
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :       c = ctx-&gt;state[2] += c;</span>
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :       d = ctx-&gt;state[3] += d;</span>
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :       e = ctx-&gt;state[4] += e;</span>
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :       f = ctx-&gt;state[5] += f;</span>
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :       g = ctx-&gt;state[6] += g;</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :       h = ctx-&gt;state[7] += h;</span>
+<span class="lineNum">     574 </span>            :     }
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     576 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

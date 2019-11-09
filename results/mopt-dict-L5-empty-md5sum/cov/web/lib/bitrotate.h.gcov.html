@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/bitrotate.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - bitrotate.h<span style="font-size: 80%;"> (source / <a href="bitrotate.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* bitrotate.h - Rotate bits in integers</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2008-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* Written by Simon Josefsson &lt;simon@josefsson.org&gt;, 2008. */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #ifndef _GL_BITROTATE_H
+<span class="lineNum">      20 </span>            : #define _GL_BITROTATE_H
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      23 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #ifndef _GL_INLINE_HEADER_BEGIN
+<span class="lineNum">      27 </span>            :  #error &quot;Please include config.h first.&quot;
+<span class="lineNum">      28 </span>            : #endif
+<span class="lineNum">      29 </span>            : _GL_INLINE_HEADER_BEGIN
+<span class="lineNum">      30 </span>            : #ifndef BITROTATE_INLINE
+<span class="lineNum">      31 </span>            : # define BITROTATE_INLINE _GL_INLINE
+<span class="lineNum">      32 </span>            : #endif
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #ifdef UINT64_MAX
+<span class="lineNum">      35 </span>            : /* Given an unsigned 64-bit argument X, return the value corresponding
+<span class="lineNum">      36 </span>            :    to rotating the bits N steps to the left.  N must be between 1 and
+<a name="37"><span class="lineNum">      37 </span>            :    63 inclusive. */</a>
+<span class="lineNum">      38 </span>            : BITROTATE_INLINE uint64_t
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 : rotl64 (uint64_t x, int n)</span>
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   return ((x &lt;&lt; n) | (x &gt;&gt; (64 - n))) &amp; UINT64_MAX;</span>
+<span class="lineNum">      42 </span>            : }
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : /* Given an unsigned 64-bit argument X, return the value corresponding
+<span class="lineNum">      45 </span>            :    to rotating the bits N steps to the right.  N must be between 1 to
+<a name="46"><span class="lineNum">      46 </span>            :    63 inclusive.*/</a>
+<span class="lineNum">      47 </span>            : BITROTATE_INLINE uint64_t
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 : rotr64 (uint64_t x, int n)</span>
+<span class="lineNum">      49 </span>            : {
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :   return ((x &gt;&gt; n) | (x &lt;&lt; (64 - n))) &amp; UINT64_MAX;</span>
+<span class="lineNum">      51 </span>            : }
+<span class="lineNum">      52 </span>            : #endif
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : /* Given an unsigned 32-bit argument X, return the value corresponding
+<span class="lineNum">      55 </span>            :    to rotating the bits N steps to the left.  N must be between 1 and
+<a name="56"><span class="lineNum">      56 </span>            :    31 inclusive. */</a>
+<span class="lineNum">      57 </span>            : BITROTATE_INLINE uint32_t
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 : rotl32 (uint32_t x, int n)</span>
+<span class="lineNum">      59 </span>            : {
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :   return ((x &lt;&lt; n) | (x &gt;&gt; (32 - n))) &amp; UINT32_MAX;</span>
+<span class="lineNum">      61 </span>            : }
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : /* Given an unsigned 32-bit argument X, return the value corresponding
+<span class="lineNum">      64 </span>            :    to rotating the bits N steps to the right.  N must be between 1 to
+<a name="65"><span class="lineNum">      65 </span>            :    31 inclusive.*/</a>
+<span class="lineNum">      66 </span>            : BITROTATE_INLINE uint32_t
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 : rotr32 (uint32_t x, int n)</span>
+<span class="lineNum">      68 </span>            : {
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :   return ((x &gt;&gt; n) | (x &lt;&lt; (32 - n))) &amp; UINT32_MAX;</span>
+<span class="lineNum">      70 </span>            : }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : /* Given a size_t argument X, return the value corresponding
+<span class="lineNum">      73 </span>            :    to rotating the bits N steps to the left.  N must be between 1 and
+<a name="74"><span class="lineNum">      74 </span>            :    (CHAR_BIT * sizeof (size_t) - 1) inclusive.  */</a>
+<span class="lineNum">      75 </span>            : BITROTATE_INLINE size_t
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 : rotl_sz (size_t x, int n)</span>
+<span class="lineNum">      77 </span>            : {
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :   return ((x &lt;&lt; n) | (x &gt;&gt; ((CHAR_BIT * sizeof x) - n))) &amp; SIZE_MAX;</span>
+<span class="lineNum">      79 </span>            : }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : /* Given a size_t argument X, return the value corresponding
+<span class="lineNum">      82 </span>            :    to rotating the bits N steps to the right.  N must be between 1 to
+<a name="83"><span class="lineNum">      83 </span>            :    (CHAR_BIT * sizeof (size_t) - 1) inclusive.  */</a>
+<span class="lineNum">      84 </span>            : BITROTATE_INLINE size_t
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 : rotr_sz (size_t x, int n)</span>
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   return ((x &gt;&gt; n) | (x &lt;&lt; ((CHAR_BIT * sizeof x) - n))) &amp; SIZE_MAX;</span>
+<span class="lineNum">      88 </span>            : }
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : /* Given an unsigned 16-bit argument X, return the value corresponding
+<span class="lineNum">      91 </span>            :    to rotating the bits N steps to the left.  N must be between 1 to
+<span class="lineNum">      92 </span>            :    15 inclusive, but on most relevant targets N can also be 0 and 16
+<span class="lineNum">      93 </span>            :    because 'int' is at least 32 bits and the arguments must widen
+<a name="94"><span class="lineNum">      94 </span>            :    before shifting. */</a>
+<span class="lineNum">      95 </span>            : BITROTATE_INLINE uint16_t
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 : rotl16 (uint16_t x, int n)</span>
+<span class="lineNum">      97 </span>            : {
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   return ((x &lt;&lt; n) | (x &gt;&gt; (16 - n))) &amp; UINT16_MAX;</span>
+<span class="lineNum">      99 </span>            : }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /* Given an unsigned 16-bit argument X, return the value corresponding
+<span class="lineNum">     102 </span>            :    to rotating the bits N steps to the right.  N must be in 1 to 15
+<span class="lineNum">     103 </span>            :    inclusive, but on most relevant targets N can also be 0 and 16
+<span class="lineNum">     104 </span>            :    because 'int' is at least 32 bits and the arguments must widen
+<a name="105"><span class="lineNum">     105 </span>            :    before shifting. */</a>
+<span class="lineNum">     106 </span>            : BITROTATE_INLINE uint16_t
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 : rotr16 (uint16_t x, int n)</span>
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   return ((x &gt;&gt; n) | (x &lt;&lt; (16 - n))) &amp; UINT16_MAX;</span>
+<span class="lineNum">     110 </span>            : }
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : /* Given an unsigned 8-bit argument X, return the value corresponding
+<span class="lineNum">     113 </span>            :    to rotating the bits N steps to the left.  N must be between 1 to 7
+<span class="lineNum">     114 </span>            :    inclusive, but on most relevant targets N can also be 0 and 8
+<span class="lineNum">     115 </span>            :    because 'int' is at least 32 bits and the arguments must widen
+<a name="116"><span class="lineNum">     116 </span>            :    before shifting. */</a>
+<span class="lineNum">     117 </span>            : BITROTATE_INLINE uint8_t
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 : rotl8 (uint8_t x, int n)</span>
+<span class="lineNum">     119 </span>            : {
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   return ((x &lt;&lt; n) | (x &gt;&gt; (8 - n))) &amp; UINT8_MAX;</span>
+<span class="lineNum">     121 </span>            : }
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            : /* Given an unsigned 8-bit argument X, return the value corresponding
+<span class="lineNum">     124 </span>            :    to rotating the bits N steps to the right.  N must be in 1 to 7
+<span class="lineNum">     125 </span>            :    inclusive, but on most relevant targets N can also be 0 and 8
+<span class="lineNum">     126 </span>            :    because 'int' is at least 32 bits and the arguments must widen
+<a name="127"><span class="lineNum">     127 </span>            :    before shifting. */</a>
+<span class="lineNum">     128 </span>            : BITROTATE_INLINE uint8_t
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 : rotr8 (uint8_t x, int n)</span>
+<span class="lineNum">     130 </span>            : {
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :   return ((x &gt;&gt; n) | (x &lt;&lt; (8 - n))) &amp; UINT8_MAX;</span>
+<span class="lineNum">     132 </span>            : }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            : _GL_INLINE_HEADER_END
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : #endif /* _GL_BITROTATE_H */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

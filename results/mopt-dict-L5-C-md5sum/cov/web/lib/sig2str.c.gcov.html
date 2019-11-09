@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/sig2str.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - sig2str.c<span style="font-size: 80%;"> (source / <a href="sig2str.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* sig2str.c -- convert between signal names and numbers</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2002, 2004, 2006, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      23 </span>            : #include &lt;signal.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &quot;sig2str.h&quot;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #ifndef SIGRTMIN
+<span class="lineNum">      31 </span>            : # define SIGRTMIN 0
+<span class="lineNum">      32 </span>            : # undef SIGRTMAX
+<span class="lineNum">      33 </span>            : #endif
+<span class="lineNum">      34 </span>            : #ifndef SIGRTMAX
+<span class="lineNum">      35 </span>            : # define SIGRTMAX (SIGRTMIN - 1)
+<span class="lineNum">      36 </span>            : #endif
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #define NUMNAME(name) { SIG##name, #name }
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : /* Signal names and numbers.  Put the preferred name first.  */
+<span class="lineNum">      41 </span>            : static struct numname { int num; char const name[8]; } numname_table[] =
+<span class="lineNum">      42 </span>            :   {
+<span class="lineNum">      43 </span>            :     /* Signals required by POSIX 1003.1-2001 base, listed in
+<span class="lineNum">      44 </span>            :        traditional numeric order where possible.  */
+<span class="lineNum">      45 </span>            : #ifdef SIGHUP
+<span class="lineNum">      46 </span>            :     NUMNAME (HUP),
+<span class="lineNum">      47 </span>            : #endif
+<span class="lineNum">      48 </span>            : #ifdef SIGINT
+<span class="lineNum">      49 </span>            :     NUMNAME (INT),
+<span class="lineNum">      50 </span>            : #endif
+<span class="lineNum">      51 </span>            : #ifdef SIGQUIT
+<span class="lineNum">      52 </span>            :     NUMNAME (QUIT),
+<span class="lineNum">      53 </span>            : #endif
+<span class="lineNum">      54 </span>            : #ifdef SIGILL
+<span class="lineNum">      55 </span>            :     NUMNAME (ILL),
+<span class="lineNum">      56 </span>            : #endif
+<span class="lineNum">      57 </span>            : #ifdef SIGTRAP
+<span class="lineNum">      58 </span>            :     NUMNAME (TRAP),
+<span class="lineNum">      59 </span>            : #endif
+<span class="lineNum">      60 </span>            : #ifdef SIGABRT
+<span class="lineNum">      61 </span>            :     NUMNAME (ABRT),
+<span class="lineNum">      62 </span>            : #endif
+<span class="lineNum">      63 </span>            : #ifdef SIGFPE
+<span class="lineNum">      64 </span>            :     NUMNAME (FPE),
+<span class="lineNum">      65 </span>            : #endif
+<span class="lineNum">      66 </span>            : #ifdef SIGKILL
+<span class="lineNum">      67 </span>            :     NUMNAME (KILL),
+<span class="lineNum">      68 </span>            : #endif
+<span class="lineNum">      69 </span>            : #ifdef SIGSEGV
+<span class="lineNum">      70 </span>            :     NUMNAME (SEGV),
+<span class="lineNum">      71 </span>            : #endif
+<span class="lineNum">      72 </span>            :     /* On Haiku, SIGSEGV == SIGBUS, but we prefer SIGSEGV to match
+<span class="lineNum">      73 </span>            :        strsignal.c output, so SIGBUS must be listed second.  */
+<span class="lineNum">      74 </span>            : #ifdef SIGBUS
+<span class="lineNum">      75 </span>            :     NUMNAME (BUS),
+<span class="lineNum">      76 </span>            : #endif
+<span class="lineNum">      77 </span>            : #ifdef SIGPIPE
+<span class="lineNum">      78 </span>            :     NUMNAME (PIPE),
+<span class="lineNum">      79 </span>            : #endif
+<span class="lineNum">      80 </span>            : #ifdef SIGALRM
+<span class="lineNum">      81 </span>            :     NUMNAME (ALRM),
+<span class="lineNum">      82 </span>            : #endif
+<span class="lineNum">      83 </span>            : #ifdef SIGTERM
+<span class="lineNum">      84 </span>            :     NUMNAME (TERM),
+<span class="lineNum">      85 </span>            : #endif
+<span class="lineNum">      86 </span>            : #ifdef SIGUSR1
+<span class="lineNum">      87 </span>            :     NUMNAME (USR1),
+<span class="lineNum">      88 </span>            : #endif
+<span class="lineNum">      89 </span>            : #ifdef SIGUSR2
+<span class="lineNum">      90 </span>            :     NUMNAME (USR2),
+<span class="lineNum">      91 </span>            : #endif
+<span class="lineNum">      92 </span>            : #ifdef SIGCHLD
+<span class="lineNum">      93 </span>            :     NUMNAME (CHLD),
+<span class="lineNum">      94 </span>            : #endif
+<span class="lineNum">      95 </span>            : #ifdef SIGURG
+<span class="lineNum">      96 </span>            :     NUMNAME (URG),
+<span class="lineNum">      97 </span>            : #endif
+<span class="lineNum">      98 </span>            : #ifdef SIGSTOP
+<span class="lineNum">      99 </span>            :     NUMNAME (STOP),
+<span class="lineNum">     100 </span>            : #endif
+<span class="lineNum">     101 </span>            : #ifdef SIGTSTP
+<span class="lineNum">     102 </span>            :     NUMNAME (TSTP),
+<span class="lineNum">     103 </span>            : #endif
+<span class="lineNum">     104 </span>            : #ifdef SIGCONT
+<span class="lineNum">     105 </span>            :     NUMNAME (CONT),
+<span class="lineNum">     106 </span>            : #endif
+<span class="lineNum">     107 </span>            : #ifdef SIGTTIN
+<span class="lineNum">     108 </span>            :     NUMNAME (TTIN),
+<span class="lineNum">     109 </span>            : #endif
+<span class="lineNum">     110 </span>            : #ifdef SIGTTOU
+<span class="lineNum">     111 </span>            :     NUMNAME (TTOU),
+<span class="lineNum">     112 </span>            : #endif
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     /* Signals required by POSIX 1003.1-2001 with the XSI extension.  */
+<span class="lineNum">     115 </span>            : #ifdef SIGSYS
+<span class="lineNum">     116 </span>            :     NUMNAME (SYS),
+<span class="lineNum">     117 </span>            : #endif
+<span class="lineNum">     118 </span>            : #ifdef SIGPOLL
+<span class="lineNum">     119 </span>            :     NUMNAME (POLL),
+<span class="lineNum">     120 </span>            : #endif
+<span class="lineNum">     121 </span>            : #ifdef SIGVTALRM
+<span class="lineNum">     122 </span>            :     NUMNAME (VTALRM),
+<span class="lineNum">     123 </span>            : #endif
+<span class="lineNum">     124 </span>            : #ifdef SIGPROF
+<span class="lineNum">     125 </span>            :     NUMNAME (PROF),
+<span class="lineNum">     126 </span>            : #endif
+<span class="lineNum">     127 </span>            : #ifdef SIGXCPU
+<span class="lineNum">     128 </span>            :     NUMNAME (XCPU),
+<span class="lineNum">     129 </span>            : #endif
+<span class="lineNum">     130 </span>            : #ifdef SIGXFSZ
+<span class="lineNum">     131 </span>            :     NUMNAME (XFSZ),
+<span class="lineNum">     132 </span>            : #endif
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     /* Unix Version 7.  */
+<span class="lineNum">     135 </span>            : #ifdef SIGIOT
+<span class="lineNum">     136 </span>            :     NUMNAME (IOT),      /* Older name for ABRT.  */
+<span class="lineNum">     137 </span>            : #endif
+<span class="lineNum">     138 </span>            : #ifdef SIGEMT
+<span class="lineNum">     139 </span>            :     NUMNAME (EMT),
+<span class="lineNum">     140 </span>            : #endif
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :     /* USG Unix.  */
+<span class="lineNum">     143 </span>            : #ifdef SIGPHONE
+<span class="lineNum">     144 </span>            :     NUMNAME (PHONE),
+<span class="lineNum">     145 </span>            : #endif
+<span class="lineNum">     146 </span>            : #ifdef SIGWIND
+<span class="lineNum">     147 </span>            :     NUMNAME (WIND),
+<span class="lineNum">     148 </span>            : #endif
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :     /* Unix System V.  */
+<span class="lineNum">     151 </span>            : #ifdef SIGCLD
+<span class="lineNum">     152 </span>            :     NUMNAME (CLD),
+<span class="lineNum">     153 </span>            : #endif
+<span class="lineNum">     154 </span>            : #ifdef SIGPWR
+<span class="lineNum">     155 </span>            :     NUMNAME (PWR),
+<span class="lineNum">     156 </span>            : #endif
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :     /* GNU/Linux 2.2 and Solaris 8.  */
+<span class="lineNum">     159 </span>            : #ifdef SIGCANCEL
+<span class="lineNum">     160 </span>            :     NUMNAME (CANCEL),
+<span class="lineNum">     161 </span>            : #endif
+<span class="lineNum">     162 </span>            : #ifdef SIGLWP
+<span class="lineNum">     163 </span>            :     NUMNAME (LWP),
+<span class="lineNum">     164 </span>            : #endif
+<span class="lineNum">     165 </span>            : #ifdef SIGWAITING
+<span class="lineNum">     166 </span>            :     NUMNAME (WAITING),
+<span class="lineNum">     167 </span>            : #endif
+<span class="lineNum">     168 </span>            : #ifdef SIGFREEZE
+<span class="lineNum">     169 </span>            :     NUMNAME (FREEZE),
+<span class="lineNum">     170 </span>            : #endif
+<span class="lineNum">     171 </span>            : #ifdef SIGTHAW
+<span class="lineNum">     172 </span>            :     NUMNAME (THAW),
+<span class="lineNum">     173 </span>            : #endif
+<span class="lineNum">     174 </span>            : #ifdef SIGLOST
+<span class="lineNum">     175 </span>            :     NUMNAME (LOST),
+<span class="lineNum">     176 </span>            : #endif
+<span class="lineNum">     177 </span>            : #ifdef SIGWINCH
+<span class="lineNum">     178 </span>            :     NUMNAME (WINCH),
+<span class="lineNum">     179 </span>            : #endif
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :     /* GNU/Linux 2.2.  */
+<span class="lineNum">     182 </span>            : #ifdef SIGINFO
+<span class="lineNum">     183 </span>            :     NUMNAME (INFO),
+<span class="lineNum">     184 </span>            : #endif
+<span class="lineNum">     185 </span>            : #ifdef SIGIO
+<span class="lineNum">     186 </span>            :     NUMNAME (IO),
+<span class="lineNum">     187 </span>            : #endif
+<span class="lineNum">     188 </span>            : #ifdef SIGSTKFLT
+<span class="lineNum">     189 </span>            :     NUMNAME (STKFLT),
+<span class="lineNum">     190 </span>            : #endif
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :     /* AIX 5L.  */
+<span class="lineNum">     193 </span>            : #ifdef SIGDANGER
+<span class="lineNum">     194 </span>            :     NUMNAME (DANGER),
+<span class="lineNum">     195 </span>            : #endif
+<span class="lineNum">     196 </span>            : #ifdef SIGGRANT
+<span class="lineNum">     197 </span>            :     NUMNAME (GRANT),
+<span class="lineNum">     198 </span>            : #endif
+<span class="lineNum">     199 </span>            : #ifdef SIGMIGRATE
+<span class="lineNum">     200 </span>            :     NUMNAME (MIGRATE),
+<span class="lineNum">     201 </span>            : #endif
+<span class="lineNum">     202 </span>            : #ifdef SIGMSG
+<span class="lineNum">     203 </span>            :     NUMNAME (MSG),
+<span class="lineNum">     204 </span>            : #endif
+<span class="lineNum">     205 </span>            : #ifdef SIGPRE
+<span class="lineNum">     206 </span>            :     NUMNAME (PRE),
+<span class="lineNum">     207 </span>            : #endif
+<span class="lineNum">     208 </span>            : #ifdef SIGRETRACT
+<span class="lineNum">     209 </span>            :     NUMNAME (RETRACT),
+<span class="lineNum">     210 </span>            : #endif
+<span class="lineNum">     211 </span>            : #ifdef SIGSAK
+<span class="lineNum">     212 </span>            :     NUMNAME (SAK),
+<span class="lineNum">     213 </span>            : #endif
+<span class="lineNum">     214 </span>            : #ifdef SIGSOUND
+<span class="lineNum">     215 </span>            :     NUMNAME (SOUND),
+<span class="lineNum">     216 </span>            : #endif
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :     /* Older AIX versions.  */
+<span class="lineNum">     219 </span>            : #ifdef SIGALRM1
+<span class="lineNum">     220 </span>            :     NUMNAME (ALRM1),    /* unknown; taken from Bash 2.05 */
+<span class="lineNum">     221 </span>            : #endif
+<span class="lineNum">     222 </span>            : #ifdef SIGKAP
+<span class="lineNum">     223 </span>            :     NUMNAME (KAP),      /* Older name for SIGGRANT.  */
+<span class="lineNum">     224 </span>            : #endif
+<span class="lineNum">     225 </span>            : #ifdef SIGVIRT
+<span class="lineNum">     226 </span>            :     NUMNAME (VIRT),     /* unknown; taken from Bash 2.05 */
+<span class="lineNum">     227 </span>            : #endif
+<span class="lineNum">     228 </span>            : #ifdef SIGWINDOW
+<span class="lineNum">     229 </span>            :     NUMNAME (WINDOW),   /* Older name for SIGWINCH.  */
+<span class="lineNum">     230 </span>            : #endif
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :     /* BeOS */
+<span class="lineNum">     233 </span>            : #ifdef SIGKILLTHR
+<span class="lineNum">     234 </span>            :     NUMNAME (KILLTHR),
+<span class="lineNum">     235 </span>            : #endif
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :     /* Older HP-UX versions.  */
+<span class="lineNum">     238 </span>            : #ifdef SIGDIL
+<span class="lineNum">     239 </span>            :     NUMNAME (DIL),
+<span class="lineNum">     240 </span>            : #endif
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :     /* Korn shell and Bash, of uncertain vintage.  */
+<span class="lineNum">     243 </span>            :     { 0, &quot;EXIT&quot; }
+<span class="lineNum">     244 </span>            :   };
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span>            : #define NUMNAME_ENTRIES (sizeof numname_table / sizeof numname_table[0])
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            : /* ISDIGIT differs from isdigit, as follows:
+<span class="lineNum">     249 </span>            :    - Its arg may be any int or unsigned int; it need not be an unsigned char
+<span class="lineNum">     250 </span>            :      or EOF.
+<span class="lineNum">     251 </span>            :    - It's typically faster.
+<span class="lineNum">     252 </span>            :    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
+<span class="lineNum">     253 </span>            :    isdigit unless it's important to use the locale's definition
+<span class="lineNum">     254 </span>            :    of &quot;digit&quot; even when the host does not conform to POSIX.  */
+<span class="lineNum">     255 </span>            : #define ISDIGIT(c) ((unsigned int) (c) - '0' &lt;= 9)
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : /* Convert the signal name SIGNAME to a signal number.  Return the
+<span class="lineNum">     258 </span>            :    signal number if successful, -1 otherwise.  */
+<a name="259"><span class="lineNum">     259 </span>            : </a>
+<span class="lineNum">     260 </span>            : static int
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 : str2signum (char const *signame)</span>
+<span class="lineNum">     262 </span>            : {
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :   if (ISDIGIT (*signame))</span>
+<span class="lineNum">     264 </span>            :     {
+<span class="lineNum">     265 </span>            :       char *endp;
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       long int n = strtol (signame, &amp;endp, 10);</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :       if (! *endp &amp;&amp; n &lt;= SIGNUM_BOUND)</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :         return n;</span>
+<span class="lineNum">     269 </span>            :     }
+<span class="lineNum">     270 </span>            :   else
+<span class="lineNum">     271 </span>            :     {
+<span class="lineNum">     272 </span>            :       unsigned int i;
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       for (i = 0; i &lt; NUMNAME_ENTRIES; i++)</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :         if (strcmp (numname_table[i].name, signame) == 0)</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :           return numname_table[i].num;</span>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :       {
+<span class="lineNum">     278 </span>            :         char *endp;
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :         int rtmin = SIGRTMIN;</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :         int rtmax = SIGRTMAX;</span>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :         if (0 &lt; rtmin &amp;&amp; strncmp (signame, &quot;RTMIN&quot;, 5) == 0)</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :           {</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :             long int n = strtol (signame + 5, &amp;endp, 10);</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :             if (! *endp &amp;&amp; 0 &lt;= n &amp;&amp; n &lt;= rtmax - rtmin)</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :               return rtmin + n;</span>
+<span class="lineNum">     287 </span>            :           }
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :         else if (0 &lt; rtmax &amp;&amp; strncmp (signame, &quot;RTMAX&quot;, 5) == 0)</span>
+<span class="lineNum">     289 </span>            :           {
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :             long int n = strtol (signame + 5, &amp;endp, 10);</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :             if (! *endp &amp;&amp; rtmin - rtmax &lt;= n &amp;&amp; n &lt;= 0)</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :               return rtmax + n;</span>
+<span class="lineNum">     293 </span>            :           }
+<span class="lineNum">     294 </span>            :       }
+<span class="lineNum">     295 </span>            :     }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :   return -1;</span>
+<span class="lineNum">     298 </span>            : }
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            : /* Convert the signal name SIGNAME to the signal number *SIGNUM.
+<span class="lineNum">     301 </span>            :    Return 0 if successful, -1 otherwise.  */
+<a name="302"><span class="lineNum">     302 </span>            : </a>
+<span class="lineNum">     303 </span>            : int
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 : str2sig (char const *signame, int *signum)</span>
+<span class="lineNum">     305 </span>            : {
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :   *signum = str2signum (signame);</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :   return *signum &lt; 0 ? -1 : 0;</span>
+<span class="lineNum">     308 </span>            : }
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : /* Convert SIGNUM to a signal name in SIGNAME.  SIGNAME must point to
+<span class="lineNum">     311 </span>            :    a buffer of at least SIG2STR_MAX bytes.  Return 0 if successful, -1
+<span class="lineNum">     312 </span>            :    otherwise.  */
+<a name="313"><span class="lineNum">     313 </span>            : </a>
+<span class="lineNum">     314 </span>            : int
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 : sig2str (int signum, char *signame)</span>
+<span class="lineNum">     316 </span>            : {
+<span class="lineNum">     317 </span>            :   unsigned int i;
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :   for (i = 0; i &lt; NUMNAME_ENTRIES; i++)</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :     if (numname_table[i].num == signum)</span>
+<span class="lineNum">     320 </span>            :       {
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         strcpy (signame, numname_table[i].name);</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     323 </span>            :       }
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :   {
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :     int rtmin = SIGRTMIN;</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :     int rtmax = SIGRTMAX;</span>
+<span class="lineNum">     328 </span>            :     int base, delta;
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :     if (! (rtmin &lt;= signum &amp;&amp; signum &lt;= rtmax))</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :       return -1;</span>
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :     if (signum &lt;= rtmin + (rtmax - rtmin) / 2)</span>
+<span class="lineNum">     334 </span>            :       {
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :         strcpy (signame, &quot;RTMIN&quot;);</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :         base = rtmin;</span>
+<span class="lineNum">     337 </span>            :       }
+<span class="lineNum">     338 </span>            :     else
+<span class="lineNum">     339 </span>            :       {
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :         strcpy (signame, &quot;RTMAX&quot;);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :         base = rtmax;</span>
+<span class="lineNum">     342 </span>            :       }
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :     delta = signum - base;</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :     if (delta != 0)</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :       sprintf (signame + 5, &quot;%+d&quot;, delta);</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">     348 </span>            :   }
+<span class="lineNum">     349 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

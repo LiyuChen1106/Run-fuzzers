@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/read-file.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - read-file.c<span style="font-size: 80%;"> (source / <a href="read-file.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">59</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* read-file.c -- read file contents into a string</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2006, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            :    Written by Simon Josefsson and Bruno Haible.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software; you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       8 </span>            :    any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program; if not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &quot;read-file.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : /* Get fstat.  */
+<span class="lineNum">      23 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /* Get ftello.  */
+<span class="lineNum">      26 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : /* Get SIZE_MAX.  */
+<span class="lineNum">      29 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : /* Get malloc, realloc, free. */
+<span class="lineNum">      32 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : /* Get errno. */
+<span class="lineNum">      35 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : /* Read a STREAM and return a newly allocated string with the content,
+<span class="lineNum">      38 </span>            :    and set *LENGTH to the length of the string.  The string is
+<span class="lineNum">      39 </span>            :    zero-terminated, but the terminating zero byte is not counted in
+<span class="lineNum">      40 </span>            :    *LENGTH.  On errors, *LENGTH is undefined, errno preserves the
+<a name="41"><span class="lineNum">      41 </span>            :    values set by system functions (if any), and NULL is returned.  */</a>
+<span class="lineNum">      42 </span>            : char *
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 : fread_file (FILE *stream, size_t *length)</span>
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   char *buf = NULL;</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :   size_t alloc = BUFSIZ;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   /* For a regular file, allocate a buffer that has exactly the right
+<span class="lineNum">      49 </span>            :      size.  This avoids the need to do dynamic reallocations later.  */
+<span class="lineNum">      50 </span>            :   {
+<span class="lineNum">      51 </span>            :     struct stat st;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :     if (fstat (fileno (stream), &amp;st) &gt;= 0 &amp;&amp; S_ISREG (st.st_mode))</span>
+<span class="lineNum">      54 </span>            :       {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :         off_t pos = ftello (stream);</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :         if (pos &gt;= 0 &amp;&amp; pos &lt; st.st_size)</span>
+<span class="lineNum">      58 </span>            :           {
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :             off_t alloc_off = st.st_size - pos;</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :             /* '1' below, accounts for the trailing NUL.  */
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :             if (SIZE_MAX - 1 &lt; alloc_off)</span>
+<span class="lineNum">      63 </span>            :               {
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :                 errno = ENOMEM;</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">      66 </span>            :               }
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :             alloc = alloc_off + 1;</span>
+<span class="lineNum">      69 </span>            :           }
+<span class="lineNum">      70 </span>            :       }
+<span class="lineNum">      71 </span>            :   }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :   if (!(buf = malloc (alloc)))</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     return NULL; /* errno is ENOMEM.  */</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   {
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     size_t size = 0; /* number of bytes read so far */</span>
+<span class="lineNum">      78 </span>            :     int save_errno;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :     for (;;)
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :       {</span>
+<span class="lineNum">      82 </span>            :         /* This reads 1 more than the size of a regular file
+<span class="lineNum">      83 </span>            :            so that we get eof immediately.  */
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :         size_t requested = alloc - size;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :         size_t count = fread (buf + size, 1, requested, stream);</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :         size += count;</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         if (count != requested)</span>
+<span class="lineNum">      89 </span>            :           {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :             save_errno = errno;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :             if (ferror (stream))</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :             /* Shrink the allocated memory if possible.  */
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :             if (size &lt; alloc - 1)</span>
+<span class="lineNum">      96 </span>            :               {
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :                 char *smaller_buf = realloc (buf, size + 1);</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :                 if (smaller_buf != NULL)</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :                   buf = smaller_buf;</span>
+<span class="lineNum">     100 </span>            :               }
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :             buf[size] = '\0';</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :             *length = size;</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :             return buf;</span>
+<span class="lineNum">     105 </span>            :           }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :         {
+<span class="lineNum">     108 </span>            :           char *new_buf;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :           if (alloc == SIZE_MAX)</span>
+<span class="lineNum">     111 </span>            :             {
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :               save_errno = ENOMEM;</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     114 </span>            :             }
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :           if (alloc &lt; SIZE_MAX - alloc / 2)</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :             alloc = alloc + alloc / 2;</span>
+<span class="lineNum">     118 </span>            :           else
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :             alloc = SIZE_MAX;</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :           if (!(new_buf = realloc (buf, alloc)))</span>
+<span class="lineNum">     122 </span>            :             {
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :               save_errno = errno;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     125 </span>            :             }
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :           buf = new_buf;</span>
+<span class="lineNum">     128 </span>            :         }
+<span class="lineNum">     129 </span>            :       }
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     free (buf);</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     errno = save_errno;</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     134 </span>            :   }
+<span class="lineNum">     135 </span>            : }
+<a name="136"><span class="lineNum">     136 </span>            : </a>
+<span class="lineNum">     137 </span>            : static char *
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 : internal_read_file (const char *filename, size_t *length, const char *mode)</span>
+<span class="lineNum">     139 </span>            : {
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   FILE *stream = fopen (filename, mode);</span>
+<span class="lineNum">     141 </span>            :   char *out;
+<span class="lineNum">     142 </span>            :   int save_errno;
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   if (!stream)</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :   out = fread_file (stream, length);</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   save_errno = errno;</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   if (fclose (stream) != 0)</span>
+<span class="lineNum">     152 </span>            :     {
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       if (out)</span>
+<span class="lineNum">     154 </span>            :         {
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :           save_errno = errno;</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :           free (out);</span>
+<span class="lineNum">     157 </span>            :         }
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       errno = save_errno;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       return NULL;</span>
+<span class="lineNum">     160 </span>            :     }
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :   return out;</span>
+<span class="lineNum">     163 </span>            : }
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : /* Open and read the contents of FILENAME, and return a newly
+<span class="lineNum">     166 </span>            :    allocated string with the content, and set *LENGTH to the length of
+<span class="lineNum">     167 </span>            :    the string.  The string is zero-terminated, but the terminating
+<span class="lineNum">     168 </span>            :    zero byte is not counted in *LENGTH.  On errors, *LENGTH is
+<span class="lineNum">     169 </span>            :    undefined, errno preserves the values set by system functions (if
+<a name="170"><span class="lineNum">     170 </span>            :    any), and NULL is returned.  */</a>
+<span class="lineNum">     171 </span>            : char *
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 : read_file (const char *filename, size_t *length)</span>
+<span class="lineNum">     173 </span>            : {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :   return internal_read_file (filename, length, &quot;r&quot;);</span>
+<span class="lineNum">     175 </span>            : }
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : /* Open (on non-POSIX systems, in binary mode) and read the contents
+<span class="lineNum">     178 </span>            :    of FILENAME, and return a newly allocated string with the content,
+<span class="lineNum">     179 </span>            :    and set LENGTH to the length of the string.  The string is
+<span class="lineNum">     180 </span>            :    zero-terminated, but the terminating zero byte is not counted in
+<span class="lineNum">     181 </span>            :    the LENGTH variable.  On errors, *LENGTH is undefined, errno
+<span class="lineNum">     182 </span>            :    preserves the values set by system functions (if any), and NULL is
+<a name="183"><span class="lineNum">     183 </span>            :    returned.  */</a>
+<span class="lineNum">     184 </span>            : char *
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 : read_binary_file (const char *filename, size_t *length)</span>
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :   return internal_read_file (filename, length, &quot;rb&quot;);</span>
+<span class="lineNum">     188 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

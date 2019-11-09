@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/closein.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - closein.c<span style="font-size: 80%;"> (source / <a href="closein.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:15:06</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Close standard input, rewinding seekable stdin if necessary.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2007, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &quot;closein.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      23 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      28 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;close-stream.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;closeout.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;error.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;exitfail.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;freadahead.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;quotearg.h&quot;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : static const char *file_name;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : /* Set the file name to be reported in the event an error is detected
+<span class="lineNum">      40 </span>            :    on stdin by close_stdin.  See also close_stdout_set_file_name, if
+<a name="41"><span class="lineNum">      41 </span>            :    an error is detected when closing stdout.  */</a>
+<span class="lineNum">      42 </span>            : void
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 : close_stdin_set_file_name (const char *file)</span>
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   file_name = file;</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : /* Close standard input, rewinding any unused input if stdin is
+<span class="lineNum">      49 </span>            :    seekable.  On error, issue a diagnostic and _exit with status
+<span class="lineNum">      50 </span>            :    'exit_failure'.  Then call close_stdout.
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :    Most programs can get by with close_stdout.  close_stdin is only
+<span class="lineNum">      53 </span>            :    needed when a program wants to guarantee that partially read input
+<span class="lineNum">      54 </span>            :    from seekable stdin is not consumed, for any subsequent clients.
+<span class="lineNum">      55 </span>            :    For example, POSIX requires that these two commands behave alike:
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :      (sed -ne 1q; cat) &lt; file
+<span class="lineNum">      58 </span>            :      tail -n +2 file
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :    Since close_stdin is commonly registered via 'atexit', POSIX
+<span class="lineNum">      61 </span>            :    and the C standard both say that it should not call 'exit',
+<span class="lineNum">      62 </span>            :    because the behavior is undefined if 'exit' is called more than
+<span class="lineNum">      63 </span>            :    once.  So it calls '_exit' instead of 'exit'.  If close_stdin
+<span class="lineNum">      64 </span>            :    is registered via atexit before other functions are registered,
+<span class="lineNum">      65 </span>            :    the other functions can act before this _exit is invoked.
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :    Applications that use close_stdout should flush any streams other
+<span class="lineNum">      68 </span>            :    than stdin, stdout, and stderr before exiting, since the call to
+<span class="lineNum">      69 </span>            :    _exit will bypass other buffer flushing.  Applications should be
+<span class="lineNum">      70 </span>            :    flushing and closing other streams anyway, to check for I/O errors.
+<span class="lineNum">      71 </span>            :    Also, applications should not use tmpfile, since _exit can bypass
+<span class="lineNum">      72 </span>            :    the removal of these files.
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :    It's important to detect such failures and exit nonzero because many
+<span class="lineNum">      75 </span>            :    tools (most notably 'make' and other build-management systems) depend
+<span class="lineNum">      76 </span>            :    on being able to detect failure in other tools via their exit status.  */
+<a name="77"><span class="lineNum">      77 </span>            : </a>
+<span class="lineNum">      78 </span>            : void
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 : close_stdin (void)</span>
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   bool fail = false;</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :   /* There is no need to flush stdin if we can determine quickly that stdin's
+<span class="lineNum">      84 </span>            :      input buffer is empty; in this case we know that if stdin is seekable,
+<span class="lineNum">      85 </span>            :      (fseeko (stdin, 0, SEEK_CUR), ftello (stdin))
+<span class="lineNum">      86 </span>            :      == lseek (0, 0, SEEK_CUR).  */
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   if (freadahead (stdin) &gt; 0)</span>
+<span class="lineNum">      88 </span>            :     {
+<span class="lineNum">      89 </span>            :       /* Only attempt flush if stdin is seekable, as fflush is entitled to
+<span class="lineNum">      90 </span>            :          fail on non-seekable streams.  */
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       if (fseeko (stdin, 0, SEEK_CUR) == 0 &amp;&amp; fflush (stdin) != 0)</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :         fail = true;</span>
+<span class="lineNum">      93 </span>            :     }
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   if (close_stream (stdin) != 0)</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     fail = true;</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   if (fail)</span>
+<span class="lineNum">      97 </span>            :     {
+<span class="lineNum">      98 </span>            :       /* Report failure, but defer exit until after closing stdout,
+<span class="lineNum">      99 </span>            :          since the failure report should still be flushed.  */
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       char const *close_error = _(&quot;error closing file&quot;);</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       if (file_name)</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :         error (0, errno, &quot;%s: %s&quot;, quotearg_colon (file_name),</span>
+<span class="lineNum">     103 </span>            :                close_error);
+<span class="lineNum">     104 </span>            :       else
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :         error (0, errno, &quot;%s&quot;, close_error);</span>
+<span class="lineNum">     106 </span>            :     }
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :   close_stdout ();</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   if (fail)</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     _exit (exit_failure);</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

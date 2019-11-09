@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/verror.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - verror.c<span style="font-size: 80%;"> (source / <a href="verror.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* va_list error handler for noninteractive utilities</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2006-2007, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* Written by Eric Blake.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &quot;verror.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;xvasprintf.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;stdarg.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #if ENABLE_NLS
+<span class="lineNum">      29 </span>            : # include &quot;gettext.h&quot;
+<span class="lineNum">      30 </span>            : # define _(msgid) gettext (msgid)
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #ifndef _
+<span class="lineNum">      34 </span>            : # define _(String) String
+<span class="lineNum">      35 </span>            : #endif
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : /* Print a message with 'vfprintf (stderr, FORMAT, ARGS)';
+<span class="lineNum">      38 </span>            :    if ERRNUM is nonzero, follow it with &quot;: &quot; and strerror (ERRNUM).
+<span class="lineNum">      39 </span>            :    If STATUS is nonzero, terminate the program with 'exit (STATUS)'.
+<span class="lineNum">      40 </span>            :    Use the globals error_print_progname and error_message_count similarly
+<a name="41"><span class="lineNum">      41 </span>            :    to error().  */</a>
+<span class="lineNum">      42 </span>            : void
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 : verror (int status, int errnum, const char *format, va_list args)</span>
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   verror_at_line (status, errnum, NULL, 0, format, args);</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : /* Print a message with 'vfprintf (stderr, FORMAT, ARGS)';
+<span class="lineNum">      49 </span>            :    if ERRNUM is nonzero, follow it with &quot;: &quot; and strerror (ERRNUM).
+<span class="lineNum">      50 </span>            :    If STATUS is nonzero, terminate the program with 'exit (STATUS)'.
+<span class="lineNum">      51 </span>            :    If FNAME is not NULL, prepend the message with &quot;FNAME:LINENO:&quot;.
+<span class="lineNum">      52 </span>            :    Use the globals error_print_progname, error_message_count, and
+<a name="53"><span class="lineNum">      53 </span>            :    error_one_per_line similarly to error_at_line().  */</a>
+<span class="lineNum">      54 </span>            : void
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 : verror_at_line (int status, int errnum, const char *file,</span>
+<span class="lineNum">      56 </span>            :                 unsigned int line_number, const char *format, va_list args)
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :   char *message = xvasprintf (format, args);</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :   if (message)</span>
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span>            :       /* Until http://sourceware.org/bugzilla/show_bug.cgi?id=2997 is fixed,
+<span class="lineNum">      62 </span>            :          glibc violates GNU Coding Standards when the file argument to
+<span class="lineNum">      63 </span>            :          error_at_line is NULL.  */
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :       if (file)</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :         error_at_line (status, errnum, file, line_number, &quot;%s&quot;, message);</span>
+<span class="lineNum">      66 </span>            :       else
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :         error (status, errnum, &quot;%s&quot;, message);</span>
+<span class="lineNum">      68 </span>            :     }
+<span class="lineNum">      69 </span>            :   else
+<span class="lineNum">      70 </span>            :     {
+<span class="lineNum">      71 </span>            :       /* EOVERFLOW, EINVAL, and EILSEQ from xvasprintf are signs of
+<span class="lineNum">      72 </span>            :          serious programmer errors.  */
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :       error (0, errno, _(&quot;unable to display error message&quot;));</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       abort ();</span>
+<span class="lineNum">      75 </span>            :     }
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   free (message);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

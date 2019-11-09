@@ -1,0 +1,3 @@
+afl_cov_pid     : 30918
+afl_cov_version : 0.6.2
+command_line    : /home/ubuntu/afl-cov/afl-cov -d ../../mopt-dict-L5-C-md5sum/ --coverage-cmd /bin/cat AFL_FILE | ./md5sum -d --code-dir ..

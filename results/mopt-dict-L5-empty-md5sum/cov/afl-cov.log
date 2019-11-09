@@ -1,54 +1,346 @@
-    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --initial --directory .. --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
-Capturing coverage data from ..
-Found gcov version: 5.4.0
-Scanning .. for .gcno files ...
-Out of memory!
-Found 361 graph files in ..
-Processing lib/se-context.gcno
 
 *** Imported 1 new test cases from: ../../mopt-dict-L5-empty-md5sum//queue
 
 [+] AFL test case: id:000000,orig:giantpanda-bin-md5s (0 / 1), cycle: 0
-    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --directory .. --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info
-Capturing coverage data from ..
-Found gcov version: 5.4.0
-Scanning .. for .gcda files ...
-Out of memory!
-Found 22 data files in ..
-Processing lib/quotearg.gcda
-    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info --output-file /tmp/tmpf7SoX5
-lcov: ERROR: no valid records found in tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
-Combining tracefiles.
-Reading tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
-    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -r /tmp/tmpf7SoX5 /usr/include/\*  --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
-lcov: ERROR: no valid records found in tracefile /tmp/tmpf7SoX5
-Reading tracefile /tmp/tmpf7SoX5
-[-] Coverage file '../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final' does not exist, skipping.
+    Non-zero exit status '1' for CMD: /bin/cat ../../mopt-dict-L5-empty-md5sum//queue/id:000000,orig:giantpanda-bin-md5s | ./md5sum -d
+./md5sum: invalid option -- 'd'
+Try './md5sum --help' for more information.
+/bin/cat: write error: Broken pipe
+    lines......: 0.1% (62 of 41741 lines)
+    functions..: 0.4% (10 of 2330 functions)
+
+    Coverage diff (init) id:000000,orig:giantpanda-bin-md5s
+diff (init) -> id:000000,orig:giantpanda-bin-md5s
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/fflush.c
+  New 'line' coverage: 149
+  New 'line' coverage: 150
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/src/system.h
+  New 'function' coverage: emit_try_help()
+  New 'function' coverage: ptr_align()
+  New 'line' coverage: 482
+  New 'line' coverage: 484
+  New 'line' coverage: 485
+  New 'line' coverage: 486
+  New 'line' coverage: 611
+  New 'line' coverage: 613
+  New 'line' coverage: 614
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/close-stream.c
+  New 'function' coverage: close_stream()
+  New 'line' coverage: 57
+  New 'line' coverage: 59
+  New 'line' coverage: 60
+  New 'line' coverage: 61
+  New 'line' coverage: 71
+  New 'line' coverage: 78
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/stdio.h
+  New 'function' coverage: rpl_fclose()
+  New 'function' coverage: rpl_fflush()
+  New 'line' coverage: 486
+  New 'line' coverage: 530
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/src/md5sum.c
+  New 'function' coverage: lava_get()
+  New 'function' coverage: main()
+  New 'function' coverage: usage()
+  New 'line' coverage: 10
+  New 'line' coverage: 11
+  New 'line' coverage: 17
+  New 'line' coverage: 176
+  New 'line' coverage: 178
+  New 'line' coverage: 179
+  New 'line' coverage: 237
+  New 'line' coverage: 8
+  New 'line' coverage: 821
+  New 'line' coverage: 825
+  New 'line' coverage: 826
+  New 'line' coverage: 828
+  New 'line' coverage: 829
+  New 'line' coverage: 830
+  New 'line' coverage: 834
+  New 'line' coverage: 835
+  New 'line' coverage: 836
+  New 'line' coverage: 837
+  New 'line' coverage: 839
+  New 'line' coverage: 843
+  New 'line' coverage: 845
+  New 'line' coverage: 846
+  New 'line' coverage: 881
+  New 'line' coverage: 882
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/closeout.c
+  New 'function' coverage: close_stdout()
+  New 'line' coverage: 107
+  New 'line' coverage: 109
+  New 'line' coverage: 122
+  New 'line' coverage: 124
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/fclose.c
+  New 'line' coverage: 104
+  New 'line' coverage: 110
+  New 'line' coverage: 59
+  New 'line' coverage: 61
+  New 'line' coverage: 64
+  New 'line' coverage: 65
+  New 'line' coverage: 71
+  New 'line' coverage: 72
+  New 'line' coverage: 99
+New src file: /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/progname.c
+  New 'function' coverage: set_program_name()
+  New 'line' coverage: 39
+  New 'line' coverage: 51
+  New 'line' coverage: 59
+  New 'line' coverage: 60
+  New 'line' coverage: 61
+  New 'line' coverage: 84
+  New 'line' coverage: 90
+  New 'line' coverage: 92
 
 
-++++++ BEGIN - first exec output for CMD: /bin/cat ../../mopt-dict-L5-empty-md5sum//queue/id:000000,orig:giantpanda-bin-md5s | ./md5sum 
-    d784fa8b6d98d27699781bd9a7cf19f0  -
+
+++++++ BEGIN - first exec output for CMD: /bin/cat ../../mopt-dict-L5-empty-md5sum//queue/id:000000,orig:giantpanda-bin-md5s | ./md5sum -d
+    ./md5sum: invalid option -- 'd'
+    Try './md5sum --help' for more information.
+    /bin/cat: write error: Broken pipe
 ++++++ END
 
 [+] Processed 1 / 1 test cases.
 
 [+] Final zero coverage report: ../../mopt-dict-L5-empty-md5sum//cov/zero-cov
 [+] Final positive coverage report: ../../mopt-dict-L5-empty-md5sum//cov/pos-cov
-    Non-zero exit status '1' for CMD: /usr/bin/lcov --no-checksum --capture --directory .. --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info
-Capturing coverage data from ..
-Found gcov version: 5.4.0
-Scanning .. for .gcda files ...
-Out of memory!
-Found 22 data files in ..
-Processing lib/quotearg.gcda
-    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base -a ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info --output-file /tmp/tmpgoP6Rm
-lcov: ERROR: no valid records found in tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
-Combining tracefiles.
-Reading tracefile ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_base
-    Non-zero exit status '255' for CMD: /usr/bin/lcov --no-checksum -r /tmp/tmpgoP6Rm /usr/include/\*  --output-file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
-lcov: ERROR: no valid records found in tracefile /tmp/tmpgoP6Rm
-Reading tracefile /tmp/tmpgoP6Rm
+    lines......: 0.1% (62 of 41741 lines)
+    functions..: 0.4% (10 of 2330 functions)
     Non-zero exit status '2' for CMD: /usr/bin/genhtml --output-directory ../../mopt-dict-L5-empty-md5sum//cov/web ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
-genhtml: ERROR: cannot read file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final!
 Reading data file ../../mopt-dict-L5-empty-md5sum//cov/lcov/trace.lcov_info_final
+Found 354 entries.
+Found common filename prefix "/home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov"
+Writing .css and .png files.
+Generating output.
+Processing file lib/progname.c
+Processing file lib/savewd.h
+Processing file lib/isapipe.c
+Processing file lib/filenamecat.c
+Processing file lib/fts-cycle.copy.c
+Processing file lib/strintcmp.c
+Processing file lib/strftime.c
+Processing file lib/printf-frexp.c
+Processing file lib/xstrtol-error.c
+Processing file lib/at-func.copy1.c
+Processing file lib/areadlink.c
+Processing file lib/c-strtod.copy.c
+Processing file lib/c-ctype.c
+Processing file lib/fopen-safer.c
+Processing file lib/hash-triple.c
+Processing file lib/gl_xlist.h
+Processing file lib/posixver.c
+Processing file lib/xstrtol.c
+Processing file lib/freopen-safer.c
+Processing file lib/fcntl.h
+Processing file lib/getpass.c
+Processing file lib/filenamecat-lgpl.c
+Processing file lib/quotearg.c
+Processing file lib/xdectoint.copy1.c
+Processing file lib/xstrtod.copy1.c
+Processing file lib/xstrtol.copy.c
+Processing file lib/verror.c
+Processing file lib/canon-host.c
+Processing file lib/fseek.c
+Processing file lib/same.c
+Processing file lib/mbsalign.c
+Processing file lib/strftime.copy.c
+Processing file lib/ftoastr.copy2.c
+Processing file lib/xgetcwd.c
+Processing file lib/posixtm.c
+Processing file lib/stripslash.c
+Processing file lib/readtokens.c
+Processing file lib/at-func.copy4.c
+Processing file lib/yesno.c
+Processing file lib/xvasprintf.c
+Processing file lib/xfts.c
+Processing file lib/mkstemp-safer.c
+Processing file lib/mbscasecmp.c
+Processing file lib/exclude.c
+Processing file lib/stdio.h
+Processing file lib/fsusage.c
+Processing file lib/version-etc.c
+Processing file lib/cycle-check.c
+Processing file lib/openat.h
+Processing file lib/at-func.copy5.c
+Processing file lib/ftoastr.copy.c
+Processing file lib/anytostr.copy3.c
+Processing file lib/mbiter.h
+Processing file lib/idcache.c
+Processing file lib/physmem.c
+Processing file lib/xalloc-die.c
+Processing file lib/filemode.c
+Processing file lib/randint.c
+Processing file lib/dup-safer.c
+Processing file lib/write-any-file.c
+Processing file lib/basename-lgpl.c
+Processing file lib/sig-handler.h
+Processing file lib/file-set.c
+Processing file lib/canonicalize.c
+Processing file lib/xgethostname.c
+Processing file lib/xgetgroups.c
+Processing file lib/mkancesdirs.c
+Processing file lib/settime.c
+Processing file lib/areadlinkat.c
+Processing file lib/human.c
+Processing file lib/read-file.c
+Processing file lib/fd-reopen.c
+Processing file lib/careadlinkat.c
+Processing file lib/freadseek.c
+Processing file lib/xstrtod.c
+Processing file lib/xasprintf.c
+Processing file lib/memcoll.c
+Processing file lib/bitrotate.h
+Processing file lib/acl-internal.c
+Processing file lib/gethrxtime.c
+Processing file lib/obstack.c
+Processing file lib/randperm.c
+Processing file lib/unicodeio.c
+Processing file lib/trim.c
+Processing file lib/xalloc.h
+Processing file lib/openat-die.c
+Processing file lib/ftoastr.c
+Processing file lib/string.h
+Processing file lib/dirname-lgpl.c
+Processing file lib/malloca.c
+Processing file lib/mbsstr.c
+Processing file lib/opendir-safer.c
+Processing file lib/xtime.h
+Processing file lib/anytostr.copy5.c
+Processing file lib/backupfile.c
+Processing file lib/hard-locale.c
+Processing file lib/striconv.c
+Processing file lib/userspec.c
+Processing file lib/propername.c
+Processing file lib/buffer-lcm.c
+Processing file lib/xreadlink.c
+Processing file lib/mbchar.h
+Processing file lib/sockets.c
+Processing file lib/fd-safer.c
+Processing file lib/randint.h
+Processing file lib/gl_anylinked_list2.h
+Processing file lib/xmalloc.c
+Processing file lib/c-strtod.c
+Processing file lib/fd-safer-flag.c
+Processing file lib/full-write.c
+Processing file lib/xstriconv.c
+Processing file lib/sha256.c
+Processing file lib/mkdir-p.c
+Processing file lib/mgetgroups.c
+Processing file lib/save-cwd.c
+Processing file lib/c-strcasecmp.c
+Processing file lib/sha512.c
+Processing file lib/str-kmp.h
+Processing file lib/full-write.copy.c
+Processing file lib/fpurge.c
+Processing file lib/heap.c
+Processing file lib/fcntl.c
+Processing file lib/dtotimespec.c
+Processing file lib/parse-datetime.c
+Processing file lib/qcopy-acl.c
+Processing file lib/i-ring.c
+Processing file lib/open-safer.c
+Processing file lib/rand-isaac.c
+Processing file lib/utimensat.c
+Processing file lib/mountlist.c
+Processing file lib/printf-args.c
+Processing file lib/at-func.copy3.c
+Processing file lib/sha1.c
+Processing file lib/filevercmp.c
+Processing file lib/dirchownmod.c
+Processing file lib/freadptr.c
+Processing file lib/di-set.c
+Processing file lib/fseeko.c
+Processing file lib/xdectoint.copy2.c
+Processing file lib/pipe-safer.c
+Processing file lib/closein.c
+Processing file lib/gettime.c
+Processing file lib/md5.c
+Processing file lib/mbswidth.c
+Processing file lib/closeout.c
+Processing file lib/anytostr.copy4.c
+Processing file lib/fts.c
+Processing file lib/asnprintf.c
+Processing file lib/ino-map.c
+Processing file lib/tempname.c
+Processing file lib/file-has-acl.c
+Processing file lib/strnumcmp-in.h
+Processing file lib/mbuiter.h
+Processing file lib/c-strncasecmp.c
+Processing file lib/utimens.c
+Processing file lib/savewd.c
+Processing file lib/dup-safer-flag.c
+Processing file lib/nproc.c
+Processing file lib/argv-iter.c
+Processing file lib/xstrndup.c
+Processing file lib/getugroups.c
+Processing file lib/smack.h
+Processing file lib/xprintf.c
+Processing file lib/chdir-long.c
+Processing file lib/fflush.c
+Processing file lib/savedir.c
+Processing file lib/long-options.c
+Processing file lib/cloexec.c
+Processing file lib/memcasecmp.c
+Processing file lib/readutmp.c
+Processing file lib/xstrtol.copy2.c
+Processing file lib/printf-parse.c
+Processing file lib/qset-acl.c
+Processing file lib/modechange.c
+Processing file lib/randread.c
+Processing file lib/xstrtol.copy3.c
+Processing file lib/linebuffer.c
+Processing file lib/areadlink-with-size.c
+Processing file lib/vasnprintf.c
+Processing file lib/mbslen.c
+Processing file lib/fclose.c
+Processing file lib/base64.c
+Processing file lib/gl_list.h
+Processing file lib/xsize.h
+Processing file lib/openat-safer.c
+Processing file lib/utimecmp.c
+Processing file lib/freadahead.c
+Processing file lib/set-acl.c
+Processing file lib/fdutimensat.c
+Processing file lib/safe-read.copy1.c
+Processing file lib/anytostr.copy2.c
+Processing file lib/hash.c
+Processing file lib/memcmp2.c
+Processing file lib/file-type.c
+Processing file lib/utimens.h
+Processing file lib/basename.c
+Processing file lib/fadvise.c
+Processing file lib/mpsort.c
+Processing file lib/set-permissions.c
+Processing file lib/dirname.c
+Processing file lib/nanosleep.c
+Processing file lib/creat-safer.c
+Processing file lib/copy-acl.c
+Processing file lib/safe-read.c
+Processing file lib/futimens.c
+Processing file lib/get-permissions.c
+Processing file lib/root-dev-ino.c
+Processing file lib/localcharset.c
+Processing file lib/stat-time.h
+Processing file lib/fseterr.c
+Processing file lib/at-func.copy2.c
+Processing file lib/xfreopen.c
+Processing file lib/xnanosleep.c
+Processing file lib/strnumcmp.c
+Processing file lib/sig2str.c
+Processing file lib/strnlen1.c
+Processing file lib/getndelim2.c
+Processing file lib/argmatch.c
+Processing file lib/timespec.h
+Processing file lib/openat-proc.c
+Processing file lib/priv-set.h
+Processing file lib/acl-errno-valid.c
+Processing file lib/memchr2.c
+Processing file lib/close-stream.c
+Processing file lib/anytostr.copy1.c
+Processing file lib/hash-pjw.c
+Processing file lib/xmemcoll.c
+Processing file lib/readtokens0.c
+Processing file lib/glthread/lock.c
+genhtml: ERROR: cannot read /home/ubuntu/lava_corpus/LAVA-M/md5sum/coreutils-8.24-lava-safe-gcov/lib/lib/parse-datetime.y
+Processing file lib/lib/parse-datetime.y
 [+] Final lcov web report: ../../mopt-dict-L5-empty-md5sum//cov/web/index.html

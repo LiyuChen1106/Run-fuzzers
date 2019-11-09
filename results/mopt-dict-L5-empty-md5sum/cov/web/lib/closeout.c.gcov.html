@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/closeout.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - closeout.c<span style="font-size: 80%;"> (source / <a href="closeout.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryLo">23.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Close standard output and standard error, exiting with a diagnostic on error.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1998-2002, 2004, 2006, 2008-2015 Free Software Foundation,
+<span class="lineNum">       4 </span>            :    Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &quot;closeout.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      29 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #include &quot;close-stream.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;error.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;exitfail.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;quotearg.h&quot;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : static const char *file_name;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : /* Set the file name to be reported in the event an error is detected
+<a name="39"><span class="lineNum">      39 </span>            :    by close_stdout.  */</a>
+<span class="lineNum">      40 </span>            : void
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 : close_stdout_set_file_name (const char *file)</span>
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :   file_name = file;</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : static bool ignore_EPIPE /* = false */;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : /* Specify the reaction to an EPIPE error during the closing of stdout:
+<span class="lineNum">      49 </span>            :      - If ignore = true, it shall be ignored.
+<span class="lineNum">      50 </span>            :      - If ignore = false, it shall evoke a diagnostic, along with a nonzero
+<span class="lineNum">      51 </span>            :        exit status.
+<span class="lineNum">      52 </span>            :    The default is ignore = false.
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :    This setting matters only if the SIGPIPE signal is ignored (i.e. its
+<span class="lineNum">      55 </span>            :    handler set to SIG_IGN) or blocked.  Only particular programs need to
+<span class="lineNum">      56 </span>            :    temporarily ignore SIGPIPE.  If SIGPIPE is ignored or blocked because
+<span class="lineNum">      57 </span>            :    it was ignored or blocked in the parent process when it created the
+<span class="lineNum">      58 </span>            :    child process, it usually is a bug in the parent process: It is bad
+<span class="lineNum">      59 </span>            :    practice to have SIGPIPE ignored or blocked while creating a child
+<span class="lineNum">      60 </span>            :    process.
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :    EPIPE occurs when writing to a pipe or socket that has no readers now,
+<span class="lineNum">      63 </span>            :    when SIGPIPE is ignored or blocked.
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :    The ignore = false setting is suitable for a scenario where it is normally
+<span class="lineNum">      66 </span>            :    guaranteed that the pipe writer terminates before the pipe reader.  In
+<span class="lineNum">      67 </span>            :    this case, an EPIPE is an indication of a premature termination of the
+<span class="lineNum">      68 </span>            :    pipe reader and should lead to a diagnostic and a nonzero exit status.
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :    The ignore = true setting is suitable for a scenario where you don't know
+<span class="lineNum">      71 </span>            :    ahead of time whether the pipe writer or the pipe reader will terminate
+<span class="lineNum">      72 </span>            :    first.  In this case, an EPIPE is an indication that the pipe writer can
+<span class="lineNum">      73 </span>            :    stop doing useless write() calls; this is what close_stdout does anyway.
+<span class="lineNum">      74 </span>            :    EPIPE is part of the normal pipe/socket shutdown protocol in this case,
+<span class="lineNum">      75 </span>            :    and should not lead to a diagnostic message.  */
+<a name="76"><span class="lineNum">      76 </span>            : </a>
+<span class="lineNum">      77 </span>            : void
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 : close_stdout_set_ignore_EPIPE (bool ignore)</span>
+<span class="lineNum">      79 </span>            : {
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   ignore_EPIPE = ignore;</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : /* Close standard output.  On error, issue a diagnostic and _exit
+<span class="lineNum">      84 </span>            :    with status 'exit_failure'.
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :    Also close standard error.  On error, _exit with status 'exit_failure'.
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :    Since close_stdout is commonly registered via 'atexit', POSIX
+<span class="lineNum">      89 </span>            :    and the C standard both say that it should not call 'exit',
+<span class="lineNum">      90 </span>            :    because the behavior is undefined if 'exit' is called more than
+<span class="lineNum">      91 </span>            :    once.  So it calls '_exit' instead of 'exit'.  If close_stdout
+<span class="lineNum">      92 </span>            :    is registered via atexit before other functions are registered,
+<span class="lineNum">      93 </span>            :    the other functions can act before this _exit is invoked.
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :    Applications that use close_stdout should flush any streams
+<span class="lineNum">      96 </span>            :    other than stdout and stderr before exiting, since the call to
+<span class="lineNum">      97 </span>            :    _exit will bypass other buffer flushing.  Applications should
+<span class="lineNum">      98 </span>            :    be flushing and closing other streams anyway, to check for I/O
+<span class="lineNum">      99 </span>            :    errors.  Also, applications should not use tmpfile, since _exit
+<span class="lineNum">     100 </span>            :    can bypass the removal of these files.
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :    It's important to detect such failures and exit nonzero because many
+<span class="lineNum">     103 </span>            :    tools (most notably 'make' and other build-management systems) depend
+<span class="lineNum">     104 </span>            :    on being able to detect failure in other tools via their exit status.  */
+<a name="105"><span class="lineNum">     105 </span>            : </a>
+<span class="lineNum">     106 </span>            : void
+<span class="lineNum">     107 </span><span class="lineCov">          1 : close_stdout (void)</span>
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineCov">          1 :   if (close_stream (stdout) != 0</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :       &amp;&amp; !(ignore_EPIPE &amp;&amp; errno == EPIPE))</span>
+<span class="lineNum">     111 </span>            :     {
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :       char const *write_error = _(&quot;write error&quot;);</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :       if (file_name)</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         error (0, errno, &quot;%s: %s&quot;, quotearg_colon (file_name),</span>
+<span class="lineNum">     115 </span>            :                write_error);
+<span class="lineNum">     116 </span>            :       else
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         error (0, errno, &quot;%s&quot;, write_error);</span>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :       _exit (exit_failure);</span>
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineCov">          1 :    if (close_stream (stderr) != 0)</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :      _exit (exit_failure);</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

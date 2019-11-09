@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/filevercmp.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - filevercmp.c<span style="font-size: 80%;"> (source / <a href="filevercmp.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">88</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-09 23:11:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 1995 Ian Jackson &lt;iwj10@cus.cam.ac.uk&gt;
+<span class="lineNum">       3 </span>            :    Copyright (C) 2001 Anthony Towns &lt;aj@azure.humbug.org.au&gt;
+<span class="lineNum">       4 </span>            :    Copyright (C) 2008-2015 Free Software Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;. */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : #include &quot;filevercmp.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      23 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;c-ctype.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : /* Match a file suffix defined by this regular expression:
+<span class="lineNum">      30 </span>            :    /(\.[A-Za-z~][A-Za-z0-9~]*)*$/
+<span class="lineNum">      31 </span>            :    Scan the string *STR and return a pointer to the matching suffix, or
+<a name="32"><span class="lineNum">      32 </span>            :    NULL if not found.  Upon return, *STR points to terminating NUL.  */</a>
+<span class="lineNum">      33 </span>            : static const char *
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 : match_suffix (const char **str)</span>
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   const char *match = NULL;</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   bool read_alpha = false;</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   while (**str)</span>
+<span class="lineNum">      39 </span>            :     {
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :       if (read_alpha)</span>
+<span class="lineNum">      41 </span>            :         {
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :           read_alpha = false;</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :           if (!c_isalpha (**str) &amp;&amp; '~' != **str)</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :             match = NULL;</span>
+<span class="lineNum">      45 </span>            :         }
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :       else if ('.' == **str)</span>
+<span class="lineNum">      47 </span>            :         {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :           read_alpha = true;</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :           if (!match)</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :             match = *str;</span>
+<span class="lineNum">      51 </span>            :         }
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :       else if (!c_isalnum (**str) &amp;&amp; '~' != **str)</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :         match = NULL;</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :       (*str)++;</span>
+<span class="lineNum">      55 </span>            :     }
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   return match;</span>
+<span class="lineNum">      57 </span>            : }
+<span class="lineNum">      58 </span>            : 
+<a name="59"><span class="lineNum">      59 </span>            : /* verrevcmp helper function */</a>
+<span class="lineNum">      60 </span>            : static int
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 : order (unsigned char c)</span>
+<span class="lineNum">      62 </span>            : {
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :   if (c_isdigit (c))</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   else if (c_isalpha (c))</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     return c;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   else if (c == '~')</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">      69 </span>            :   else
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     return (int) c + UCHAR_MAX + 1;</span>
+<span class="lineNum">      71 </span>            : }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : /* slightly modified verrevcmp function from dpkg
+<span class="lineNum">      74 </span>            :    S1, S2 - compared string
+<span class="lineNum">      75 </span>            :    S1_LEN, S2_LEN - length of strings to be scanned
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :    This implements the algorithm for comparison of version strings
+<span class="lineNum">      78 </span>            :    specified by Debian and now widely adopted.  The detailed
+<span class="lineNum">      79 </span>            :    specification can be found in the Debian Policy Manual in the
+<span class="lineNum">      80 </span>            :    section on the 'Version' control field.  This version of the code
+<span class="lineNum">      81 </span>            :    implements that from s5.6.12 of Debian Policy v3.8.0.1
+<a name="82"><span class="lineNum">      82 </span>            :    http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version */</a>
+<span class="lineNum">      83 </span>            : static int _GL_ATTRIBUTE_PURE
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 : verrevcmp (const char *s1, size_t s1_len, const char *s2, size_t s2_len)</span>
+<span class="lineNum">      85 </span>            : {
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   size_t s1_pos = 0;</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   size_t s2_pos = 0;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   while (s1_pos &lt; s1_len || s2_pos &lt; s2_len)</span>
+<span class="lineNum">      89 </span>            :     {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       int first_diff = 0;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       while ((s1_pos &lt; s1_len &amp;&amp; !c_isdigit (s1[s1_pos]))</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :              || (s2_pos &lt; s2_len &amp;&amp; !c_isdigit (s2[s2_pos])))</span>
+<span class="lineNum">      93 </span>            :         {
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :           int s1_c = (s1_pos == s1_len) ? 0 : order (s1[s1_pos]);</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :           int s2_c = (s2_pos == s2_len) ? 0 : order (s2[s2_pos]);</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :           if (s1_c != s2_c)</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :             return s1_c - s2_c;</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :           s1_pos++;</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :           s2_pos++;</span>
+<span class="lineNum">     100 </span>            :         }
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       while (s1[s1_pos] == '0')</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :         s1_pos++;</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       while (s2[s2_pos] == '0')</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :         s2_pos++;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :       while (c_isdigit (s1[s1_pos]) &amp;&amp; c_isdigit (s2[s2_pos]))</span>
+<span class="lineNum">     106 </span>            :         {
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :           if (!first_diff)</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :             first_diff = s1[s1_pos] - s2[s2_pos];</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :           s1_pos++;</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :           s2_pos++;</span>
+<span class="lineNum">     111 </span>            :         }
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :       if (c_isdigit (s1[s1_pos]))</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :         return 1;</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :       if (c_isdigit (s2[s2_pos]))</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :       if (first_diff)</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         return first_diff;</span>
+<span class="lineNum">     118 </span>            :     }
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     120 </span>            : }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            : /* Compare version strings S1 and S2.
+<a name="123"><span class="lineNum">     123 </span>            :    See filevercmp.h for function description.  */</a>
+<span class="lineNum">     124 </span>            : int
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 : filevercmp (const char *s1, const char *s2)</span>
+<span class="lineNum">     126 </span>            : {
+<span class="lineNum">     127 </span>            :   const char *s1_pos;
+<span class="lineNum">     128 </span>            :   const char *s2_pos;
+<span class="lineNum">     129 </span>            :   const char *s1_suffix, *s2_suffix;
+<span class="lineNum">     130 </span>            :   size_t s1_len, s2_len;
+<span class="lineNum">     131 </span>            :   int result;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :   /* easy comparison to see if strings are identical */
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   int simple_cmp = strcmp (s1, s2);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :   if (simple_cmp == 0)</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :   /* special handle for &quot;&quot;, &quot;.&quot; and &quot;..&quot; */
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   if (!*s1)</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   if (!*s2)</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :   if (0 == strcmp (&quot;.&quot;, s1))</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :   if (0 == strcmp (&quot;.&quot;, s2))</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :   if (0 == strcmp (&quot;..&quot;, s1))</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   if (0 == strcmp (&quot;..&quot;, s2))</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :   /* special handle for other hidden files */
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   if (*s1 == '.' &amp;&amp; *s2 != '.')</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :   if (*s1 != '.' &amp;&amp; *s2 == '.')</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   if (*s1 == '.' &amp;&amp; *s2 == '.')</span>
+<span class="lineNum">     158 </span>            :     {
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       s1++;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       s2++;</span>
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :   /* &quot;cut&quot; file suffixes */
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :   s1_pos = s1;</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :   s2_pos = s2;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :   s1_suffix = match_suffix (&amp;s1_pos);</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   s2_suffix = match_suffix (&amp;s2_pos);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   s1_len = (s1_suffix ? s1_suffix : s1_pos) - s1;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   s2_len = (s2_suffix ? s2_suffix : s2_pos) - s2;</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :   /* restore file suffixes if strings are identical after &quot;cut&quot; */
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   if ((s1_suffix || s2_suffix) &amp;&amp; (s1_len == s2_len)</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       &amp;&amp; 0 == strncmp (s1, s2, s1_len))</span>
+<span class="lineNum">     174 </span>            :     {
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :       s1_len = s1_pos - s1;</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :       s2_len = s2_pos - s2;</span>
+<span class="lineNum">     177 </span>            :     }
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :   result = verrevcmp (s1, s1_len, s2, s2_len);</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   return result == 0 ? simple_cmp : result;</span>
+<span class="lineNum">     181 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
