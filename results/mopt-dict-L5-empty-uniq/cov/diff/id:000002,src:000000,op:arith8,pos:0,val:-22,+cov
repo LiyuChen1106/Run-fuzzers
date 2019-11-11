@@ -1,0 +1,33 @@
+diff id:000001,src:000000,op:flip1,pos:1,+cov -> id:000002,src:000000,op:arith8,pos:0,val:-22,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/src/uniq.c
+  New 'function' coverage: different()
+  New 'line' coverage: 299
+  New 'line' coverage: 301
+  New 'line' coverage: 303
+  New 'line' coverage: 306
+  New 'line' coverage: 311
+  New 'line' coverage: 312
+  New 'line' coverage: 328
+  New 'line' coverage: 332
+  New 'line' coverage: 335
+  New 'line' coverage: 479
+  New 'line' coverage: 480
+  New 'line' coverage: 481
+  New 'line' coverage: 482
+  New 'line' coverage: 484
+  New 'line' coverage: 491
+  New 'line' coverage: 507
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/lib/memcoll.c
+  New 'function' coverage: memcoll()
+  New 'line' coverage: 66
+  New 'line' coverage: 74
+  New 'line' coverage: 76
+  New 'line' coverage: 77
+  New 'line' coverage: 93
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/lib/xmemcoll.c
+  New 'function' coverage: xmemcoll()
+  New 'line' coverage: 54
+  New 'line' coverage: 56
+  New 'line' coverage: 57
+  New 'line' coverage: 58
+  New 'line' coverage: 60

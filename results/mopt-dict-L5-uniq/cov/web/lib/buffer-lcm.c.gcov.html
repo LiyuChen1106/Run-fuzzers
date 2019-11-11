@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/buffer-lcm.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - buffer-lcm.c<span style="font-size: 80%;"> (source / <a href="buffer-lcm.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* buffer-lcm.c - compute a good buffer size for dealing with two files</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2002-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : #include &quot;buffer-lcm.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : /* Return a buffer size suitable for doing I/O with files whose block
+<span class="lineNum">      24 </span>            :    sizes are A and B.  However, never return a value greater than
+<span class="lineNum">      25 </span>            :    LCM_MAX.  */
+<a name="26"><span class="lineNum">      26 </span>            : </a>
+<span class="lineNum">      27 </span>            : size_t
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 : buffer_lcm (size_t a, size_t b, size_t lcm_max)</span>
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span>            :   size_t size;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :   /* Use reasonable values if buffer sizes are zero.  */
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :   if (!a)</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     size = b ? b : 8 * 1024;</span>
+<span class="lineNum">      35 </span>            :   else
+<span class="lineNum">      36 </span>            :     {
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :       if (b)</span>
+<span class="lineNum">      38 </span>            :         {
+<span class="lineNum">      39 </span>            :           /* Return lcm (A, B) if it is in range; otherwise, fall back
+<span class="lineNum">      40 </span>            :              on A.  */
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :           size_t lcm, m, n, q, r;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :           /* N = gcd (A, B).  */
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :           for (m = a, n = b;  (r = m % n) != 0;  m = n, n = r)</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :           /* LCM = lcm (A, B), if in range.  */
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :           q = a / n;</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :           lcm = q * b;</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :           if (lcm &lt;= lcm_max &amp;&amp; lcm / b == q)</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :             return lcm;</span>
+<span class="lineNum">      53 </span>            :         }
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :       size = a;</span>
+<span class="lineNum">      56 </span>            :     }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :   return size &lt;= lcm_max ? size : lcm_max;</span>
+<span class="lineNum">      59 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

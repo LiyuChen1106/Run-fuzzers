@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/hard-locale.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - hard-locale.c<span style="font-size: 80%;"> (source / <a href="hard-locale.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryMed">85.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* hard-locale.c -- Determine whether a locale is hard.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1997-1999, 2002-2004, 2006-2007, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &quot;hard-locale.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;locale.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #ifdef __GLIBC__
+<span class="lineNum">      28 </span>            : # define GLIBC_VERSION __GLIBC__
+<span class="lineNum">      29 </span>            : #elif defined __UCLIBC__
+<span class="lineNum">      30 </span>            : # define GLIBC_VERSION 2
+<span class="lineNum">      31 </span>            : #else
+<span class="lineNum">      32 </span>            : # define GLIBC_VERSION 0
+<span class="lineNum">      33 </span>            : #endif
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : /* Return true if the current CATEGORY locale is hard, i.e. if you
+<a name="36"><span class="lineNum">      36 </span>            :    can't get away with assuming traditional C or POSIX behavior.  */</a>
+<span class="lineNum">      37 </span>            : bool
+<span class="lineNum">      38 </span><span class="lineCov">          9 : hard_locale (int category)</span>
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span><span class="lineCov">          9 :   bool hard = true;</span>
+<span class="lineNum">      41 </span><span class="lineCov">          9 :   char const *p = setlocale (category, NULL);</span>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">          9 :   if (p)</span>
+<span class="lineNum">      44 </span>            :     {
+<span class="lineNum">      45 </span>            :       if (2 &lt;= GLIBC_VERSION)
+<span class="lineNum">      46 </span>            :         {
+<span class="lineNum">      47 </span><span class="lineCov">          9 :           if (strcmp (p, &quot;C&quot;) == 0 || strcmp (p, &quot;POSIX&quot;) == 0)</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :             hard = false;</span>
+<span class="lineNum">      49 </span>            :         }
+<span class="lineNum">      50 </span>            :       else
+<span class="lineNum">      51 </span>            :         {
+<span class="lineNum">      52 </span>            :           char *locale = strdup (p);
+<span class="lineNum">      53 </span>            :           if (locale)
+<span class="lineNum">      54 </span>            :             {
+<span class="lineNum">      55 </span>            :               /* Temporarily set the locale to the &quot;C&quot; and &quot;POSIX&quot; locales
+<span class="lineNum">      56 </span>            :                  to find their names, so that we can determine whether one
+<span class="lineNum">      57 </span>            :                  or the other is the caller's locale.  */
+<span class="lineNum">      58 </span>            :               if (((p = setlocale (category, &quot;C&quot;))
+<span class="lineNum">      59 </span>            :                    &amp;&amp; strcmp (p, locale) == 0)
+<span class="lineNum">      60 </span>            :                   || ((p = setlocale (category, &quot;POSIX&quot;))
+<span class="lineNum">      61 </span>            :                       &amp;&amp; strcmp (p, locale) == 0))
+<span class="lineNum">      62 </span>            :                 hard = false;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :               /* Restore the caller's locale.  */
+<span class="lineNum">      65 </span>            :               setlocale (category, locale);
+<span class="lineNum">      66 </span>            :               free (locale);
+<span class="lineNum">      67 </span>            :             }
+<span class="lineNum">      68 </span>            :         }
+<span class="lineNum">      69 </span>            :     }
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">          9 :   return hard;</span>
+<span class="lineNum">      72 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

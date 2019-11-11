@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/mbscasecmp.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - mbscasecmp.c<span style="font-size: 80%;"> (source / <a href="mbscasecmp.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Case-insensitive string comparison function.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 1998-1999, 2005-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            :    Written by Bruno Haible &lt;bruno@clisp.org&gt;, 2005,
+<span class="lineNum">       4 </span>            :    based on earlier glibc code.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : /* Specification.  */
+<span class="lineNum">      22 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;mbuiter.h&quot;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #define TOLOWER(Ch) (isupper (Ch) ? tolower (Ch) : (Ch))
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : /* Compare the character strings S1 and S2, ignoring case, returning less than,
+<span class="lineNum">      32 </span>            :    equal to or greater than zero if S1 is lexicographically less than, equal to
+<span class="lineNum">      33 </span>            :    or greater than S2.
+<span class="lineNum">      34 </span>            :    Note: This function may, in multibyte locales, return 0 for strings of
+<span class="lineNum">      35 </span>            :    different lengths!  */
+<span class="lineNum">      36 </span>            : int
+<span class="lineNum">      37 </span>            : mbscasecmp (const char *s1, const char *s2)
+<span class="lineNum">      38 </span>            : {
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :   if (s1 == s2)</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :   /* Be careful not to look at the entire extent of s1 or s2 until needed.
+<span class="lineNum">      43 </span>            :      This is useful because when two strings differ, the difference is
+<span class="lineNum">      44 </span>            :      most often already in the very few first characters.  */
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   if (MB_CUR_MAX &gt; 1)</span>
+<span class="lineNum">      46 </span>            :     {
+<span class="lineNum">      47 </span>            :       mbui_iterator_t iter1;
+<span class="lineNum">      48 </span>            :       mbui_iterator_t iter2;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       mbui_init (iter1, s1);</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :       mbui_init (iter2, s2);</span>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :       while (mbui_avail (iter1) &amp;&amp; mbui_avail (iter2))</span>
+<span class="lineNum">      54 </span>            :         {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :           int cmp = mb_casecmp (mbui_cur (iter1), mbui_cur (iter2));</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :           if (cmp != 0)</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :             return cmp;</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :           mbui_advance (iter1);</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :           mbui_advance (iter2);</span>
+<span class="lineNum">      62 </span>            :         }
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       if (mbui_avail (iter1))</span>
+<span class="lineNum">      64 </span>            :         /* s2 terminated before s1.  */
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :         return 1;</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       if (mbui_avail (iter2))</span>
+<span class="lineNum">      67 </span>            :         /* s1 terminated before s2.  */
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       return 0;</span>
+<span class="lineNum">      70 </span>            :     }
+<span class="lineNum">      71 </span>            :   else
+<span class="lineNum">      72 </span>            :     {
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :       const unsigned char *p1 = (const unsigned char *) s1;</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       const unsigned char *p2 = (const unsigned char *) s2;</span>
+<span class="lineNum">      75 </span>            :       unsigned char c1, c2;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :       do
+<span class="lineNum">      78 </span>            :         {
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :           c1 = TOLOWER (*p1);</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :           c2 = TOLOWER (*p2);</span>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :           if (c1 == '\0')</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :           ++p1;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :           ++p2;</span>
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       while (c1 == c2);</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :       if (UCHAR_MAX &lt;= INT_MAX)
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :         return c1 - c2;</span>
+<span class="lineNum">      92 </span>            :       else
+<span class="lineNum">      93 </span>            :         /* On machines where 'char' and 'int' are types of the same size, the
+<span class="lineNum">      94 </span>            :            difference of two 'unsigned char' values - including the sign bit -
+<span class="lineNum">      95 </span>            :            doesn't fit in an 'int'.  */
+<span class="lineNum">      96 </span>            :         return (c1 &gt; c2 ? 1 : c1 &lt; c2 ? -1 : 0);
+<span class="lineNum">      97 </span>            :     }
+<span class="lineNum">      98 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

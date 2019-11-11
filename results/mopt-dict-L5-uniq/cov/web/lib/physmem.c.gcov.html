@@ -1,0 +1,399 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/physmem.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - physmem.c<span style="font-size: 80%;"> (source / <a href="physmem.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Calculate the size of physical memory.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2000-2001, 2003, 2005-2006, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &quot;physmem.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #if HAVE_SYS_PSTAT_H
+<span class="lineNum">      28 </span>            : # include &lt;sys/pstat.h&gt;
+<span class="lineNum">      29 </span>            : #endif
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #if HAVE_SYS_SYSMP_H
+<span class="lineNum">      32 </span>            : # include &lt;sys/sysmp.h&gt;
+<span class="lineNum">      33 </span>            : #endif
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #if HAVE_SYS_SYSINFO_H
+<span class="lineNum">      36 </span>            : # include &lt;sys/sysinfo.h&gt;
+<span class="lineNum">      37 </span>            : #endif
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #if HAVE_MACHINE_HAL_SYSINFO_H
+<span class="lineNum">      40 </span>            : # include &lt;machine/hal_sysinfo.h&gt;
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #if HAVE_SYS_TABLE_H
+<span class="lineNum">      44 </span>            : # include &lt;sys/table.h&gt;
+<span class="lineNum">      45 </span>            : #endif
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #if HAVE_SYS_PARAM_H
+<span class="lineNum">      50 </span>            : # include &lt;sys/param.h&gt;
+<span class="lineNum">      51 </span>            : #endif
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : #if HAVE_SYS_SYSCTL_H
+<span class="lineNum">      54 </span>            : # include &lt;sys/sysctl.h&gt;
+<span class="lineNum">      55 </span>            : #endif
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : #if HAVE_SYS_SYSTEMCFG_H
+<span class="lineNum">      58 </span>            : # include &lt;sys/systemcfg.h&gt;
+<span class="lineNum">      59 </span>            : #endif
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : #ifdef _WIN32
+<span class="lineNum">      62 </span>            : # define WIN32_LEAN_AND_MEAN
+<span class="lineNum">      63 </span>            : # include &lt;windows.h&gt;
+<span class="lineNum">      64 </span>            : /*  MEMORYSTATUSEX is missing from older windows headers, so define
+<span class="lineNum">      65 </span>            :     a local replacement.  */
+<span class="lineNum">      66 </span>            : typedef struct
+<span class="lineNum">      67 </span>            : {
+<span class="lineNum">      68 </span>            :   DWORD dwLength;
+<span class="lineNum">      69 </span>            :   DWORD dwMemoryLoad;
+<span class="lineNum">      70 </span>            :   DWORDLONG ullTotalPhys;
+<span class="lineNum">      71 </span>            :   DWORDLONG ullAvailPhys;
+<span class="lineNum">      72 </span>            :   DWORDLONG ullTotalPageFile;
+<span class="lineNum">      73 </span>            :   DWORDLONG ullAvailPageFile;
+<span class="lineNum">      74 </span>            :   DWORDLONG ullTotalVirtual;
+<span class="lineNum">      75 </span>            :   DWORDLONG ullAvailVirtual;
+<span class="lineNum">      76 </span>            :   DWORDLONG ullAvailExtendedVirtual;
+<span class="lineNum">      77 </span>            : } lMEMORYSTATUSEX;
+<span class="lineNum">      78 </span>            : typedef WINBOOL (WINAPI *PFN_MS_EX) (lMEMORYSTATUSEX*);
+<span class="lineNum">      79 </span>            : #endif
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
+<span class="lineNum">      82 </span>            : 
+<a name="83"><span class="lineNum">      83 </span>            : /* Return the total amount of physical memory.  */</a>
+<span class="lineNum">      84 </span>            : double
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 : physmem_total (void)</span>
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span>            : #if defined _SC_PHYS_PAGES &amp;&amp; defined _SC_PAGESIZE
+<span class="lineNum">      88 </span>            :   { /* This works on linux-gnu, solaris2 and cygwin.  */
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     double pages = sysconf (_SC_PHYS_PAGES);</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     double pagesize = sysconf (_SC_PAGESIZE);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :       return pages * pagesize;</span>
+<span class="lineNum">      93 </span>            :   }
+<span class="lineNum">      94 </span>            : #endif
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : #if HAVE_SYSINFO &amp;&amp; HAVE_STRUCT_SYSINFO_MEM_UNIT
+<span class="lineNum">      97 </span>            :   { /* This works on linux.  */
+<span class="lineNum">      98 </span>            :     struct sysinfo si;
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     if (sysinfo(&amp;si) == 0)</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       return (double) si.totalram * si.mem_unit;</span>
+<span class="lineNum">     101 </span>            :   }
+<span class="lineNum">     102 </span>            : #endif
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            : #if HAVE_PSTAT_GETSTATIC
+<span class="lineNum">     105 </span>            :   { /* This works on hpux11.  */
+<span class="lineNum">     106 </span>            :     struct pst_static pss;
+<span class="lineNum">     107 </span>            :     if (0 &lt;= pstat_getstatic (&amp;pss, sizeof pss, 1, 0))
+<span class="lineNum">     108 </span>            :       {
+<span class="lineNum">     109 </span>            :         double pages = pss.physical_memory;
+<span class="lineNum">     110 </span>            :         double pagesize = pss.page_size;
+<span class="lineNum">     111 </span>            :         if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)
+<span class="lineNum">     112 </span>            :           return pages * pagesize;
+<span class="lineNum">     113 </span>            :       }
+<span class="lineNum">     114 </span>            :   }
+<span class="lineNum">     115 </span>            : #endif
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : #if HAVE_SYSMP &amp;&amp; defined MP_SAGET &amp;&amp; defined MPSA_RMINFO &amp;&amp; defined _SC_PAGESIZE
+<span class="lineNum">     118 </span>            :   { /* This works on irix6. */
+<span class="lineNum">     119 </span>            :     struct rminfo realmem;
+<span class="lineNum">     120 </span>            :     if (sysmp (MP_SAGET, MPSA_RMINFO, &amp;realmem, sizeof realmem) == 0)
+<span class="lineNum">     121 </span>            :       {
+<span class="lineNum">     122 </span>            :         double pagesize = sysconf (_SC_PAGESIZE);
+<span class="lineNum">     123 </span>            :         double pages = realmem.physmem;
+<span class="lineNum">     124 </span>            :         if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)
+<span class="lineNum">     125 </span>            :           return pages * pagesize;
+<span class="lineNum">     126 </span>            :       }
+<span class="lineNum">     127 </span>            :   }
+<span class="lineNum">     128 </span>            : #endif
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : #if HAVE_GETSYSINFO &amp;&amp; defined GSI_PHYSMEM
+<span class="lineNum">     131 </span>            :   { /* This works on Tru64 UNIX V4/5.  */
+<span class="lineNum">     132 </span>            :     int physmem;
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     if (getsysinfo (GSI_PHYSMEM, (caddr_t) &amp;physmem, sizeof (physmem),
+<span class="lineNum">     135 </span>            :                     NULL, NULL, NULL) == 1)
+<span class="lineNum">     136 </span>            :       {
+<span class="lineNum">     137 </span>            :         double kbytes = physmem;
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :         if (0 &lt;= kbytes)
+<span class="lineNum">     140 </span>            :           return kbytes * 1024.0;
+<span class="lineNum">     141 </span>            :       }
+<span class="lineNum">     142 </span>            :   }
+<span class="lineNum">     143 </span>            : #endif
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : #if HAVE_SYSCTL &amp;&amp; defined HW_PHYSMEM
+<span class="lineNum">     146 </span>            :   { /* This works on *bsd and darwin.  */
+<span class="lineNum">     147 </span>            :     unsigned int physmem;
+<span class="lineNum">     148 </span>            :     size_t len = sizeof physmem;
+<span class="lineNum">     149 </span>            :     static int mib[2] = { CTL_HW, HW_PHYSMEM };
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :     if (sysctl (mib, ARRAY_SIZE (mib), &amp;physmem, &amp;len, NULL, 0) == 0
+<span class="lineNum">     152 </span>            :         &amp;&amp; len == sizeof (physmem))
+<span class="lineNum">     153 </span>            :       return (double) physmem;
+<span class="lineNum">     154 </span>            :   }
+<span class="lineNum">     155 </span>            : #endif
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            : #if HAVE__SYSTEM_CONFIGURATION
+<span class="lineNum">     158 </span>            :   /* This works on AIX.  */
+<span class="lineNum">     159 </span>            :   return _system_configuration.physmem;
+<span class="lineNum">     160 </span>            : #endif
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            : #if defined _WIN32
+<span class="lineNum">     163 </span>            :   { /* this works on windows */
+<span class="lineNum">     164 </span>            :     PFN_MS_EX pfnex;
+<span class="lineNum">     165 </span>            :     HMODULE h = GetModuleHandle (&quot;kernel32.dll&quot;);
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     if (!h)
+<span class="lineNum">     168 </span>            :       return 0.0;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :     /*  Use GlobalMemoryStatusEx if available.  */
+<span class="lineNum">     171 </span>            :     if ((pfnex = (PFN_MS_EX) GetProcAddress (h, &quot;GlobalMemoryStatusEx&quot;)))
+<span class="lineNum">     172 </span>            :       {
+<span class="lineNum">     173 </span>            :         lMEMORYSTATUSEX lms_ex;
+<span class="lineNum">     174 </span>            :         lms_ex.dwLength = sizeof lms_ex;
+<span class="lineNum">     175 </span>            :         if (!pfnex (&amp;lms_ex))
+<span class="lineNum">     176 </span>            :           return 0.0;
+<span class="lineNum">     177 </span>            :         return (double) lms_ex.ullTotalPhys;
+<span class="lineNum">     178 </span>            :       }
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :     /*  Fall back to GlobalMemoryStatus which is always available.
+<span class="lineNum">     181 </span>            :         but returns wrong results for physical memory &gt; 4GB.  */
+<span class="lineNum">     182 </span>            :     else
+<span class="lineNum">     183 </span>            :       {
+<span class="lineNum">     184 </span>            :         MEMORYSTATUS ms;
+<span class="lineNum">     185 </span>            :         GlobalMemoryStatus (&amp;ms);
+<span class="lineNum">     186 </span>            :         return (double) ms.dwTotalPhys;
+<span class="lineNum">     187 </span>            :       }
+<span class="lineNum">     188 </span>            :   }
+<span class="lineNum">     189 </span>            : #endif
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :   /* Guess 64 MB.  It's probably an older host, so guess small.  */
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   return 64 * 1024 * 1024;</span>
+<span class="lineNum">     193 </span>            : }
+<span class="lineNum">     194 </span>            : 
+<a name="195"><span class="lineNum">     195 </span>            : /* Return the amount of physical memory available.  */</a>
+<span class="lineNum">     196 </span>            : double
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 : physmem_available (void)</span>
+<span class="lineNum">     198 </span>            : {
+<span class="lineNum">     199 </span>            : #if defined _SC_AVPHYS_PAGES &amp;&amp; defined _SC_PAGESIZE
+<span class="lineNum">     200 </span>            :   { /* This works on linux-gnu, solaris2 and cygwin.  */
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :     double pages = sysconf (_SC_AVPHYS_PAGES);</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     double pagesize = sysconf (_SC_PAGESIZE);</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :     if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :       return pages * pagesize;</span>
+<span class="lineNum">     205 </span>            :   }
+<span class="lineNum">     206 </span>            : #endif
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            : #if HAVE_SYSINFO &amp;&amp; HAVE_STRUCT_SYSINFO_MEM_UNIT
+<span class="lineNum">     209 </span>            :   { /* This works on linux.  */
+<span class="lineNum">     210 </span>            :     struct sysinfo si;
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :     if (sysinfo(&amp;si) == 0)</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :       return ((double) si.freeram + si.bufferram) * si.mem_unit;</span>
+<span class="lineNum">     213 </span>            :   }
+<span class="lineNum">     214 </span>            : #endif
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : #if HAVE_PSTAT_GETSTATIC &amp;&amp; HAVE_PSTAT_GETDYNAMIC
+<span class="lineNum">     217 </span>            :   { /* This works on hpux11.  */
+<span class="lineNum">     218 </span>            :     struct pst_static pss;
+<span class="lineNum">     219 </span>            :     struct pst_dynamic psd;
+<span class="lineNum">     220 </span>            :     if (0 &lt;= pstat_getstatic (&amp;pss, sizeof pss, 1, 0)
+<span class="lineNum">     221 </span>            :         &amp;&amp; 0 &lt;= pstat_getdynamic (&amp;psd, sizeof psd, 1, 0))
+<span class="lineNum">     222 </span>            :       {
+<span class="lineNum">     223 </span>            :         double pages = psd.psd_free;
+<span class="lineNum">     224 </span>            :         double pagesize = pss.page_size;
+<span class="lineNum">     225 </span>            :         if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)
+<span class="lineNum">     226 </span>            :           return pages * pagesize;
+<span class="lineNum">     227 </span>            :       }
+<span class="lineNum">     228 </span>            :   }
+<span class="lineNum">     229 </span>            : #endif
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            : #if HAVE_SYSMP &amp;&amp; defined MP_SAGET &amp;&amp; defined MPSA_RMINFO &amp;&amp; defined _SC_PAGESIZE
+<span class="lineNum">     232 </span>            :   { /* This works on irix6. */
+<span class="lineNum">     233 </span>            :     struct rminfo realmem;
+<span class="lineNum">     234 </span>            :     if (sysmp (MP_SAGET, MPSA_RMINFO, &amp;realmem, sizeof realmem) == 0)
+<span class="lineNum">     235 </span>            :       {
+<span class="lineNum">     236 </span>            :         double pagesize = sysconf (_SC_PAGESIZE);
+<span class="lineNum">     237 </span>            :         double pages = realmem.availrmem;
+<span class="lineNum">     238 </span>            :         if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)
+<span class="lineNum">     239 </span>            :           return pages * pagesize;
+<span class="lineNum">     240 </span>            :       }
+<span class="lineNum">     241 </span>            :   }
+<span class="lineNum">     242 </span>            : #endif
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            : #if HAVE_TABLE &amp;&amp; defined TBL_VMSTATS
+<span class="lineNum">     245 </span>            :   { /* This works on Tru64 UNIX V4/5.  */
+<span class="lineNum">     246 </span>            :     struct tbl_vmstats vmstats;
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :     if (table (TBL_VMSTATS, 0, &amp;vmstats, 1, sizeof (vmstats)) == 1)
+<span class="lineNum">     249 </span>            :       {
+<span class="lineNum">     250 </span>            :         double pages = vmstats.free_count;
+<span class="lineNum">     251 </span>            :         double pagesize = vmstats.pagesize;
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :         if (0 &lt;= pages &amp;&amp; 0 &lt;= pagesize)
+<span class="lineNum">     254 </span>            :           return pages * pagesize;
+<span class="lineNum">     255 </span>            :       }
+<span class="lineNum">     256 </span>            :   }
+<span class="lineNum">     257 </span>            : #endif
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : #if HAVE_SYSCTL &amp;&amp; defined HW_USERMEM
+<span class="lineNum">     260 </span>            :   { /* This works on *bsd and darwin.  */
+<span class="lineNum">     261 </span>            :     unsigned int usermem;
+<span class="lineNum">     262 </span>            :     size_t len = sizeof usermem;
+<span class="lineNum">     263 </span>            :     static int mib[2] = { CTL_HW, HW_USERMEM };
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :     if (sysctl (mib, ARRAY_SIZE (mib), &amp;usermem, &amp;len, NULL, 0) == 0
+<span class="lineNum">     266 </span>            :         &amp;&amp; len == sizeof (usermem))
+<span class="lineNum">     267 </span>            :       return (double) usermem;
+<span class="lineNum">     268 </span>            :   }
+<span class="lineNum">     269 </span>            : #endif
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            : #if defined _WIN32
+<span class="lineNum">     272 </span>            :   { /* this works on windows */
+<span class="lineNum">     273 </span>            :     PFN_MS_EX pfnex;
+<span class="lineNum">     274 </span>            :     HMODULE h = GetModuleHandle (&quot;kernel32.dll&quot;);
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :     if (!h)
+<span class="lineNum">     277 </span>            :       return 0.0;
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            :     /*  Use GlobalMemoryStatusEx if available.  */
+<span class="lineNum">     280 </span>            :     if ((pfnex = (PFN_MS_EX) GetProcAddress (h, &quot;GlobalMemoryStatusEx&quot;)))
+<span class="lineNum">     281 </span>            :       {
+<span class="lineNum">     282 </span>            :         lMEMORYSTATUSEX lms_ex;
+<span class="lineNum">     283 </span>            :         lms_ex.dwLength = sizeof lms_ex;
+<span class="lineNum">     284 </span>            :         if (!pfnex (&amp;lms_ex))
+<span class="lineNum">     285 </span>            :           return 0.0;
+<span class="lineNum">     286 </span>            :         return (double) lms_ex.ullAvailPhys;
+<span class="lineNum">     287 </span>            :       }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :     /*  Fall back to GlobalMemoryStatus which is always available.
+<span class="lineNum">     290 </span>            :         but returns wrong results for physical memory &gt; 4GB  */
+<span class="lineNum">     291 </span>            :     else
+<span class="lineNum">     292 </span>            :       {
+<span class="lineNum">     293 </span>            :         MEMORYSTATUS ms;
+<span class="lineNum">     294 </span>            :         GlobalMemoryStatus (&amp;ms);
+<span class="lineNum">     295 </span>            :         return (double) ms.dwAvailPhys;
+<span class="lineNum">     296 </span>            :       }
+<span class="lineNum">     297 </span>            :   }
+<span class="lineNum">     298 </span>            : #endif
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   /* Guess 25% of physical memory.  */
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :   return physmem_total () / 4;</span>
+<span class="lineNum">     302 </span>            : }
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            : #if DEBUG
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            : # include &lt;stdio.h&gt;
+<span class="lineNum">     308 </span>            : # include &lt;stdlib.h&gt;
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : int
+<span class="lineNum">     311 </span>            : main (void)
+<span class="lineNum">     312 </span>            : {
+<span class="lineNum">     313 </span>            :   printf (&quot;%12.f %12.f\n&quot;, physmem_total (), physmem_available ());
+<span class="lineNum">     314 </span>            :   exit (0);
+<span class="lineNum">     315 </span>            : }
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span>            : #endif /* DEBUG */
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            : /*
+<span class="lineNum">     320 </span>            : Local Variables:
+<span class="lineNum">     321 </span>            : compile-command: &quot;gcc -DDEBUG -g -O -Wall -W physmem.c&quot;
+<span class="lineNum">     322 </span>            : End:
+<span class="lineNum">     323 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

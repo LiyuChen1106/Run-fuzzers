@@ -1,0 +1,429 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/obstack.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - obstack.c<span style="font-size: 80%;"> (source / <a href="obstack.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">95</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* obstack.c - subroutines used implicitly by object stack macros</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 1988-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            :    This file is part of the GNU C Library.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    The GNU C Library is free software; you can redistribute it and/or
+<span class="lineNum">       6 </span>            :    modify it under the terms of the GNU General Public
+<span class="lineNum">       7 </span>            :    License as published by the Free Software Foundation; either
+<span class="lineNum">       8 </span>            :    version 3 of the License, or (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    The GNU C Library is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<span class="lineNum">      13 </span>            :    General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public
+<span class="lineNum">      16 </span>            :    License along with the GNU C Library; if not, see
+<span class="lineNum">      17 </span>            :    &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #ifdef _LIBC
+<span class="lineNum">      21 </span>            : # include &lt;obstack.h&gt;
+<span class="lineNum">      22 </span>            : #else
+<span class="lineNum">      23 </span>            : # include &lt;config.h&gt;
+<span class="lineNum">      24 </span>            : # include &quot;obstack.h&quot;
+<span class="lineNum">      25 </span>            : #endif
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : /* NOTE BEFORE MODIFYING THIS FILE: _OBSTACK_INTERFACE_VERSION in
+<span class="lineNum">      28 </span>            :    obstack.h must be incremented whenever callers compiled using an old
+<span class="lineNum">      29 </span>            :    obstack.h can no longer properly call the functions in this file.  */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : /* Comment out all this code if we are using the GNU C Library, and are not
+<span class="lineNum">      32 </span>            :    actually compiling the library itself, and the installed library
+<span class="lineNum">      33 </span>            :    supports the same library interface we do.  This code is part of the GNU
+<span class="lineNum">      34 </span>            :    C Library, but also included in many other GNU distributions.  Compiling
+<span class="lineNum">      35 </span>            :    and linking in this code is a waste when using the GNU C library
+<span class="lineNum">      36 </span>            :    (especially if it is a shared library).  Rather than having every GNU
+<span class="lineNum">      37 </span>            :    program understand 'configure --with-gnu-libc' and omit the object
+<span class="lineNum">      38 </span>            :    files, it is simpler to just do this in the source for each such file.  */
+<span class="lineNum">      39 </span>            : #if !defined _LIBC &amp;&amp; defined __GNU_LIBRARY__ &amp;&amp; __GNU_LIBRARY__ &gt; 1
+<span class="lineNum">      40 </span>            : # include &lt;gnu-versions.h&gt;
+<span class="lineNum">      41 </span>            : # if (_GNU_OBSTACK_INTERFACE_VERSION == _OBSTACK_INTERFACE_VERSION            \
+<span class="lineNum">      42 </span>            :       || (_GNU_OBSTACK_INTERFACE_VERSION == 1                                 \
+<span class="lineNum">      43 </span>            :           &amp;&amp; _OBSTACK_INTERFACE_VERSION == 2                                  \
+<span class="lineNum">      44 </span>            :           &amp;&amp; defined SIZEOF_INT &amp;&amp; defined SIZEOF_SIZE_T                      \
+<span class="lineNum">      45 </span>            :           &amp;&amp; SIZEOF_INT == SIZEOF_SIZE_T))
+<span class="lineNum">      46 </span>            : #  define _OBSTACK_ELIDE_CODE
+<span class="lineNum">      47 </span>            : # endif
+<span class="lineNum">      48 </span>            : #endif
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : #ifndef _OBSTACK_ELIDE_CODE
+<span class="lineNum">      51 </span>            : /* If GCC, or if an oddball (testing?) host that #defines __alignof__,
+<span class="lineNum">      52 </span>            :    use the already-supplied __alignof__.  Otherwise, this must be Gnulib
+<span class="lineNum">      53 </span>            :    (as glibc assumes GCC); defer to Gnulib's alignof_type.  */
+<span class="lineNum">      54 </span>            : # if !defined __GNUC__ &amp;&amp; !defined __alignof__
+<span class="lineNum">      55 </span>            : #  include &lt;alignof.h&gt;
+<span class="lineNum">      56 </span>            : #  define __alignof__(type) alignof_type (type)
+<span class="lineNum">      57 </span>            : # endif
+<span class="lineNum">      58 </span>            : # include &lt;stdlib.h&gt;
+<span class="lineNum">      59 </span>            : # include &lt;stdint.h&gt;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : # ifndef MAX
+<span class="lineNum">      62 </span>            : #  define MAX(a,b) ((a) &gt; (b) ? (a) : (b))
+<span class="lineNum">      63 </span>            : # endif
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            : /* Determine default alignment.  */
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : /* If malloc were really smart, it would round addresses to DEFAULT_ALIGNMENT.
+<span class="lineNum">      68 </span>            :    But in fact it might be less smart and round addresses to as much as
+<span class="lineNum">      69 </span>            :    DEFAULT_ROUNDING.  So we prepare for it to do that.
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :    DEFAULT_ALIGNMENT cannot be an enum constant; see gnulib's alignof.h.  */
+<span class="lineNum">      72 </span>            : #define DEFAULT_ALIGNMENT MAX (__alignof__ (long double),                     \
+<span class="lineNum">      73 </span>            :                                MAX (__alignof__ (uintmax_t),                  \
+<span class="lineNum">      74 </span>            :                                     __alignof__ (void *)))
+<span class="lineNum">      75 </span>            : #define DEFAULT_ROUNDING MAX (sizeof (long double),                           \
+<span class="lineNum">      76 </span>            :                                MAX (sizeof (uintmax_t),                       \
+<span class="lineNum">      77 </span>            :                                     sizeof (void *)))
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : /* Call functions with either the traditional malloc/free calling
+<span class="lineNum">      80 </span>            :    interface, or the mmalloc/mfree interface (that adds an extra first
+<span class="lineNum">      81 </span>            :    argument), based on the value of use_extra_arg.  */
+<a name="82"><span class="lineNum">      82 </span>            : </a>
+<span class="lineNum">      83 </span>            : static void *
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 : call_chunkfun (struct obstack *h, size_t size)</span>
+<span class="lineNum">      85 </span>            : {
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   if (h-&gt;use_extra_arg)</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     return h-&gt;chunkfun.extra (h-&gt;extra_arg, size);</span>
+<span class="lineNum">      88 </span>            :   else
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     return h-&gt;chunkfun.plain (size);</span>
+<span class="lineNum">      90 </span>            : }
+<a name="91"><span class="lineNum">      91 </span>            : </a>
+<span class="lineNum">      92 </span>            : static void
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 : call_freefun (struct obstack *h, void *old_chunk)</span>
+<span class="lineNum">      94 </span>            : {
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :   if (h-&gt;use_extra_arg)</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :     h-&gt;freefun.extra (h-&gt;extra_arg, old_chunk);</span>
+<span class="lineNum">      97 </span>            :   else
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :     h-&gt;freefun.plain (old_chunk);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            : /* Initialize an obstack H for use.  Specify chunk size SIZE (0 means default).
+<span class="lineNum">     103 </span>            :    Objects start on multiples of ALIGNMENT (0 means use default).
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :    Return nonzero if successful, calls obstack_alloc_failed_handler if
+<span class="lineNum">     106 </span>            :    allocation fails.  */
+<a name="107"><span class="lineNum">     107 </span>            : </a>
+<span class="lineNum">     108 </span>            : static int
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 : _obstack_begin_worker (struct obstack *h,</span>
+<span class="lineNum">     110 </span>            :                        _OBSTACK_SIZE_T size, _OBSTACK_SIZE_T alignment)
+<span class="lineNum">     111 </span>            : {
+<span class="lineNum">     112 </span>            :   struct _obstack_chunk *chunk; /* points to new chunk */
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   if (alignment == 0)</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :     alignment = DEFAULT_ALIGNMENT;</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   if (size == 0)</span>
+<span class="lineNum">     117 </span>            :     /* Default size is what GNU malloc can fit in a 4096-byte block.  */
+<span class="lineNum">     118 </span>            :     {
+<span class="lineNum">     119 </span>            :       /* 12 is sizeof (mhead) and 4 is EXTRA from GNU malloc.
+<span class="lineNum">     120 </span>            :          Use the values for range checking, because if range checking is off,
+<span class="lineNum">     121 </span>            :          the extra bytes won't be missed terribly, but if range checking is on
+<span class="lineNum">     122 </span>            :          and we used a larger request, a whole extra 4096 bytes would be
+<span class="lineNum">     123 </span>            :          allocated.
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :          These number are irrelevant to the new GNU malloc.  I suspect it is
+<span class="lineNum">     126 </span>            :          less sensitive to the size of the request.  */
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :       int extra = ((((12 + DEFAULT_ROUNDING - 1) &amp; ~(DEFAULT_ROUNDING - 1))</span>
+<span class="lineNum">     128 </span>            :                     + 4 + DEFAULT_ROUNDING - 1)
+<span class="lineNum">     129 </span>            :                    &amp; ~(DEFAULT_ROUNDING - 1));
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :       size = 4096 - extra;</span>
+<span class="lineNum">     131 </span>            :     }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :   h-&gt;chunk_size = size;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   h-&gt;alignment_mask = alignment - 1;</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :   chunk = h-&gt;chunk = call_chunkfun (h, h-&gt;chunk_size);</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :   if (!chunk)</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :     (*obstack_alloc_failed_handler) ();</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   h-&gt;next_free = h-&gt;object_base = __PTR_ALIGN ((char *) chunk, chunk-&gt;contents,</span>
+<span class="lineNum">     140 </span>            :                                                alignment - 1);
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   h-&gt;chunk_limit = chunk-&gt;limit = (char *) chunk + h-&gt;chunk_size;</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   chunk-&gt;prev = 0;</span>
+<span class="lineNum">     143 </span>            :   /* The initial chunk now contains no empty object.  */
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   h-&gt;maybe_empty_object = 0;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :   h-&gt;alloc_failed = 0;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   return 1;</span>
+<span class="lineNum">     147 </span>            : }
+<a name="148"><span class="lineNum">     148 </span>            : </a>
+<span class="lineNum">     149 </span>            : int
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 : _obstack_begin (struct obstack *h,</span>
+<span class="lineNum">     151 </span>            :                 _OBSTACK_SIZE_T size, _OBSTACK_SIZE_T alignment,
+<span class="lineNum">     152 </span>            :                 void *(*chunkfun) (size_t),
+<span class="lineNum">     153 </span>            :                 void (*freefun) (void *))
+<span class="lineNum">     154 </span>            : {
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :   h-&gt;chunkfun.plain = chunkfun;</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   h-&gt;freefun.plain = freefun;</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   h-&gt;use_extra_arg = 0;</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :   return _obstack_begin_worker (h, size, alignment);</span>
+<span class="lineNum">     159 </span>            : }
+<a name="160"><span class="lineNum">     160 </span>            : </a>
+<span class="lineNum">     161 </span>            : int
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 : _obstack_begin_1 (struct obstack *h,</span>
+<span class="lineNum">     163 </span>            :                   _OBSTACK_SIZE_T size, _OBSTACK_SIZE_T alignment,
+<span class="lineNum">     164 </span>            :                   void *(*chunkfun) (void *, size_t),
+<span class="lineNum">     165 </span>            :                   void (*freefun) (void *, void *),
+<span class="lineNum">     166 </span>            :                   void *arg)
+<span class="lineNum">     167 </span>            : {
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   h-&gt;chunkfun.extra = chunkfun;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   h-&gt;freefun.extra = freefun;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :   h-&gt;extra_arg = arg;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   h-&gt;use_extra_arg = 1;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   return _obstack_begin_worker (h, size, alignment);</span>
+<span class="lineNum">     173 </span>            : }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : /* Allocate a new current chunk for the obstack *H
+<span class="lineNum">     176 </span>            :    on the assumption that LENGTH bytes need to be added
+<span class="lineNum">     177 </span>            :    to the current object, or a new object of length LENGTH allocated.
+<span class="lineNum">     178 </span>            :    Copies any partial object from the end of the old chunk
+<span class="lineNum">     179 </span>            :    to the beginning of the new one.  */
+<a name="180"><span class="lineNum">     180 </span>            : </a>
+<span class="lineNum">     181 </span>            : void
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 : _obstack_newchunk (struct obstack *h, _OBSTACK_SIZE_T length)</span>
+<span class="lineNum">     183 </span>            : {
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :   struct _obstack_chunk *old_chunk = h-&gt;chunk;</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   struct _obstack_chunk *new_chunk = 0;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :   size_t obj_size = h-&gt;next_free - h-&gt;object_base;</span>
+<span class="lineNum">     187 </span>            :   char *object_base;
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :   /* Compute size for new chunk.  */
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   size_t sum1 = obj_size + length;</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :   size_t sum2 = sum1 + h-&gt;alignment_mask;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   size_t new_size = sum2 + (obj_size &gt;&gt; 3) + 100;</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :   if (new_size &lt; sum2)</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :     new_size = sum2;</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :   if (new_size &lt; h-&gt;chunk_size)</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :     new_size = h-&gt;chunk_size;</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   /* Allocate and initialize the new chunk.  */
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :   if (obj_size &lt;= sum1 &amp;&amp; sum1 &lt;= sum2)</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :     new_chunk = call_chunkfun (h, new_size);</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :   if (!new_chunk)</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     (*obstack_alloc_failed_handler)();</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :   h-&gt;chunk = new_chunk;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :   new_chunk-&gt;prev = old_chunk;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   new_chunk-&gt;limit = h-&gt;chunk_limit = (char *) new_chunk + new_size;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :   /* Compute an aligned object_base in the new chunk */
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :   object_base =</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :     __PTR_ALIGN ((char *) new_chunk, new_chunk-&gt;contents, h-&gt;alignment_mask);</span>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   /* Move the existing object to the new chunk.  */
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   memcpy (object_base, h-&gt;object_base, obj_size);</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :   /* If the object just copied was the only data in OLD_CHUNK,
+<span class="lineNum">     215 </span>            :      free that chunk and remove it from the chain.
+<span class="lineNum">     216 </span>            :      But not if that chunk might contain an empty object.  */
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :   if (!h-&gt;maybe_empty_object</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :       &amp;&amp; (h-&gt;object_base</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :           == __PTR_ALIGN ((char *) old_chunk, old_chunk-&gt;contents,</span>
+<span class="lineNum">     220 </span>            :                           h-&gt;alignment_mask)))
+<span class="lineNum">     221 </span>            :     {
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :       new_chunk-&gt;prev = old_chunk-&gt;prev;</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :       call_freefun (h, old_chunk);</span>
+<span class="lineNum">     224 </span>            :     }
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :   h-&gt;object_base = object_base;</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :   h-&gt;next_free = h-&gt;object_base + obj_size;</span>
+<span class="lineNum">     228 </span>            :   /* The new chunk certainly contains no empty object yet.  */
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :   h-&gt;maybe_empty_object = 0;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            : /* Return nonzero if object OBJ has been allocated from obstack H.
+<span class="lineNum">     233 </span>            :    This is here for debugging.
+<span class="lineNum">     234 </span>            :    If you use it in a program, you are probably losing.  */
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            : /* Suppress -Wmissing-prototypes warning.  We don't want to declare this in
+<span class="lineNum">     237 </span>            :    obstack.h because it is just for debugging.  */
+<span class="lineNum">     238 </span>            : int _obstack_allocated_p (struct obstack *h, void *obj) __attribute_pure__;
+<a name="239"><span class="lineNum">     239 </span>            : </a>
+<span class="lineNum">     240 </span>            : int
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 : _obstack_allocated_p (struct obstack *h, void *obj)</span>
+<span class="lineNum">     242 </span>            : {
+<span class="lineNum">     243 </span>            :   struct _obstack_chunk *lp;    /* below addr of any objects in this chunk */
+<span class="lineNum">     244 </span>            :   struct _obstack_chunk *plp;   /* point to previous chunk if any */
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :   lp = (h)-&gt;chunk;</span>
+<span class="lineNum">     247 </span>            :   /* We use &gt;= rather than &gt; since the object cannot be exactly at
+<span class="lineNum">     248 </span>            :      the beginning of the chunk but might be an empty object exactly
+<span class="lineNum">     249 </span>            :      at the end of an adjacent chunk.  */
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :   while (lp != 0 &amp;&amp; ((void *) lp &gt;= obj || (void *) (lp)-&gt;limit &lt; obj))</span>
+<span class="lineNum">     251 </span>            :     {
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :       plp = lp-&gt;prev;</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :       lp = plp;</span>
+<span class="lineNum">     254 </span>            :     }
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :   return lp != 0;</span>
+<span class="lineNum">     256 </span>            : }
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            : /* Free objects in obstack H, including OBJ and everything allocate
+<span class="lineNum">     259 </span>            :    more recently than OBJ.  If OBJ is zero, free everything in H.  */
+<a name="260"><span class="lineNum">     260 </span>            : </a>
+<span class="lineNum">     261 </span>            : void
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 : _obstack_free (struct obstack *h, void *obj)</span>
+<span class="lineNum">     263 </span>            : {
+<span class="lineNum">     264 </span>            :   struct _obstack_chunk *lp;    /* below addr of any objects in this chunk */
+<span class="lineNum">     265 </span>            :   struct _obstack_chunk *plp;   /* point to previous chunk if any */
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :   lp = h-&gt;chunk;</span>
+<span class="lineNum">     268 </span>            :   /* We use &gt;= because there cannot be an object at the beginning of a chunk.
+<span class="lineNum">     269 </span>            :      But there can be an empty object at that address
+<span class="lineNum">     270 </span>            :      at the end of another chunk.  */
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :   while (lp != 0 &amp;&amp; ((void *) lp &gt;= obj || (void *) (lp)-&gt;limit &lt; obj))</span>
+<span class="lineNum">     272 </span>            :     {
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       plp = lp-&gt;prev;</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :       call_freefun (h, lp);</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :       lp = plp;</span>
+<span class="lineNum">     276 </span>            :       /* If we switch chunks, we can't tell whether the new current
+<span class="lineNum">     277 </span>            :          chunk contains an empty object, so assume that it may.  */
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :       h-&gt;maybe_empty_object = 1;</span>
+<span class="lineNum">     279 </span>            :     }
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :   if (lp)</span>
+<span class="lineNum">     281 </span>            :     {
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       h-&gt;object_base = h-&gt;next_free = (char *) (obj);</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       h-&gt;chunk_limit = lp-&gt;limit;</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       h-&gt;chunk = lp;</span>
+<span class="lineNum">     285 </span>            :     }
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :   else if (obj != 0)</span>
+<span class="lineNum">     287 </span>            :     /* obj is not in any of the chunks! */
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 : }</span>
+<a name="290"><span class="lineNum">     290 </span>            : </a>
+<span class="lineNum">     291 </span>            : _OBSTACK_SIZE_T
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 : _obstack_memory_used (struct obstack *h)</span>
+<span class="lineNum">     293 </span>            : {
+<span class="lineNum">     294 </span>            :   struct _obstack_chunk *lp;
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :   _OBSTACK_SIZE_T nbytes = 0;</span>
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :   for (lp = h-&gt;chunk; lp != 0; lp = lp-&gt;prev)</span>
+<span class="lineNum">     298 </span>            :     {
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :       nbytes += lp-&gt;limit - (char *) lp;</span>
+<span class="lineNum">     300 </span>            :     }
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :   return nbytes;</span>
+<span class="lineNum">     302 </span>            : }
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            : # ifndef _OBSTACK_NO_ERROR_HANDLER
+<span class="lineNum">     305 </span>            : /* Define the error handler.  */
+<span class="lineNum">     306 </span>            : #  include &lt;stdio.h&gt;
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span>            : /* Exit value used when 'print_and_abort' is used.  */
+<span class="lineNum">     309 </span>            : #  ifdef _LIBC
+<span class="lineNum">     310 </span>            : int obstack_exit_failure = EXIT_FAILURE;
+<span class="lineNum">     311 </span>            : #  else
+<span class="lineNum">     312 </span>            : #   include &quot;exitfail.h&quot;
+<span class="lineNum">     313 </span>            : #   define obstack_exit_failure exit_failure
+<span class="lineNum">     314 </span>            : #  endif
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            : #  ifdef _LIBC
+<span class="lineNum">     317 </span>            : #   include &lt;libintl.h&gt;
+<span class="lineNum">     318 </span>            : #  else
+<span class="lineNum">     319 </span>            : #   include &quot;gettext.h&quot;
+<span class="lineNum">     320 </span>            : #  endif
+<span class="lineNum">     321 </span>            : #  ifndef _
+<span class="lineNum">     322 </span>            : #   define _(msgid) gettext (msgid)
+<span class="lineNum">     323 </span>            : #  endif
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : #  ifdef _LIBC
+<span class="lineNum">     326 </span>            : #   include &lt;libio/iolibio.h&gt;
+<span class="lineNum">     327 </span>            : #  endif
+<a name="328"><span class="lineNum">     328 </span>            : </a>
+<span class="lineNum">     329 </span>            : static _Noreturn void
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 : print_and_abort (void)</span>
+<span class="lineNum">     331 </span>            : {
+<span class="lineNum">     332 </span>            :   /* Don't change any of these strings.  Yes, it would be possible to add
+<span class="lineNum">     333 </span>            :      the newline to the string and use fputs or so.  But this must not
+<span class="lineNum">     334 </span>            :      happen because the &quot;memory exhausted&quot; message appears in other places
+<span class="lineNum">     335 </span>            :      like this and the translation should be reused instead of creating
+<span class="lineNum">     336 </span>            :      a very similar string which requires a separate translation.  */
+<span class="lineNum">     337 </span>            : #  ifdef _LIBC
+<span class="lineNum">     338 </span>            :   (void) __fxprintf (NULL, &quot;%s\n&quot;, _(&quot;memory exhausted&quot;));
+<span class="lineNum">     339 </span>            : #  else
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :   fprintf (stderr, &quot;%s\n&quot;, _(&quot;memory exhausted&quot;));</span>
+<span class="lineNum">     341 </span>            : #  endif
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :   exit (obstack_exit_failure);</span>
+<span class="lineNum">     343 </span>            : }
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            : /* The functions allocating more room by calling 'obstack_chunk_alloc'
+<span class="lineNum">     346 </span>            :    jump to the handler pointed to by 'obstack_alloc_failed_handler'.
+<span class="lineNum">     347 </span>            :    This can be set to a user defined function which should either
+<span class="lineNum">     348 </span>            :    abort gracefully or use longjump - but shouldn't return.  This
+<span class="lineNum">     349 </span>            :    variable by default points to the internal function
+<span class="lineNum">     350 </span>            :    'print_and_abort'.  */
+<span class="lineNum">     351 </span>            : void (*obstack_alloc_failed_handler) (void) = print_and_abort;
+<span class="lineNum">     352 </span>            : # endif /* !_OBSTACK_NO_ERROR_HANDLER */
+<span class="lineNum">     353 </span>            : #endif /* !_OBSTACK_ELIDE_CODE */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

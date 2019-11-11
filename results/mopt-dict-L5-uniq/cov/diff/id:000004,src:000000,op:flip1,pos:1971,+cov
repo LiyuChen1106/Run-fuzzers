@@ -1,0 +1,4 @@
+diff id:000003,src:000000,op:flip1,pos:340,+cov -> id:000004,src:000000,op:flip1,pos:1971,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/lib/memcoll.c
+  New 'line' coverage: 53
+  New 'line' coverage: 54

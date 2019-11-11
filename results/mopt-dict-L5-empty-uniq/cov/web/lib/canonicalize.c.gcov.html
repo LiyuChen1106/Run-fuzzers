@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/canonicalize.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - canonicalize.c<span style="font-size: 80%;"> (source / <a href="canonicalize.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">137</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Return the canonical absolute name of a given file.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 1996-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &quot;canonicalize.h&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      22 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      23 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;areadlink.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;file-set.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;hash-triple.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;pathmax.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;xgetcwd.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;dosname.h&quot;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #define MULTIPLE_BITS_SET(i) (((i) &amp; ((i) - 1)) != 0)
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : /* In this file, we cannot handle file names longer than PATH_MAX.
+<span class="lineNum">      38 </span>            :    On systems with no file name length limit, use a fallback.  */
+<span class="lineNum">      39 </span>            : #ifndef PATH_MAX
+<span class="lineNum">      40 </span>            : # define PATH_MAX 8192
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #ifndef DOUBLE_SLASH_IS_DISTINCT_ROOT
+<span class="lineNum">      44 </span>            : # define DOUBLE_SLASH_IS_DISTINCT_ROOT 0
+<span class="lineNum">      45 </span>            : #endif
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : #if ISSLASH ('\\')
+<span class="lineNum">      48 </span>            : # define SLASHES &quot;/\\&quot;
+<span class="lineNum">      49 </span>            : #else
+<span class="lineNum">      50 </span>            : # define SLASHES &quot;/&quot;
+<span class="lineNum">      51 </span>            : #endif
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : #if !((HAVE_CANONICALIZE_FILE_NAME &amp;&amp; FUNC_REALPATH_WORKS)      \
+<span class="lineNum">      54 </span>            :       || GNULIB_CANONICALIZE_LGPL)
+<span class="lineNum">      55 </span>            : /* Return the canonical absolute name of file NAME.  A canonical name
+<span class="lineNum">      56 </span>            :    does not contain any &quot;.&quot;, &quot;..&quot; components nor any repeated file name
+<span class="lineNum">      57 </span>            :    separators ('/') or symlinks.  All components must exist.
+<span class="lineNum">      58 </span>            :    The result is malloc'd.  */
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : char *
+<span class="lineNum">      61 </span>            : canonicalize_file_name (const char *name)
+<span class="lineNum">      62 </span>            : {
+<span class="lineNum">      63 </span>            :   return canonicalize_filename_mode (name, CAN_EXISTING);
+<span class="lineNum">      64 </span>            : }
+<span class="lineNum">      65 </span>            : #endif /* !HAVE_CANONICALIZE_FILE_NAME */
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : /* Return true if we've already seen the triple, &lt;FILENAME, dev, ino&gt;.
+<a name="68"><span class="lineNum">      68 </span>            :    If *HT is not initialized, initialize it.  */</a>
+<span class="lineNum">      69 </span>            : static bool
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 : seen_triple (Hash_table **ht, char const *filename, struct stat const *st)</span>
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   if (*ht == NULL)</span>
+<span class="lineNum">      73 </span>            :     {
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       size_t initial_capacity = 7;</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       *ht = hash_initialize (initial_capacity,</span>
+<span class="lineNum">      76 </span>            :                             NULL,
+<span class="lineNum">      77 </span>            :                             triple_hash,
+<span class="lineNum">      78 </span>            :                             triple_compare_ino_str,
+<span class="lineNum">      79 </span>            :                             triple_free);
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       if (*ht == NULL)</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :         xalloc_die ();</span>
+<span class="lineNum">      82 </span>            :     }
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :   if (seen_file (*ht, filename, st))</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   record_file (*ht, filename, st);</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">      89 </span>            : }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            : /* Return the canonical absolute name of file NAME, while treating
+<span class="lineNum">      92 </span>            :    missing elements according to CAN_MODE.  A canonical name
+<span class="lineNum">      93 </span>            :    does not contain any &quot;.&quot;, &quot;..&quot; components nor any repeated file name
+<span class="lineNum">      94 </span>            :    separators ('/') or, depending on other CAN_MODE flags, symlinks.
+<span class="lineNum">      95 </span>            :    Whether components must exist or not depends on canonicalize mode.
+<span class="lineNum">      96 </span>            :    The result is malloc'd.  */
+<a name="97"><span class="lineNum">      97 </span>            : </a>
+<span class="lineNum">      98 </span>            : char *
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 : canonicalize_filename_mode (const char *name, canonicalize_mode_t can_mode)</span>
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   char *rname, *dest, *extra_buf = NULL;</span>
+<span class="lineNum">     102 </span>            :   char const *start;
+<span class="lineNum">     103 </span>            :   char const *end;
+<span class="lineNum">     104 </span>            :   char const *rname_limit;
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   size_t extra_len = 0;</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :   Hash_table *ht = NULL;</span>
+<span class="lineNum">     107 </span>            :   int saved_errno;
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :   int can_flags = can_mode &amp; ~CAN_MODE_MASK;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   bool logical = can_flags &amp; CAN_NOLINKS;</span>
+<span class="lineNum">     110 </span>            :   size_t prefix_len;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :   can_mode &amp;= CAN_MODE_MASK;</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   if (MULTIPLE_BITS_SET (can_mode))</span>
+<span class="lineNum">     115 </span>            :     {
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :       errno = EINVAL;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :       return NULL;</span>
+<span class="lineNum">     118 </span>            :     }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   if (name == NULL)</span>
+<span class="lineNum">     121 </span>            :     {
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :       errno = EINVAL;</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :       return NULL;</span>
+<span class="lineNum">     124 </span>            :     }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :   if (name[0] == '\0')</span>
+<span class="lineNum">     127 </span>            :     {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :       errno = ENOENT;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :       return NULL;</span>
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :   /* This is always zero for Posix hosts, but can be 2 for MS-Windows
+<span class="lineNum">     133 </span>            :      and MS-DOS X:/foo/bar file names.  */
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   prefix_len = FILE_SYSTEM_PREFIX_LEN (name);</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :   if (!IS_ABSOLUTE_FILE_NAME (name))</span>
+<span class="lineNum">     137 </span>            :     {
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :       rname = xgetcwd ();</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :       if (!rname)</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :         return NULL;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       dest = strchr (rname, '\0');</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :       if (dest - rname &lt; PATH_MAX)</span>
+<span class="lineNum">     143 </span>            :         {
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :           char *p = xrealloc (rname, PATH_MAX);</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :           dest = p + (dest - rname);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :           rname = p;</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :           rname_limit = rname + PATH_MAX;</span>
+<span class="lineNum">     148 </span>            :         }
+<span class="lineNum">     149 </span>            :       else
+<span class="lineNum">     150 </span>            :         {
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :           rname_limit = dest;</span>
+<span class="lineNum">     152 </span>            :         }
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       start = name;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       prefix_len = FILE_SYSTEM_PREFIX_LEN (rname);</span>
+<span class="lineNum">     155 </span>            :     }
+<span class="lineNum">     156 </span>            :   else
+<span class="lineNum">     157 </span>            :     {
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       rname = xmalloc (PATH_MAX);</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       rname_limit = rname + PATH_MAX;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       dest = rname;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       if (prefix_len)</span>
+<span class="lineNum">     162 </span>            :         {
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :           memcpy (rname, name, prefix_len);</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :           dest += prefix_len;</span>
+<span class="lineNum">     165 </span>            :         }
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :       *dest++ = '/';</span>
+<span class="lineNum">     167 </span>            :       if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
+<span class="lineNum">     168 </span>            :         {
+<span class="lineNum">     169 </span>            :           if (ISSLASH (name[1]) &amp;&amp; !ISSLASH (name[2]) &amp;&amp; !prefix_len)
+<span class="lineNum">     170 </span>            :             *dest++ = '/';
+<span class="lineNum">     171 </span>            :           *dest = '\0';
+<span class="lineNum">     172 </span>            :         }
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       start = name + prefix_len;</span>
+<span class="lineNum">     174 </span>            :     }
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :   for ( ; *start; start = end)</span>
+<span class="lineNum">     177 </span>            :     {
+<span class="lineNum">     178 </span>            :       /* Skip sequence of multiple file name separators.  */
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :       while (ISSLASH (*start))</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :         ++start;</span>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :       /* Find end of component.  */
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :       for (end = start; *end &amp;&amp; !ISSLASH (*end); ++end)</span>
+<span class="lineNum">     184 </span>            :         /* Nothing.  */;
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :       if (end - start == 0)</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :       else if (end - start == 1 &amp;&amp; start[0] == '.')</span>
+<span class="lineNum">     189 </span>            :         /* nothing */;
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :       else if (end - start == 2 &amp;&amp; start[0] == '.' &amp;&amp; start[1] == '.')</span>
+<span class="lineNum">     191 </span>            :         {
+<span class="lineNum">     192 </span>            :           /* Back up to previous component, ignore if at root already.  */
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :           if (dest &gt; rname + prefix_len + 1)</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :             for (--dest; dest &gt; rname &amp;&amp; !ISSLASH (dest[-1]); --dest)</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :               continue;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :           if (DOUBLE_SLASH_IS_DISTINCT_ROOT &amp;&amp; dest == rname + 1</span>
+<span class="lineNum">     197 </span>            :               &amp;&amp; !prefix_len &amp;&amp; ISSLASH (*dest) &amp;&amp; !ISSLASH (dest[1]))
+<span class="lineNum">     198 </span>            :             dest++;
+<span class="lineNum">     199 </span>            :         }
+<span class="lineNum">     200 </span>            :       else
+<span class="lineNum">     201 </span>            :         {
+<span class="lineNum">     202 </span>            :           struct stat st;
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :           if (!ISSLASH (dest[-1]))</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :             *dest++ = '/';</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :           if (dest + (end - start) &gt;= rname_limit)</span>
+<span class="lineNum">     208 </span>            :             {
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :               ptrdiff_t dest_offset = dest - rname;</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :               size_t new_size = rname_limit - rname;</span>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :               if (end - start + 1 &gt; PATH_MAX)</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                 new_size += end - start + 1;</span>
+<span class="lineNum">     214 </span>            :               else
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                 new_size += PATH_MAX;</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :               rname = xrealloc (rname, new_size);</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :               rname_limit = rname + new_size;</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :               dest = rname + dest_offset;</span>
+<span class="lineNum">     220 </span>            :             }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :           dest = memcpy (dest, start, end - start);</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :           dest += end - start;</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :           *dest = '\0';</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :           if (logical &amp;&amp; (can_mode == CAN_MISSING))</span>
+<span class="lineNum">     227 </span>            :             {
+<span class="lineNum">     228 </span>            :               /* Avoid the stat in this case as it's inconsequential.
+<span class="lineNum">     229 </span>            :                  i.e. we're neither resolving symlinks or testing
+<span class="lineNum">     230 </span>            :                  component existence.  */
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :               st.st_mode = 0;</span>
+<span class="lineNum">     232 </span>            :             }
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :           else if ((logical ? stat (rname, &amp;st) : lstat (rname, &amp;st)) != 0)</span>
+<span class="lineNum">     234 </span>            :             {
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :               saved_errno = errno;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :               if (can_mode == CAN_EXISTING)</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :                 goto error;</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :               if (can_mode == CAN_ALL_BUT_LAST)</span>
+<span class="lineNum">     239 </span>            :                 {
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                   if (end[strspn (end, SLASHES)] || saved_errno != ENOENT)</span>
+<span class="lineNum">     241 </span>            :                     goto error;
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :                   continue;</span>
+<span class="lineNum">     243 </span>            :                 }
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :               st.st_mode = 0;</span>
+<span class="lineNum">     245 </span>            :             }
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :           if (S_ISLNK (st.st_mode))</span>
+<span class="lineNum">     248 </span>            :             {
+<span class="lineNum">     249 </span>            :               char *buf;
+<span class="lineNum">     250 </span>            :               size_t n, len;
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            :               /* Detect loops.  We cannot use the cycle-check module here,
+<span class="lineNum">     253 </span>            :                  since it's actually possible to encounter the same symlink
+<span class="lineNum">     254 </span>            :                  more than once in a given traversal.  However, encountering
+<span class="lineNum">     255 </span>            :                  the same symlink,NAME pair twice does indicate a loop.  */
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :               if (seen_triple (&amp;ht, name, &amp;st))</span>
+<span class="lineNum">     257 </span>            :                 {
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                   if (can_mode == CAN_MISSING)</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                     continue;</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                   saved_errno = ELOOP;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :                   goto error;</span>
+<span class="lineNum">     262 </span>            :                 }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :               buf = areadlink_with_size (rname, st.st_size);</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :               if (!buf)</span>
+<span class="lineNum">     266 </span>            :                 {
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                   if (can_mode == CAN_MISSING &amp;&amp; errno != ENOMEM)</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                     continue;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                   saved_errno = errno;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                   goto error;</span>
+<span class="lineNum">     271 </span>            :                 }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :               n = strlen (buf);</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :               len = strlen (end);</span>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :               if (!extra_len)</span>
+<span class="lineNum">     277 </span>            :                 {
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                   extra_len =</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                     ((n + len + 1) &gt; PATH_MAX) ? (n + len + 1) : PATH_MAX;</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                   extra_buf = xmalloc (extra_len);</span>
+<span class="lineNum">     281 </span>            :                 }
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :               else if ((n + len + 1) &gt; extra_len)</span>
+<span class="lineNum">     283 </span>            :                 {
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :                   extra_len = n + len + 1;</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :                   extra_buf = xrealloc (extra_buf, extra_len);</span>
+<span class="lineNum">     286 </span>            :                 }
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :               /* Careful here, end may be a pointer into extra_buf... */
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :               memmove (&amp;extra_buf[n], end, len + 1);</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :               name = end = memcpy (extra_buf, buf, n);</span>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :               if (IS_ABSOLUTE_FILE_NAME (buf))</span>
+<span class="lineNum">     293 </span>            :                 {
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                   size_t pfxlen = FILE_SYSTEM_PREFIX_LEN (buf);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :                   if (pfxlen)</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                     memcpy (rname, buf, pfxlen);</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :                   dest = rname + pfxlen;</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :                   *dest++ = '/'; /* It's an absolute symlink */</span>
+<span class="lineNum">     300 </span>            :                   if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
+<span class="lineNum">     301 </span>            :                     {
+<span class="lineNum">     302 </span>            :                       if (ISSLASH (buf[1]) &amp;&amp; !ISSLASH (buf[2]) &amp;&amp; !pfxlen)
+<span class="lineNum">     303 </span>            :                         *dest++ = '/';
+<span class="lineNum">     304 </span>            :                       *dest = '\0';
+<span class="lineNum">     305 </span>            :                     }
+<span class="lineNum">     306 </span>            :                   /* Install the new prefix to be in effect hereafter.  */
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                   prefix_len = pfxlen;</span>
+<span class="lineNum">     308 </span>            :                 }
+<span class="lineNum">     309 </span>            :               else
+<span class="lineNum">     310 </span>            :                 {
+<span class="lineNum">     311 </span>            :                   /* Back up to previous component, ignore if at root
+<span class="lineNum">     312 </span>            :                      already: */
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                   if (dest &gt; rname + prefix_len + 1)</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                     for (--dest; dest &gt; rname &amp;&amp; !ISSLASH (dest[-1]); --dest)</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                       continue;</span>
+<span class="lineNum">     316 </span>            :                   if (DOUBLE_SLASH_IS_DISTINCT_ROOT &amp;&amp; dest == rname + 1
+<span class="lineNum">     317 </span>            :                       &amp;&amp; ISSLASH (*dest) &amp;&amp; !ISSLASH (dest[1]) &amp;&amp; !prefix_len)
+<span class="lineNum">     318 </span>            :                     dest++;
+<span class="lineNum">     319 </span>            :                 }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :               free (buf);</span>
+<span class="lineNum">     322 </span>            :             }
+<span class="lineNum">     323 </span>            :           else
+<span class="lineNum">     324 </span>            :             {
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :               if (!S_ISDIR (st.st_mode) &amp;&amp; *end &amp;&amp; (can_mode != CAN_MISSING))</span>
+<span class="lineNum">     326 </span>            :                 {
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                   saved_errno = ENOTDIR;</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                   goto error;</span>
+<span class="lineNum">     329 </span>            :                 }
+<span class="lineNum">     330 </span>            :             }
+<span class="lineNum">     331 </span>            :         }
+<span class="lineNum">     332 </span>            :     }
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :   if (dest &gt; rname + prefix_len + 1 &amp;&amp; ISSLASH (dest[-1]))</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :     --dest;</span>
+<span class="lineNum">     335 </span>            :   if (DOUBLE_SLASH_IS_DISTINCT_ROOT &amp;&amp; dest == rname + 1 &amp;&amp; !prefix_len
+<span class="lineNum">     336 </span>            :       &amp;&amp; ISSLASH (*dest) &amp;&amp; !ISSLASH (dest[1]))
+<span class="lineNum">     337 </span>            :     dest++;
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :   *dest = '\0';</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :   if (rname_limit != dest + 1)</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :     rname = xrealloc (rname, dest - rname + 1);</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :   free (extra_buf);</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :   if (ht)</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :     hash_free (ht);</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :   return rname;</span>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 : error:</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :   free (extra_buf);</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :   free (rname);</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :   if (ht)</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :     hash_free (ht);</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :   errno = saved_errno;</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     354 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

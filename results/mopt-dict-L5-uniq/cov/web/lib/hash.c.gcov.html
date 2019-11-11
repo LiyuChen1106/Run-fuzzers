@@ -1,0 +1,1301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/hash.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - hash.c<span style="font-size: 80%;"> (source / <a href="hash.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">371</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* hash - hashing table processing.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1998-2004, 2006-2007, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    Written by Jim Meyering, 1992.
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       8 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       9 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">      10 </span>            :    (at your option) any later version.
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      13 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      14 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      15 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      18 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* A generic hash table package.  */
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : /* Define USE_OBSTACK to 1 if you want the allocator to use obstacks instead
+<span class="lineNum">      23 </span>            :    of malloc.  If you change USE_OBSTACK, you have to recompile!  */
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;hash.h&quot;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &quot;bitrotate.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;xalloc-oversized.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      34 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #if USE_OBSTACK
+<span class="lineNum">      37 </span>            : # include &quot;obstack.h&quot;
+<span class="lineNum">      38 </span>            : # ifndef obstack_chunk_alloc
+<span class="lineNum">      39 </span>            : #  define obstack_chunk_alloc malloc
+<span class="lineNum">      40 </span>            : # endif
+<span class="lineNum">      41 </span>            : # ifndef obstack_chunk_free
+<span class="lineNum">      42 </span>            : #  define obstack_chunk_free free
+<span class="lineNum">      43 </span>            : # endif
+<span class="lineNum">      44 </span>            : #endif
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : struct hash_entry
+<span class="lineNum">      47 </span>            :   {
+<span class="lineNum">      48 </span>            :     void *data;
+<span class="lineNum">      49 </span>            :     struct hash_entry *next;
+<span class="lineNum">      50 </span>            :   };
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : struct hash_table
+<span class="lineNum">      53 </span>            :   {
+<span class="lineNum">      54 </span>            :     /* The array of buckets starts at BUCKET and extends to BUCKET_LIMIT-1,
+<span class="lineNum">      55 </span>            :        for a possibility of N_BUCKETS.  Among those, N_BUCKETS_USED buckets
+<span class="lineNum">      56 </span>            :        are not empty, there are N_ENTRIES active entries in the table.  */
+<span class="lineNum">      57 </span>            :     struct hash_entry *bucket;
+<span class="lineNum">      58 </span>            :     struct hash_entry const *bucket_limit;
+<span class="lineNum">      59 </span>            :     size_t n_buckets;
+<span class="lineNum">      60 </span>            :     size_t n_buckets_used;
+<span class="lineNum">      61 </span>            :     size_t n_entries;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :     /* Tuning arguments, kept in a physically separate structure.  */
+<span class="lineNum">      64 </span>            :     const Hash_tuning *tuning;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :     /* Three functions are given to 'hash_initialize', see the documentation
+<span class="lineNum">      67 </span>            :        block for this function.  In a word, HASHER randomizes a user entry
+<span class="lineNum">      68 </span>            :        into a number up from 0 up to some maximum minus 1; COMPARATOR returns
+<span class="lineNum">      69 </span>            :        true if two user entries compare equally; and DATA_FREER is the cleanup
+<span class="lineNum">      70 </span>            :        function for a user entry.  */
+<span class="lineNum">      71 </span>            :     Hash_hasher hasher;
+<span class="lineNum">      72 </span>            :     Hash_comparator comparator;
+<span class="lineNum">      73 </span>            :     Hash_data_freer data_freer;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     /* A linked list of freed struct hash_entry structs.  */
+<span class="lineNum">      76 </span>            :     struct hash_entry *free_entry_list;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : #if USE_OBSTACK
+<span class="lineNum">      79 </span>            :     /* Whenever obstacks are used, it is possible to allocate all overflowed
+<span class="lineNum">      80 </span>            :        entries into a single stack, so they all can be freed in a single
+<span class="lineNum">      81 </span>            :        operation.  It is not clear if the speedup is worth the trouble.  */
+<span class="lineNum">      82 </span>            :     struct obstack entry_stack;
+<span class="lineNum">      83 </span>            : #endif
+<span class="lineNum">      84 </span>            :   };
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : /* A hash table contains many internal entries, each holding a pointer to
+<span class="lineNum">      87 </span>            :    some user-provided data (also called a user entry).  An entry indistinctly
+<span class="lineNum">      88 </span>            :    refers to both the internal entry and its associated user entry.  A user
+<span class="lineNum">      89 </span>            :    entry contents may be hashed by a randomization function (the hashing
+<span class="lineNum">      90 </span>            :    function, or just &quot;hasher&quot; for short) into a number (or &quot;slot&quot;) between 0
+<span class="lineNum">      91 </span>            :    and the current table size.  At each slot position in the hash table,
+<span class="lineNum">      92 </span>            :    starts a linked chain of entries for which the user data all hash to this
+<span class="lineNum">      93 </span>            :    slot.  A bucket is the collection of all entries hashing to the same slot.
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :    A good &quot;hasher&quot; function will distribute entries rather evenly in buckets.
+<span class="lineNum">      96 </span>            :    In the ideal case, the length of each bucket is roughly the number of
+<span class="lineNum">      97 </span>            :    entries divided by the table size.  Finding the slot for a data is usually
+<span class="lineNum">      98 </span>            :    done in constant time by the &quot;hasher&quot;, and the later finding of a precise
+<span class="lineNum">      99 </span>            :    entry is linear in time with the size of the bucket.  Consequently, a
+<span class="lineNum">     100 </span>            :    larger hash table size (that is, a larger number of buckets) is prone to
+<span class="lineNum">     101 </span>            :    yielding shorter chains, *given* the &quot;hasher&quot; function behaves properly.
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :    Long buckets slow down the lookup algorithm.  One might use big hash table
+<span class="lineNum">     104 </span>            :    sizes in hope to reduce the average length of buckets, but this might
+<span class="lineNum">     105 </span>            :    become inordinate, as unused slots in the hash table take some space.  The
+<span class="lineNum">     106 </span>            :    best bet is to make sure you are using a good &quot;hasher&quot; function (beware
+<span class="lineNum">     107 </span>            :    that those are not that easy to write! :-), and to use a table size
+<span class="lineNum">     108 </span>            :    larger than the actual number of entries.  */
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : /* If an insertion makes the ratio of nonempty buckets to table size larger
+<span class="lineNum">     111 </span>            :    than the growth threshold (a number between 0.0 and 1.0), then increase
+<span class="lineNum">     112 </span>            :    the table size by multiplying by the growth factor (a number greater than
+<span class="lineNum">     113 </span>            :    1.0).  The growth threshold defaults to 0.8, and the growth factor
+<span class="lineNum">     114 </span>            :    defaults to 1.414, meaning that the table will have doubled its size
+<span class="lineNum">     115 </span>            :    every second time 80% of the buckets get used.  */
+<span class="lineNum">     116 </span>            : #define DEFAULT_GROWTH_THRESHOLD 0.8f
+<span class="lineNum">     117 </span>            : #define DEFAULT_GROWTH_FACTOR 1.414f
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            : /* If a deletion empties a bucket and causes the ratio of used buckets to
+<span class="lineNum">     120 </span>            :    table size to become smaller than the shrink threshold (a number between
+<span class="lineNum">     121 </span>            :    0.0 and 1.0), then shrink the table by multiplying by the shrink factor (a
+<span class="lineNum">     122 </span>            :    number greater than the shrink threshold but smaller than 1.0).  The shrink
+<span class="lineNum">     123 </span>            :    threshold and factor default to 0.0 and 1.0, meaning that the table never
+<span class="lineNum">     124 </span>            :    shrinks.  */
+<span class="lineNum">     125 </span>            : #define DEFAULT_SHRINK_THRESHOLD 0.0f
+<span class="lineNum">     126 </span>            : #define DEFAULT_SHRINK_FACTOR 1.0f
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            : /* Use this to initialize or reset a TUNING structure to
+<span class="lineNum">     129 </span>            :    some sensible values. */
+<span class="lineNum">     130 </span>            : static const Hash_tuning default_tuning =
+<span class="lineNum">     131 </span>            :   {
+<span class="lineNum">     132 </span>            :     DEFAULT_SHRINK_THRESHOLD,
+<span class="lineNum">     133 </span>            :     DEFAULT_SHRINK_FACTOR,
+<span class="lineNum">     134 </span>            :     DEFAULT_GROWTH_THRESHOLD,
+<span class="lineNum">     135 </span>            :     DEFAULT_GROWTH_FACTOR,
+<span class="lineNum">     136 </span>            :     false
+<span class="lineNum">     137 </span>            :   };
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            : /* Information and lookup.  */
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : /* The following few functions provide information about the overall hash
+<span class="lineNum">     142 </span>            :    table organization: the number of entries, number of buckets and maximum
+<span class="lineNum">     143 </span>            :    length of buckets.  */
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : /* Return the number of buckets in the hash table.  The table size, the total
+<span class="lineNum">     146 </span>            :    number of buckets (used plus unused), or the maximum number of slots, are
+<span class="lineNum">     147 </span>            :    the same quantity.  */
+<a name="148"><span class="lineNum">     148 </span>            : </a>
+<span class="lineNum">     149 </span>            : size_t
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 : hash_get_n_buckets (const Hash_table *table)</span>
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :   return table-&gt;n_buckets;</span>
+<span class="lineNum">     153 </span>            : }
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            : /* Return the number of slots in use (non-empty buckets).  */
+<a name="156"><span class="lineNum">     156 </span>            : </a>
+<span class="lineNum">     157 </span>            : size_t
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 : hash_get_n_buckets_used (const Hash_table *table)</span>
+<span class="lineNum">     159 </span>            : {
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :   return table-&gt;n_buckets_used;</span>
+<span class="lineNum">     161 </span>            : }
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            : /* Return the number of active entries.  */
+<a name="164"><span class="lineNum">     164 </span>            : </a>
+<span class="lineNum">     165 </span>            : size_t
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 : hash_get_n_entries (const Hash_table *table)</span>
+<span class="lineNum">     167 </span>            : {
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   return table-&gt;n_entries;</span>
+<span class="lineNum">     169 </span>            : }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            : /* Return the length of the longest chain (bucket).  */
+<a name="172"><span class="lineNum">     172 </span>            : </a>
+<span class="lineNum">     173 </span>            : size_t
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 : hash_get_max_bucket_length (const Hash_table *table)</span>
+<span class="lineNum">     175 </span>            : {
+<span class="lineNum">     176 </span>            :   struct hash_entry const *bucket;
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :   size_t max_bucket_length = 0;</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     180 </span>            :     {
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :       if (bucket-&gt;data)</span>
+<span class="lineNum">     182 </span>            :         {
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :           struct hash_entry const *cursor = bucket;</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :           size_t bucket_length = 1;</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :           while (cursor = cursor-&gt;next, cursor)</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :             bucket_length++;</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :           if (bucket_length &gt; max_bucket_length)</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :             max_bucket_length = bucket_length;</span>
+<span class="lineNum">     191 </span>            :         }
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :   return max_bucket_length;</span>
+<span class="lineNum">     195 </span>            : }
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : /* Do a mild validation of a hash table, by traversing it and checking two
+<span class="lineNum">     198 </span>            :    statistics.  */
+<a name="199"><span class="lineNum">     199 </span>            : </a>
+<span class="lineNum">     200 </span>            : bool
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 : hash_table_ok (const Hash_table *table)</span>
+<span class="lineNum">     202 </span>            : {
+<span class="lineNum">     203 </span>            :   struct hash_entry const *bucket;
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :   size_t n_buckets_used = 0;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   size_t n_entries = 0;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     208 </span>            :     {
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :       if (bucket-&gt;data)</span>
+<span class="lineNum">     210 </span>            :         {
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :           struct hash_entry const *cursor = bucket;</span>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :           /* Count bucket head.  */
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :           n_buckets_used++;</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :           n_entries++;</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :           /* Count bucket overflow.  */
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :           while (cursor = cursor-&gt;next, cursor)</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :             n_entries++;</span>
+<span class="lineNum">     220 </span>            :         }
+<span class="lineNum">     221 </span>            :     }
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :   if (n_buckets_used == table-&gt;n_buckets_used &amp;&amp; n_entries == table-&gt;n_entries)</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">     227 </span>            : }
+<a name="228"><span class="lineNum">     228 </span>            : </a>
+<span class="lineNum">     229 </span>            : void
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 : hash_print_statistics (const Hash_table *table, FILE *stream)</span>
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :   size_t n_entries = hash_get_n_entries (table);</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :   size_t n_buckets = hash_get_n_buckets (table);</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :   size_t n_buckets_used = hash_get_n_buckets_used (table);</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :   size_t max_bucket_length = hash_get_max_bucket_length (table);</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :   fprintf (stream, &quot;# entries:         %lu\n&quot;, (unsigned long int) n_entries);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :   fprintf (stream, &quot;# buckets:         %lu\n&quot;, (unsigned long int) n_buckets);</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :   fprintf (stream, &quot;# buckets used:    %lu (%.2f%%)\n&quot;,</span>
+<span class="lineNum">     240 </span>            :            (unsigned long int) n_buckets_used,
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :            (100.0 * n_buckets_used) / n_buckets);</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :   fprintf (stream, &quot;max bucket length: %lu\n&quot;,</span>
+<span class="lineNum">     243 </span>            :            (unsigned long int) max_bucket_length);
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span>            : /* Hash KEY and return a pointer to the selected bucket.
+<a name="247"><span class="lineNum">     247 </span>            :    If TABLE-&gt;hasher misbehaves, abort.  */</a>
+<span class="lineNum">     248 </span>            : static struct hash_entry *
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 : safe_hasher (const Hash_table *table, const void *key)</span>
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :   size_t n = table-&gt;hasher (key, table-&gt;n_buckets);</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :   if (! (n &lt; table-&gt;n_buckets))</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :   return table-&gt;bucket + n;</span>
+<span class="lineNum">     255 </span>            : }
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : /* If ENTRY matches an entry already in the hash table, return the
+<span class="lineNum">     258 </span>            :    entry from the table.  Otherwise, return NULL.  */
+<a name="259"><span class="lineNum">     259 </span>            : </a>
+<span class="lineNum">     260 </span>            : void *
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 : hash_lookup (const Hash_table *table, const void *entry)</span>
+<span class="lineNum">     262 </span>            : {
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :   struct hash_entry const *bucket = safe_hasher (table, entry);</span>
+<span class="lineNum">     264 </span>            :   struct hash_entry const *cursor;
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :   if (bucket-&gt;data == NULL)</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :   for (cursor = bucket; cursor; cursor = cursor-&gt;next)</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :     if (entry == cursor-&gt;data || table-&gt;comparator (entry, cursor-&gt;data))</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :       return cursor-&gt;data;</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     274 </span>            : }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            : /* Walking.  */
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            : /* The functions in this page traverse the hash table and process the
+<span class="lineNum">     279 </span>            :    contained entries.  For the traversal to work properly, the hash table
+<span class="lineNum">     280 </span>            :    should not be resized nor modified while any particular entry is being
+<span class="lineNum">     281 </span>            :    processed.  In particular, entries should not be added, and an entry
+<span class="lineNum">     282 </span>            :    may be removed only if there is no shrink threshold and the entry being
+<span class="lineNum">     283 </span>            :    removed has already been passed to hash_get_next.  */
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : /* Return the first data in the table, or NULL if the table is empty.  */
+<a name="286"><span class="lineNum">     286 </span>            : </a>
+<span class="lineNum">     287 </span>            : void *
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 : hash_get_first (const Hash_table *table)</span>
+<span class="lineNum">     289 </span>            : {
+<span class="lineNum">     290 </span>            :   struct hash_entry const *bucket;
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   if (table-&gt;n_entries == 0)</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; ; bucket++)</span>
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :     if (! (bucket &lt; table-&gt;bucket_limit))</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :       abort ();</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :     else if (bucket-&gt;data)</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :       return bucket-&gt;data;</span>
+<span class="lineNum">     300 </span>            : }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            : /* Return the user data for the entry following ENTRY, where ENTRY has been
+<span class="lineNum">     303 </span>            :    returned by a previous call to either 'hash_get_first' or 'hash_get_next'.
+<span class="lineNum">     304 </span>            :    Return NULL if there are no more entries.  */
+<a name="305"><span class="lineNum">     305 </span>            : </a>
+<span class="lineNum">     306 </span>            : void *
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 : hash_get_next (const Hash_table *table, const void *entry)</span>
+<span class="lineNum">     308 </span>            : {
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :   struct hash_entry const *bucket = safe_hasher (table, entry);</span>
+<span class="lineNum">     310 </span>            :   struct hash_entry const *cursor;
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :   /* Find next entry in the same bucket.  */
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :   cursor = bucket;</span>
+<span class="lineNum">     314 </span>            :   do
+<span class="lineNum">     315 </span>            :     {
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :       if (cursor-&gt;data == entry &amp;&amp; cursor-&gt;next)</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :         return cursor-&gt;next-&gt;data;</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :       cursor = cursor-&gt;next;</span>
+<span class="lineNum">     319 </span>            :     }
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :   while (cursor != NULL);</span>
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :   /* Find first entry in any subsequent bucket.  */
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :   while (++bucket &lt; table-&gt;bucket_limit)</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     if (bucket-&gt;data)</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :       return bucket-&gt;data;</span>
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            :   /* None found.  */
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     329 </span>            : }
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            : /* Fill BUFFER with pointers to active user entries in the hash table, then
+<span class="lineNum">     332 </span>            :    return the number of pointers copied.  Do not copy more than BUFFER_SIZE
+<span class="lineNum">     333 </span>            :    pointers.  */
+<a name="334"><span class="lineNum">     334 </span>            : </a>
+<span class="lineNum">     335 </span>            : size_t
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 : hash_get_entries (const Hash_table *table, void **buffer,</span>
+<span class="lineNum">     337 </span>            :                   size_t buffer_size)
+<span class="lineNum">     338 </span>            : {
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :   size_t counter = 0;</span>
+<span class="lineNum">     340 </span>            :   struct hash_entry const *bucket;
+<span class="lineNum">     341 </span>            :   struct hash_entry const *cursor;
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     344 </span>            :     {
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :       if (bucket-&gt;data)</span>
+<span class="lineNum">     346 </span>            :         {
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :           for (cursor = bucket; cursor; cursor = cursor-&gt;next)</span>
+<span class="lineNum">     348 </span>            :             {
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :               if (counter &gt;= buffer_size)</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                 return counter;</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :               buffer[counter++] = cursor-&gt;data;</span>
+<span class="lineNum">     352 </span>            :             }
+<span class="lineNum">     353 </span>            :         }
+<span class="lineNum">     354 </span>            :     }
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :   return counter;</span>
+<span class="lineNum">     357 </span>            : }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            : /* Call a PROCESSOR function for each entry of a hash table, and return the
+<span class="lineNum">     360 </span>            :    number of entries for which the processor function returned success.  A
+<span class="lineNum">     361 </span>            :    pointer to some PROCESSOR_DATA which will be made available to each call to
+<span class="lineNum">     362 </span>            :    the processor function.  The PROCESSOR accepts two arguments: the first is
+<span class="lineNum">     363 </span>            :    the user entry being walked into, the second is the value of PROCESSOR_DATA
+<span class="lineNum">     364 </span>            :    as received.  The walking continue for as long as the PROCESSOR function
+<span class="lineNum">     365 </span>            :    returns nonzero.  When it returns zero, the walking is interrupted.  */
+<a name="366"><span class="lineNum">     366 </span>            : </a>
+<span class="lineNum">     367 </span>            : size_t
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 : hash_do_for_each (const Hash_table *table, Hash_processor processor,</span>
+<span class="lineNum">     369 </span>            :                   void *processor_data)
+<span class="lineNum">     370 </span>            : {
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :   size_t counter = 0;</span>
+<span class="lineNum">     372 </span>            :   struct hash_entry const *bucket;
+<span class="lineNum">     373 </span>            :   struct hash_entry const *cursor;
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     376 </span>            :     {
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :       if (bucket-&gt;data)</span>
+<span class="lineNum">     378 </span>            :         {
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :           for (cursor = bucket; cursor; cursor = cursor-&gt;next)</span>
+<span class="lineNum">     380 </span>            :             {
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :               if (! processor (cursor-&gt;data, processor_data))</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :                 return counter;</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :               counter++;</span>
+<span class="lineNum">     384 </span>            :             }
+<span class="lineNum">     385 </span>            :         }
+<span class="lineNum">     386 </span>            :     }
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :   return counter;</span>
+<span class="lineNum">     389 </span>            : }
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : /* Allocation and clean-up.  */
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : /* Return a hash index for a NUL-terminated STRING between 0 and N_BUCKETS-1.
+<span class="lineNum">     394 </span>            :    This is a convenience routine for constructing other hashing functions.  */
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            : #if USE_DIFF_HASH
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            : /* About hashings, Paul Eggert writes to me (FP), on 1994-01-01: &quot;Please see
+<span class="lineNum">     399 </span>            :    B. J. McKenzie, R. Harries &amp; T. Bell, Selecting a hashing algorithm,
+<span class="lineNum">     400 </span>            :    Software--practice &amp; experience 20, 2 (Feb 1990), 209-224.  Good hash
+<span class="lineNum">     401 </span>            :    algorithms tend to be domain-specific, so what's good for [diffutils'] io.c
+<span class="lineNum">     402 </span>            :    may not be good for your application.&quot;  */
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            : size_t
+<span class="lineNum">     405 </span>            : hash_string (const char *string, size_t n_buckets)
+<span class="lineNum">     406 </span>            : {
+<span class="lineNum">     407 </span>            : # define HASH_ONE_CHAR(Value, Byte) \
+<span class="lineNum">     408 </span>            :   ((Byte) + rotl_sz (Value, 7))
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            :   size_t value = 0;
+<span class="lineNum">     411 </span>            :   unsigned char ch;
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            :   for (; (ch = *string); string++)
+<span class="lineNum">     414 </span>            :     value = HASH_ONE_CHAR (value, ch);
+<span class="lineNum">     415 </span>            :   return value % n_buckets;
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            : # undef HASH_ONE_CHAR
+<span class="lineNum">     418 </span>            : }
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            : #else /* not USE_DIFF_HASH */
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : /* This one comes from 'recode', and performs a bit better than the above as
+<span class="lineNum">     423 </span>            :    per a few experiments.  It is inspired from a hashing routine found in the
+<span class="lineNum">     424 </span>            :    very old Cyber 'snoop', itself written in typical Greg Mansfield style.
+<span class="lineNum">     425 </span>            :    (By the way, what happened to this excellent man?  Is he still alive?)  */
+<a name="426"><span class="lineNum">     426 </span>            : </a>
+<span class="lineNum">     427 </span>            : size_t
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 : hash_string (const char *string, size_t n_buckets)</span>
+<span class="lineNum">     429 </span>            : {
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :   size_t value = 0;</span>
+<span class="lineNum">     431 </span>            :   unsigned char ch;
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :   for (; (ch = *string); string++)</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :     value = (value * 31 + ch) % n_buckets;</span>
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :   return value;</span>
+<span class="lineNum">     436 </span>            : }
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            : #endif /* not USE_DIFF_HASH */
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            : /* Return true if CANDIDATE is a prime number.  CANDIDATE should be an odd
+<span class="lineNum">     441 </span>            :    number at least equal to 11.  */
+<a name="442"><span class="lineNum">     442 </span>            : </a>
+<span class="lineNum">     443 </span>            : static bool _GL_ATTRIBUTE_CONST
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 : is_prime (size_t candidate)</span>
+<span class="lineNum">     445 </span>            : {
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :   size_t divisor = 3;</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :   size_t square = divisor * divisor;</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :   while (square &lt; candidate &amp;&amp; (candidate % divisor))</span>
+<span class="lineNum">     450 </span>            :     {
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :       divisor++;</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :       square += 4 * divisor;</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :       divisor++;</span>
+<span class="lineNum">     454 </span>            :     }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :   return (candidate % divisor ? true : false);</span>
+<span class="lineNum">     457 </span>            : }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            : /* Round a given CANDIDATE number up to the nearest prime, and return that
+<span class="lineNum">     460 </span>            :    prime.  Primes lower than 10 are merely skipped.  */
+<a name="461"><span class="lineNum">     461 </span>            : </a>
+<span class="lineNum">     462 </span>            : static size_t _GL_ATTRIBUTE_CONST
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 : next_prime (size_t candidate)</span>
+<span class="lineNum">     464 </span>            : {
+<span class="lineNum">     465 </span>            :   /* Skip small primes.  */
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :   if (candidate &lt; 10)</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :     candidate = 10;</span>
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            :   /* Make it definitely odd.  */
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :   candidate |= 1;</span>
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :   while (SIZE_MAX != candidate &amp;&amp; !is_prime (candidate))</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :     candidate += 2;</span>
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :   return candidate;</span>
+<span class="lineNum">     476 </span>            : }
+<a name="477"><span class="lineNum">     477 </span>            : </a>
+<span class="lineNum">     478 </span>            : void
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 : hash_reset_tuning (Hash_tuning *tuning)</span>
+<span class="lineNum">     480 </span>            : {
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :   *tuning = default_tuning;</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     483 </span>            : 
+<a name="484"><span class="lineNum">     484 </span>            : /* If the user passes a NULL hasher, we hash the raw pointer.  */</a>
+<span class="lineNum">     485 </span>            : static size_t
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 : raw_hasher (const void *data, size_t n)</span>
+<span class="lineNum">     487 </span>            : {
+<span class="lineNum">     488 </span>            :   /* When hashing unique pointers, it is often the case that they were
+<span class="lineNum">     489 </span>            :      generated by malloc and thus have the property that the low-order
+<span class="lineNum">     490 </span>            :      bits are 0.  As this tends to give poorer performance with small
+<span class="lineNum">     491 </span>            :      tables, we rotate the pointer value before performing division,
+<span class="lineNum">     492 </span>            :      in an attempt to improve hash quality.  */
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :   size_t val = rotr_sz ((size_t) data, 3);</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :   return val % n;</span>
+<span class="lineNum">     495 </span>            : }
+<span class="lineNum">     496 </span>            : 
+<a name="497"><span class="lineNum">     497 </span>            : /* If the user passes a NULL comparator, we use pointer comparison.  */</a>
+<span class="lineNum">     498 </span>            : static bool
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 : raw_comparator (const void *a, const void *b)</span>
+<span class="lineNum">     500 </span>            : {
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :   return a == b;</span>
+<span class="lineNum">     502 </span>            : }
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            : /* For the given hash TABLE, check the user supplied tuning structure for
+<span class="lineNum">     506 </span>            :    reasonable values, and return true if there is no gross error with it.
+<span class="lineNum">     507 </span>            :    Otherwise, definitively reset the TUNING field to some acceptable default
+<span class="lineNum">     508 </span>            :    in the hash table (that is, the user loses the right of further modifying
+<span class="lineNum">     509 </span>            :    tuning arguments), and return false.  */
+<a name="510"><span class="lineNum">     510 </span>            : </a>
+<span class="lineNum">     511 </span>            : static bool
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 : check_tuning (Hash_table *table)</span>
+<span class="lineNum">     513 </span>            : {
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :   const Hash_tuning *tuning = table-&gt;tuning;</span>
+<span class="lineNum">     515 </span>            :   float epsilon;
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :   if (tuning == &amp;default_tuning)</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            :   /* Be a bit stricter than mathematics would require, so that
+<span class="lineNum">     520 </span>            :      rounding errors in size calculations do not cause allocations to
+<span class="lineNum">     521 </span>            :      fail to grow or shrink as they should.  The smallest allocation
+<span class="lineNum">     522 </span>            :      is 11 (due to next_prime's algorithm), so an epsilon of 0.1
+<span class="lineNum">     523 </span>            :      should be good enough.  */
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :   epsilon = 0.1f;</span>
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :   if (epsilon &lt; tuning-&gt;growth_threshold</span>
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :       &amp;&amp; tuning-&gt;growth_threshold &lt; 1 - epsilon</span>
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :       &amp;&amp; 1 + epsilon &lt; tuning-&gt;growth_factor</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :       &amp;&amp; 0 &lt;= tuning-&gt;shrink_threshold</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :       &amp;&amp; tuning-&gt;shrink_threshold + epsilon &lt; tuning-&gt;shrink_factor</span>
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :       &amp;&amp; tuning-&gt;shrink_factor &lt;= 1</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :       &amp;&amp; tuning-&gt;shrink_threshold + epsilon &lt; tuning-&gt;growth_threshold)</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :   table-&gt;tuning = &amp;default_tuning;</span>
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">     537 </span>            : }
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span>            : /* Compute the size of the bucket array for the given CANDIDATE and
+<span class="lineNum">     540 </span>            :    TUNING, or return 0 if there is no possible way to allocate that
+<span class="lineNum">     541 </span>            :    many entries.  */
+<a name="542"><span class="lineNum">     542 </span>            : </a>
+<span class="lineNum">     543 </span>            : static size_t _GL_ATTRIBUTE_PURE
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 : compute_bucket_size (size_t candidate, const Hash_tuning *tuning)</span>
+<span class="lineNum">     545 </span>            : {
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :   if (!tuning-&gt;is_n_buckets)</span>
+<span class="lineNum">     547 </span>            :     {
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :       float new_candidate = candidate / tuning-&gt;growth_threshold;</span>
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :       if (SIZE_MAX &lt;= new_candidate)</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :       candidate = new_candidate;</span>
+<span class="lineNum">     552 </span>            :     }
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :   candidate = next_prime (candidate);</span>
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :   if (xalloc_oversized (candidate, sizeof (struct hash_entry *)))</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :   return candidate;</span>
+<span class="lineNum">     557 </span>            : }
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span>            : /* Allocate and return a new hash table, or NULL upon failure.  The initial
+<span class="lineNum">     560 </span>            :    number of buckets is automatically selected so as to _guarantee_ that you
+<span class="lineNum">     561 </span>            :    may insert at least CANDIDATE different user entries before any growth of
+<span class="lineNum">     562 </span>            :    the hash table size occurs.  So, if have a reasonably tight a-priori upper
+<span class="lineNum">     563 </span>            :    bound on the number of entries you intend to insert in the hash table, you
+<span class="lineNum">     564 </span>            :    may save some table memory and insertion time, by specifying it here.  If
+<span class="lineNum">     565 </span>            :    the IS_N_BUCKETS field of the TUNING structure is true, the CANDIDATE
+<span class="lineNum">     566 </span>            :    argument has its meaning changed to the wanted number of buckets.
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span>            :    TUNING points to a structure of user-supplied values, in case some fine
+<span class="lineNum">     569 </span>            :    tuning is wanted over the default behavior of the hasher.  If TUNING is
+<span class="lineNum">     570 </span>            :    NULL, the default tuning parameters are used instead.  If TUNING is
+<span class="lineNum">     571 </span>            :    provided but the values requested are out of bounds or might cause
+<span class="lineNum">     572 </span>            :    rounding errors, return NULL.
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            :    The user-supplied HASHER function, when not NULL, accepts two
+<span class="lineNum">     575 </span>            :    arguments ENTRY and TABLE_SIZE.  It computes, by hashing ENTRY contents, a
+<span class="lineNum">     576 </span>            :    slot number for that entry which should be in the range 0..TABLE_SIZE-1.
+<span class="lineNum">     577 </span>            :    This slot number is then returned.
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :    The user-supplied COMPARATOR function, when not NULL, accepts two
+<span class="lineNum">     580 </span>            :    arguments pointing to user data, it then returns true for a pair of entries
+<span class="lineNum">     581 </span>            :    that compare equal, or false otherwise.  This function is internally called
+<span class="lineNum">     582 </span>            :    on entries which are already known to hash to the same bucket index,
+<span class="lineNum">     583 </span>            :    but which are distinct pointers.
+<span class="lineNum">     584 </span>            : 
+<span class="lineNum">     585 </span>            :    The user-supplied DATA_FREER function, when not NULL, may be later called
+<span class="lineNum">     586 </span>            :    with the user data as an argument, just before the entry containing the
+<span class="lineNum">     587 </span>            :    data gets freed.  This happens from within 'hash_free' or 'hash_clear'.
+<span class="lineNum">     588 </span>            :    You should specify this function only if you want these functions to free
+<span class="lineNum">     589 </span>            :    all of your 'data' data.  This is typically the case when your data is
+<span class="lineNum">     590 </span>            :    simply an auxiliary struct that you have malloc'd to aggregate several
+<span class="lineNum">     591 </span>            :    values.  */
+<a name="592"><span class="lineNum">     592 </span>            : </a>
+<span class="lineNum">     593 </span>            : Hash_table *
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 : hash_initialize (size_t candidate, const Hash_tuning *tuning,</span>
+<span class="lineNum">     595 </span>            :                  Hash_hasher hasher, Hash_comparator comparator,
+<span class="lineNum">     596 </span>            :                  Hash_data_freer data_freer)
+<span class="lineNum">     597 </span>            : {
+<span class="lineNum">     598 </span>            :   Hash_table *table;
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :   if (hasher == NULL)</span>
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :     hasher = raw_hasher;</span>
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :   if (comparator == NULL)</span>
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :     comparator = raw_comparator;</span>
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span><span class="lineNoCov">          0 :   table = malloc (sizeof *table);</span>
+<span class="lineNum">     606 </span><span class="lineNoCov">          0 :   if (table == NULL)</span>
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     608 </span>            : 
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :   if (!tuning)</span>
+<span class="lineNum">     610 </span><span class="lineNoCov">          0 :     tuning = &amp;default_tuning;</span>
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :   table-&gt;tuning = tuning;</span>
+<span class="lineNum">     612 </span><span class="lineNoCov">          0 :   if (!check_tuning (table))</span>
+<span class="lineNum">     613 </span>            :     {
+<span class="lineNum">     614 </span>            :       /* Fail if the tuning options are invalid.  This is the only occasion
+<span class="lineNum">     615 </span>            :          when the user gets some feedback about it.  Once the table is created,
+<span class="lineNum">     616 </span>            :          if the user provides invalid tuning options, we silently revert to
+<span class="lineNum">     617 </span>            :          using the defaults, and ignore further request to change the tuning
+<span class="lineNum">     618 </span>            :          options.  */
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :       goto fail;</span>
+<span class="lineNum">     620 </span>            :     }
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :   table-&gt;n_buckets = compute_bucket_size (candidate, tuning);</span>
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :   if (!table-&gt;n_buckets)</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :     goto fail;</span>
+<span class="lineNum">     625 </span>            : 
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :   table-&gt;bucket = calloc (table-&gt;n_buckets, sizeof *table-&gt;bucket);</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :   if (table-&gt;bucket == NULL)</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :     goto fail;</span>
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :   table-&gt;bucket_limit = table-&gt;bucket + table-&gt;n_buckets;</span>
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :   table-&gt;n_buckets_used = 0;</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :   table-&gt;n_entries = 0;</span>
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :   table-&gt;hasher = hasher;</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :   table-&gt;comparator = comparator;</span>
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :   table-&gt;data_freer = data_freer;</span>
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :   table-&gt;free_entry_list = NULL;</span>
+<span class="lineNum">     638 </span>            : #if USE_OBSTACK
+<span class="lineNum">     639 </span>            :   obstack_init (&amp;table-&gt;entry_stack);
+<span class="lineNum">     640 </span>            : #endif
+<span class="lineNum">     641 </span><span class="lineNoCov">          0 :   return table;</span>
+<span class="lineNum">     642 </span>            : 
+<span class="lineNum">     643 </span><span class="lineNoCov">          0 :  fail:</span>
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :   free (table);</span>
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     646 </span>            : }
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : /* Make all buckets empty, placing any chained entries on the free list.
+<span class="lineNum">     649 </span>            :    Apply the user-specified function data_freer (if any) to the datas of any
+<span class="lineNum">     650 </span>            :    affected entries.  */
+<a name="651"><span class="lineNum">     651 </span>            : </a>
+<span class="lineNum">     652 </span>            : void
+<span class="lineNum">     653 </span><span class="lineNoCov">          0 : hash_clear (Hash_table *table)</span>
+<span class="lineNum">     654 </span>            : {
+<span class="lineNum">     655 </span>            :   struct hash_entry *bucket;
+<span class="lineNum">     656 </span>            : 
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     658 </span>            :     {
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :       if (bucket-&gt;data)</span>
+<span class="lineNum">     660 </span>            :         {
+<span class="lineNum">     661 </span>            :           struct hash_entry *cursor;
+<span class="lineNum">     662 </span>            :           struct hash_entry *next;
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            :           /* Free the bucket overflow.  */
+<span class="lineNum">     665 </span><span class="lineNoCov">          0 :           for (cursor = bucket-&gt;next; cursor; cursor = next)</span>
+<span class="lineNum">     666 </span>            :             {
+<span class="lineNum">     667 </span><span class="lineNoCov">          0 :               if (table-&gt;data_freer)</span>
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :                 table-&gt;data_freer (cursor-&gt;data);</span>
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 :               cursor-&gt;data = NULL;</span>
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :               next = cursor-&gt;next;</span>
+<span class="lineNum">     672 </span>            :               /* Relinking is done one entry at a time, as it is to be expected
+<span class="lineNum">     673 </span>            :                  that overflows are either rare or short.  */
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :               cursor-&gt;next = table-&gt;free_entry_list;</span>
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :               table-&gt;free_entry_list = cursor;</span>
+<span class="lineNum">     676 </span>            :             }
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            :           /* Free the bucket head.  */
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 :           if (table-&gt;data_freer)</span>
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :             table-&gt;data_freer (bucket-&gt;data);</span>
+<span class="lineNum">     681 </span><span class="lineNoCov">          0 :           bucket-&gt;data = NULL;</span>
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :           bucket-&gt;next = NULL;</span>
+<span class="lineNum">     683 </span>            :         }
+<span class="lineNum">     684 </span>            :     }
+<span class="lineNum">     685 </span>            : 
+<span class="lineNum">     686 </span><span class="lineNoCov">          0 :   table-&gt;n_buckets_used = 0;</span>
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :   table-&gt;n_entries = 0;</span>
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     689 </span>            : 
+<span class="lineNum">     690 </span>            : /* Reclaim all storage associated with a hash table.  If a data_freer
+<span class="lineNum">     691 </span>            :    function has been supplied by the user when the hash table was created,
+<span class="lineNum">     692 </span>            :    this function applies it to the data of each entry before freeing that
+<span class="lineNum">     693 </span>            :    entry.  */
+<a name="694"><span class="lineNum">     694 </span>            : </a>
+<span class="lineNum">     695 </span>            : void
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 : hash_free (Hash_table *table)</span>
+<span class="lineNum">     697 </span>            : {
+<span class="lineNum">     698 </span>            :   struct hash_entry *bucket;
+<span class="lineNum">     699 </span>            :   struct hash_entry *cursor;
+<span class="lineNum">     700 </span>            :   struct hash_entry *next;
+<span class="lineNum">     701 </span>            : 
+<span class="lineNum">     702 </span>            :   /* Call the user data_freer function.  */
+<span class="lineNum">     703 </span><span class="lineNoCov">          0 :   if (table-&gt;data_freer &amp;&amp; table-&gt;n_entries)</span>
+<span class="lineNum">     704 </span>            :     {
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :       for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     706 </span>            :         {
+<span class="lineNum">     707 </span><span class="lineNoCov">          0 :           if (bucket-&gt;data)</span>
+<span class="lineNum">     708 </span>            :             {
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :               for (cursor = bucket; cursor; cursor = cursor-&gt;next)</span>
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :                 table-&gt;data_freer (cursor-&gt;data);</span>
+<span class="lineNum">     711 </span>            :             }
+<span class="lineNum">     712 </span>            :         }
+<span class="lineNum">     713 </span>            :     }
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span>            : #if USE_OBSTACK
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span>            :   obstack_free (&amp;table-&gt;entry_stack, NULL);
+<span class="lineNum">     718 </span>            : 
+<span class="lineNum">     719 </span>            : #else
+<span class="lineNum">     720 </span>            : 
+<span class="lineNum">     721 </span>            :   /* Free all bucket overflowed entries.  */
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :   for (bucket = table-&gt;bucket; bucket &lt; table-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     723 </span>            :     {
+<span class="lineNum">     724 </span><span class="lineNoCov">          0 :       for (cursor = bucket-&gt;next; cursor; cursor = next)</span>
+<span class="lineNum">     725 </span>            :         {
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :           next = cursor-&gt;next;</span>
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :           free (cursor);</span>
+<span class="lineNum">     728 </span>            :         }
+<span class="lineNum">     729 </span>            :     }
+<span class="lineNum">     730 </span>            : 
+<span class="lineNum">     731 </span>            :   /* Also reclaim the internal list of previously freed entries.  */
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :   for (cursor = table-&gt;free_entry_list; cursor; cursor = next)</span>
+<span class="lineNum">     733 </span>            :     {
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :       next = cursor-&gt;next;</span>
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :       free (cursor);</span>
+<span class="lineNum">     736 </span>            :     }
+<span class="lineNum">     737 </span>            : 
+<span class="lineNum">     738 </span>            : #endif
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span>            :   /* Free the remainder of the hash table structure.  */
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :   free (table-&gt;bucket);</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 :   free (table);</span>
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     744 </span>            : 
+<span class="lineNum">     745 </span>            : /* Insertion and deletion.  */
+<span class="lineNum">     746 </span>            : 
+<span class="lineNum">     747 </span>            : /* Get a new hash entry for a bucket overflow, possibly by recycling a
+<span class="lineNum">     748 </span>            :    previously freed one.  If this is not possible, allocate a new one.  */
+<a name="749"><span class="lineNum">     749 </span>            : </a>
+<span class="lineNum">     750 </span>            : static struct hash_entry *
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 : allocate_entry (Hash_table *table)</span>
+<span class="lineNum">     752 </span>            : {
+<span class="lineNum">     753 </span>            :   struct hash_entry *new;
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :   if (table-&gt;free_entry_list)</span>
+<span class="lineNum">     756 </span>            :     {
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :       new = table-&gt;free_entry_list;</span>
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :       table-&gt;free_entry_list = new-&gt;next;</span>
+<span class="lineNum">     759 </span>            :     }
+<span class="lineNum">     760 </span>            :   else
+<span class="lineNum">     761 </span>            :     {
+<span class="lineNum">     762 </span>            : #if USE_OBSTACK
+<span class="lineNum">     763 </span>            :       new = obstack_alloc (&amp;table-&gt;entry_stack, sizeof *new);
+<span class="lineNum">     764 </span>            : #else
+<span class="lineNum">     765 </span><span class="lineNoCov">          0 :       new = malloc (sizeof *new);</span>
+<span class="lineNum">     766 </span>            : #endif
+<span class="lineNum">     767 </span>            :     }
+<span class="lineNum">     768 </span>            : 
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :   return new;</span>
+<span class="lineNum">     770 </span>            : }
+<span class="lineNum">     771 </span>            : 
+<span class="lineNum">     772 </span>            : /* Free a hash entry which was part of some bucket overflow,
+<span class="lineNum">     773 </span>            :    saving it for later recycling.  */
+<a name="774"><span class="lineNum">     774 </span>            : </a>
+<span class="lineNum">     775 </span>            : static void
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 : free_entry (Hash_table *table, struct hash_entry *entry)</span>
+<span class="lineNum">     777 </span>            : {
+<span class="lineNum">     778 </span><span class="lineNoCov">          0 :   entry-&gt;data = NULL;</span>
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :   entry-&gt;next = table-&gt;free_entry_list;</span>
+<span class="lineNum">     780 </span><span class="lineNoCov">          0 :   table-&gt;free_entry_list = entry;</span>
+<span class="lineNum">     781 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     782 </span>            : 
+<span class="lineNum">     783 </span>            : /* This private function is used to help with insertion and deletion.  When
+<span class="lineNum">     784 </span>            :    ENTRY matches an entry in the table, return a pointer to the corresponding
+<span class="lineNum">     785 </span>            :    user data and set *BUCKET_HEAD to the head of the selected bucket.
+<span class="lineNum">     786 </span>            :    Otherwise, return NULL.  When DELETE is true and ENTRY matches an entry in
+<span class="lineNum">     787 </span>            :    the table, unlink the matching entry.  */
+<a name="788"><span class="lineNum">     788 </span>            : </a>
+<span class="lineNum">     789 </span>            : static void *
+<span class="lineNum">     790 </span><span class="lineNoCov">          0 : hash_find_entry (Hash_table *table, const void *entry,</span>
+<span class="lineNum">     791 </span>            :                  struct hash_entry **bucket_head, bool delete)
+<span class="lineNum">     792 </span>            : {
+<span class="lineNum">     793 </span><span class="lineNoCov">          0 :   struct hash_entry *bucket = safe_hasher (table, entry);</span>
+<span class="lineNum">     794 </span>            :   struct hash_entry *cursor;
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 :   *bucket_head = bucket;</span>
+<span class="lineNum">     797 </span>            : 
+<span class="lineNum">     798 </span>            :   /* Test for empty bucket.  */
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :   if (bucket-&gt;data == NULL)</span>
+<span class="lineNum">     800 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     801 </span>            : 
+<span class="lineNum">     802 </span>            :   /* See if the entry is the first in the bucket.  */
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :   if (entry == bucket-&gt;data || table-&gt;comparator (entry, bucket-&gt;data))</span>
+<span class="lineNum">     804 </span>            :     {
+<span class="lineNum">     805 </span><span class="lineNoCov">          0 :       void *data = bucket-&gt;data;</span>
+<span class="lineNum">     806 </span>            : 
+<span class="lineNum">     807 </span><span class="lineNoCov">          0 :       if (delete)</span>
+<span class="lineNum">     808 </span>            :         {
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :           if (bucket-&gt;next)</span>
+<span class="lineNum">     810 </span>            :             {
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :               struct hash_entry *next = bucket-&gt;next;</span>
+<span class="lineNum">     812 </span>            : 
+<span class="lineNum">     813 </span>            :               /* Bump the first overflow entry into the bucket head, then save
+<span class="lineNum">     814 </span>            :                  the previous first overflow entry for later recycling.  */
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :               *bucket = *next;</span>
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :               free_entry (table, next);</span>
+<span class="lineNum">     817 </span>            :             }
+<span class="lineNum">     818 </span>            :           else
+<span class="lineNum">     819 </span>            :             {
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :               bucket-&gt;data = NULL;</span>
+<span class="lineNum">     821 </span>            :             }
+<span class="lineNum">     822 </span>            :         }
+<span class="lineNum">     823 </span>            : 
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :       return data;</span>
+<span class="lineNum">     825 </span>            :     }
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            :   /* Scan the bucket overflow.  */
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :   for (cursor = bucket; cursor-&gt;next; cursor = cursor-&gt;next)</span>
+<span class="lineNum">     829 </span>            :     {
+<span class="lineNum">     830 </span><span class="lineNoCov">          0 :       if (entry == cursor-&gt;next-&gt;data</span>
+<span class="lineNum">     831 </span><span class="lineNoCov">          0 :           || table-&gt;comparator (entry, cursor-&gt;next-&gt;data))</span>
+<span class="lineNum">     832 </span>            :         {
+<span class="lineNum">     833 </span><span class="lineNoCov">          0 :           void *data = cursor-&gt;next-&gt;data;</span>
+<span class="lineNum">     834 </span>            : 
+<span class="lineNum">     835 </span><span class="lineNoCov">          0 :           if (delete)</span>
+<span class="lineNum">     836 </span>            :             {
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :               struct hash_entry *next = cursor-&gt;next;</span>
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span>            :               /* Unlink the entry to delete, then save the freed entry for later
+<span class="lineNum">     840 </span>            :                  recycling.  */
+<span class="lineNum">     841 </span><span class="lineNoCov">          0 :               cursor-&gt;next = next-&gt;next;</span>
+<span class="lineNum">     842 </span><span class="lineNoCov">          0 :               free_entry (table, next);</span>
+<span class="lineNum">     843 </span>            :             }
+<span class="lineNum">     844 </span>            : 
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :           return data;</span>
+<span class="lineNum">     846 </span>            :         }
+<span class="lineNum">     847 </span>            :     }
+<span class="lineNum">     848 </span>            : 
+<span class="lineNum">     849 </span>            :   /* No entry found.  */
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     851 </span>            : }
+<span class="lineNum">     852 </span>            : 
+<span class="lineNum">     853 </span>            : /* Internal helper, to move entries from SRC to DST.  Both tables must
+<span class="lineNum">     854 </span>            :    share the same free entry list.  If SAFE, only move overflow
+<span class="lineNum">     855 </span>            :    entries, saving bucket heads for later, so that no allocations will
+<span class="lineNum">     856 </span>            :    occur.  Return false if the free entry list is exhausted and an
+<span class="lineNum">     857 </span>            :    allocation fails.  */
+<a name="858"><span class="lineNum">     858 </span>            : </a>
+<span class="lineNum">     859 </span>            : static bool
+<span class="lineNum">     860 </span><span class="lineNoCov">          0 : transfer_entries (Hash_table *dst, Hash_table *src, bool safe)</span>
+<span class="lineNum">     861 </span>            : {
+<span class="lineNum">     862 </span>            :   struct hash_entry *bucket;
+<span class="lineNum">     863 </span>            :   struct hash_entry *cursor;
+<span class="lineNum">     864 </span>            :   struct hash_entry *next;
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 :   for (bucket = src-&gt;bucket; bucket &lt; src-&gt;bucket_limit; bucket++)</span>
+<span class="lineNum">     866 </span><span class="lineNoCov">          0 :     if (bucket-&gt;data)</span>
+<span class="lineNum">     867 </span>            :       {
+<span class="lineNum">     868 </span>            :         void *data;
+<span class="lineNum">     869 </span>            :         struct hash_entry *new_bucket;
+<span class="lineNum">     870 </span>            : 
+<span class="lineNum">     871 </span>            :         /* Within each bucket, transfer overflow entries first and
+<span class="lineNum">     872 </span>            :            then the bucket head, to minimize memory pressure.  After
+<span class="lineNum">     873 </span>            :            all, the only time we might allocate is when moving the
+<span class="lineNum">     874 </span>            :            bucket head, but moving overflow entries first may create
+<span class="lineNum">     875 </span>            :            free entries that can be recycled by the time we finally
+<span class="lineNum">     876 </span>            :            get to the bucket head.  */
+<span class="lineNum">     877 </span><span class="lineNoCov">          0 :         for (cursor = bucket-&gt;next; cursor; cursor = next)</span>
+<span class="lineNum">     878 </span>            :           {
+<span class="lineNum">     879 </span><span class="lineNoCov">          0 :             data = cursor-&gt;data;</span>
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :             new_bucket = safe_hasher (dst, data);</span>
+<span class="lineNum">     881 </span>            : 
+<span class="lineNum">     882 </span><span class="lineNoCov">          0 :             next = cursor-&gt;next;</span>
+<span class="lineNum">     883 </span>            : 
+<span class="lineNum">     884 </span><span class="lineNoCov">          0 :             if (new_bucket-&gt;data)</span>
+<span class="lineNum">     885 </span>            :               {
+<span class="lineNum">     886 </span>            :                 /* Merely relink an existing entry, when moving from a
+<span class="lineNum">     887 </span>            :                    bucket overflow into a bucket overflow.  */
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :                 cursor-&gt;next = new_bucket-&gt;next;</span>
+<span class="lineNum">     889 </span><span class="lineNoCov">          0 :                 new_bucket-&gt;next = cursor;</span>
+<span class="lineNum">     890 </span>            :               }
+<span class="lineNum">     891 </span>            :             else
+<span class="lineNum">     892 </span>            :               {
+<span class="lineNum">     893 </span>            :                 /* Free an existing entry, when moving from a bucket
+<span class="lineNum">     894 </span>            :                    overflow into a bucket header.  */
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 :                 new_bucket-&gt;data = data;</span>
+<span class="lineNum">     896 </span><span class="lineNoCov">          0 :                 dst-&gt;n_buckets_used++;</span>
+<span class="lineNum">     897 </span><span class="lineNoCov">          0 :                 free_entry (dst, cursor);</span>
+<span class="lineNum">     898 </span>            :               }
+<span class="lineNum">     899 </span>            :           }
+<span class="lineNum">     900 </span>            :         /* Now move the bucket head.  Be sure that if we fail due to
+<span class="lineNum">     901 </span>            :            allocation failure that the src table is in a consistent
+<span class="lineNum">     902 </span>            :            state.  */
+<span class="lineNum">     903 </span><span class="lineNoCov">          0 :         data = bucket-&gt;data;</span>
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 :         bucket-&gt;next = NULL;</span>
+<span class="lineNum">     905 </span><span class="lineNoCov">          0 :         if (safe)</span>
+<span class="lineNum">     906 </span><span class="lineNoCov">          0 :           continue;</span>
+<span class="lineNum">     907 </span><span class="lineNoCov">          0 :         new_bucket = safe_hasher (dst, data);</span>
+<span class="lineNum">     908 </span>            : 
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :         if (new_bucket-&gt;data)</span>
+<span class="lineNum">     910 </span>            :           {
+<span class="lineNum">     911 </span>            :             /* Allocate or recycle an entry, when moving from a bucket
+<span class="lineNum">     912 </span>            :                header into a bucket overflow.  */
+<span class="lineNum">     913 </span><span class="lineNoCov">          0 :             struct hash_entry *new_entry = allocate_entry (dst);</span>
+<span class="lineNum">     914 </span>            : 
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :             if (new_entry == NULL)</span>
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :               return false;</span>
+<span class="lineNum">     917 </span>            : 
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :             new_entry-&gt;data = data;</span>
+<span class="lineNum">     919 </span><span class="lineNoCov">          0 :             new_entry-&gt;next = new_bucket-&gt;next;</span>
+<span class="lineNum">     920 </span><span class="lineNoCov">          0 :             new_bucket-&gt;next = new_entry;</span>
+<span class="lineNum">     921 </span>            :           }
+<span class="lineNum">     922 </span>            :         else
+<span class="lineNum">     923 </span>            :           {
+<span class="lineNum">     924 </span>            :             /* Move from one bucket header to another.  */
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :             new_bucket-&gt;data = data;</span>
+<span class="lineNum">     926 </span><span class="lineNoCov">          0 :             dst-&gt;n_buckets_used++;</span>
+<span class="lineNum">     927 </span>            :           }
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :         bucket-&gt;data = NULL;</span>
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 :         src-&gt;n_buckets_used--;</span>
+<span class="lineNum">     930 </span>            :       }
+<span class="lineNum">     931 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     932 </span>            : }
+<span class="lineNum">     933 </span>            : 
+<span class="lineNum">     934 </span>            : /* For an already existing hash table, change the number of buckets through
+<span class="lineNum">     935 </span>            :    specifying CANDIDATE.  The contents of the hash table are preserved.  The
+<span class="lineNum">     936 </span>            :    new number of buckets is automatically selected so as to _guarantee_ that
+<span class="lineNum">     937 </span>            :    the table may receive at least CANDIDATE different user entries, including
+<span class="lineNum">     938 </span>            :    those already in the table, before any other growth of the hash table size
+<span class="lineNum">     939 </span>            :    occurs.  If TUNING-&gt;IS_N_BUCKETS is true, then CANDIDATE specifies the
+<span class="lineNum">     940 </span>            :    exact number of buckets desired.  Return true iff the rehash succeeded.  */
+<a name="941"><span class="lineNum">     941 </span>            : </a>
+<span class="lineNum">     942 </span>            : bool
+<span class="lineNum">     943 </span><span class="lineNoCov">          0 : hash_rehash (Hash_table *table, size_t candidate)</span>
+<span class="lineNum">     944 </span>            : {
+<span class="lineNum">     945 </span>            :   Hash_table storage;
+<span class="lineNum">     946 </span>            :   Hash_table *new_table;
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :   size_t new_size = compute_bucket_size (candidate, table-&gt;tuning);</span>
+<span class="lineNum">     948 </span>            : 
+<span class="lineNum">     949 </span><span class="lineNoCov">          0 :   if (!new_size)</span>
+<span class="lineNum">     950 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     951 </span><span class="lineNoCov">          0 :   if (new_size == table-&gt;n_buckets)</span>
+<span class="lineNum">     952 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     953 </span><span class="lineNoCov">          0 :   new_table = &amp;storage;</span>
+<span class="lineNum">     954 </span><span class="lineNoCov">          0 :   new_table-&gt;bucket = calloc (new_size, sizeof *new_table-&gt;bucket);</span>
+<span class="lineNum">     955 </span><span class="lineNoCov">          0 :   if (new_table-&gt;bucket == NULL)</span>
+<span class="lineNum">     956 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 :   new_table-&gt;n_buckets = new_size;</span>
+<span class="lineNum">     958 </span><span class="lineNoCov">          0 :   new_table-&gt;bucket_limit = new_table-&gt;bucket + new_size;</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :   new_table-&gt;n_buckets_used = 0;</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :   new_table-&gt;n_entries = 0;</span>
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :   new_table-&gt;tuning = table-&gt;tuning;</span>
+<span class="lineNum">     962 </span><span class="lineNoCov">          0 :   new_table-&gt;hasher = table-&gt;hasher;</span>
+<span class="lineNum">     963 </span><span class="lineNoCov">          0 :   new_table-&gt;comparator = table-&gt;comparator;</span>
+<span class="lineNum">     964 </span><span class="lineNoCov">          0 :   new_table-&gt;data_freer = table-&gt;data_freer;</span>
+<span class="lineNum">     965 </span>            : 
+<span class="lineNum">     966 </span>            :   /* In order for the transfer to successfully complete, we need
+<span class="lineNum">     967 </span>            :      additional overflow entries when distinct buckets in the old
+<span class="lineNum">     968 </span>            :      table collide into a common bucket in the new table.  The worst
+<span class="lineNum">     969 </span>            :      case possible is a hasher that gives a good spread with the old
+<span class="lineNum">     970 </span>            :      size, but returns a constant with the new size; if we were to
+<span class="lineNum">     971 </span>            :      guarantee table-&gt;n_buckets_used-1 free entries in advance, then
+<span class="lineNum">     972 </span>            :      the transfer would be guaranteed to not allocate memory.
+<span class="lineNum">     973 </span>            :      However, for large tables, a guarantee of no further allocation
+<span class="lineNum">     974 </span>            :      introduces a lot of extra memory pressure, all for an unlikely
+<span class="lineNum">     975 </span>            :      corner case (most rehashes reduce, rather than increase, the
+<span class="lineNum">     976 </span>            :      number of overflow entries needed).  So, we instead ensure that
+<span class="lineNum">     977 </span>            :      the transfer process can be reversed if we hit a memory
+<span class="lineNum">     978 </span>            :      allocation failure mid-transfer.  */
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span>            :   /* Merely reuse the extra old space into the new table.  */
+<span class="lineNum">     981 </span>            : #if USE_OBSTACK
+<span class="lineNum">     982 </span>            :   new_table-&gt;entry_stack = table-&gt;entry_stack;
+<span class="lineNum">     983 </span>            : #endif
+<span class="lineNum">     984 </span><span class="lineNoCov">          0 :   new_table-&gt;free_entry_list = table-&gt;free_entry_list;</span>
+<span class="lineNum">     985 </span>            : 
+<span class="lineNum">     986 </span><span class="lineNoCov">          0 :   if (transfer_entries (new_table, table, false))</span>
+<span class="lineNum">     987 </span>            :     {
+<span class="lineNum">     988 </span>            :       /* Entries transferred successfully; tie up the loose ends.  */
+<span class="lineNum">     989 </span><span class="lineNoCov">          0 :       free (table-&gt;bucket);</span>
+<span class="lineNum">     990 </span><span class="lineNoCov">          0 :       table-&gt;bucket = new_table-&gt;bucket;</span>
+<span class="lineNum">     991 </span><span class="lineNoCov">          0 :       table-&gt;bucket_limit = new_table-&gt;bucket_limit;</span>
+<span class="lineNum">     992 </span><span class="lineNoCov">          0 :       table-&gt;n_buckets = new_table-&gt;n_buckets;</span>
+<span class="lineNum">     993 </span><span class="lineNoCov">          0 :       table-&gt;n_buckets_used = new_table-&gt;n_buckets_used;</span>
+<span class="lineNum">     994 </span><span class="lineNoCov">          0 :       table-&gt;free_entry_list = new_table-&gt;free_entry_list;</span>
+<span class="lineNum">     995 </span>            :       /* table-&gt;n_entries and table-&gt;entry_stack already hold their value.  */
+<span class="lineNum">     996 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     997 </span>            :     }
+<span class="lineNum">     998 </span>            : 
+<span class="lineNum">     999 </span>            :   /* We've allocated new_table-&gt;bucket (and possibly some entries),
+<span class="lineNum">    1000 </span>            :      exhausted the free list, and moved some but not all entries into
+<span class="lineNum">    1001 </span>            :      new_table.  We must undo the partial move before returning
+<span class="lineNum">    1002 </span>            :      failure.  The only way to get into this situation is if new_table
+<span class="lineNum">    1003 </span>            :      uses fewer buckets than the old table, so we will reclaim some
+<span class="lineNum">    1004 </span>            :      free entries as overflows in the new table are put back into
+<span class="lineNum">    1005 </span>            :      distinct buckets in the old table.
+<span class="lineNum">    1006 </span>            : 
+<span class="lineNum">    1007 </span>            :      There are some pathological cases where a single pass through the
+<span class="lineNum">    1008 </span>            :      table requires more intermediate overflow entries than using two
+<span class="lineNum">    1009 </span>            :      passes.  Two passes give worse cache performance and takes
+<span class="lineNum">    1010 </span>            :      longer, but at this point, we're already out of memory, so slow
+<span class="lineNum">    1011 </span>            :      and safe is better than failure.  */
+<span class="lineNum">    1012 </span><span class="lineNoCov">          0 :   table-&gt;free_entry_list = new_table-&gt;free_entry_list;</span>
+<span class="lineNum">    1013 </span><span class="lineNoCov">          0 :   if (! (transfer_entries (table, new_table, true)</span>
+<span class="lineNum">    1014 </span><span class="lineNoCov">          0 :          &amp;&amp; transfer_entries (table, new_table, false)))</span>
+<span class="lineNum">    1015 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">    1016 </span>            :   /* table-&gt;n_entries already holds its value.  */
+<span class="lineNum">    1017 </span><span class="lineNoCov">          0 :   free (new_table-&gt;bucket);</span>
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">    1019 </span>            : }
+<span class="lineNum">    1020 </span>            : 
+<span class="lineNum">    1021 </span>            : /* Insert ENTRY into hash TABLE if there is not already a matching entry.
+<span class="lineNum">    1022 </span>            : 
+<span class="lineNum">    1023 </span>            :    Return -1 upon memory allocation failure.
+<span class="lineNum">    1024 </span>            :    Return 1 if insertion succeeded.
+<span class="lineNum">    1025 </span>            :    Return 0 if there is already a matching entry in the table,
+<span class="lineNum">    1026 </span>            :    and in that case, if MATCHED_ENT is non-NULL, set *MATCHED_ENT
+<span class="lineNum">    1027 </span>            :    to that entry.
+<span class="lineNum">    1028 </span>            : 
+<span class="lineNum">    1029 </span>            :    This interface is easier to use than hash_insert when you must
+<span class="lineNum">    1030 </span>            :    distinguish between the latter two cases.  More importantly,
+<span class="lineNum">    1031 </span>            :    hash_insert is unusable for some types of ENTRY values.  When using
+<span class="lineNum">    1032 </span>            :    hash_insert, the only way to distinguish those cases is to compare
+<span class="lineNum">    1033 </span>            :    the return value and ENTRY.  That works only when you can have two
+<span class="lineNum">    1034 </span>            :    different ENTRY values that point to data that compares &quot;equal&quot;.  Thus,
+<span class="lineNum">    1035 </span>            :    when the ENTRY value is a simple scalar, you must use
+<a name="1036"><span class="lineNum">    1036 </span>            :    hash_insert_if_absent.  ENTRY must not be NULL.  */</a>
+<span class="lineNum">    1037 </span>            : int
+<span class="lineNum">    1038 </span><span class="lineNoCov">          0 : hash_insert_if_absent (Hash_table *table, void const *entry,</span>
+<span class="lineNum">    1039 </span>            :                        void const **matched_ent)
+<span class="lineNum">    1040 </span>            : {
+<span class="lineNum">    1041 </span>            :   void *data;
+<span class="lineNum">    1042 </span>            :   struct hash_entry *bucket;
+<span class="lineNum">    1043 </span>            : 
+<span class="lineNum">    1044 </span>            :   /* The caller cannot insert a NULL entry, since hash_lookup returns NULL
+<span class="lineNum">    1045 </span>            :      to indicate &quot;not found&quot;, and hash_find_entry uses &quot;bucket-&gt;data == NULL&quot;
+<span class="lineNum">    1046 </span>            :      to indicate an empty bucket.  */
+<span class="lineNum">    1047 </span><span class="lineNoCov">          0 :   if (! entry)</span>
+<span class="lineNum">    1048 </span><span class="lineNoCov">          0 :     abort ();</span>
+<span class="lineNum">    1049 </span>            : 
+<span class="lineNum">    1050 </span>            :   /* If there's a matching entry already in the table, return that.  */
+<span class="lineNum">    1051 </span><span class="lineNoCov">          0 :   if ((data = hash_find_entry (table, entry, &amp;bucket, false)) != NULL)</span>
+<span class="lineNum">    1052 </span>            :     {
+<span class="lineNum">    1053 </span><span class="lineNoCov">          0 :       if (matched_ent)</span>
+<span class="lineNum">    1054 </span><span class="lineNoCov">          0 :         *matched_ent = data;</span>
+<span class="lineNum">    1055 </span><span class="lineNoCov">          0 :       return 0;</span>
+<span class="lineNum">    1056 </span>            :     }
+<span class="lineNum">    1057 </span>            : 
+<span class="lineNum">    1058 </span>            :   /* If the growth threshold of the buckets in use has been reached, increase
+<span class="lineNum">    1059 </span>            :      the table size and rehash.  There's no point in checking the number of
+<span class="lineNum">    1060 </span>            :      entries:  if the hashing function is ill-conditioned, rehashing is not
+<span class="lineNum">    1061 </span>            :      likely to improve it.  */
+<span class="lineNum">    1062 </span>            : 
+<span class="lineNum">    1063 </span><span class="lineNoCov">          0 :   if (table-&gt;n_buckets_used</span>
+<span class="lineNum">    1064 </span><span class="lineNoCov">          0 :       &gt; table-&gt;tuning-&gt;growth_threshold * table-&gt;n_buckets)</span>
+<span class="lineNum">    1065 </span>            :     {
+<span class="lineNum">    1066 </span>            :       /* Check more fully, before starting real work.  If tuning arguments
+<span class="lineNum">    1067 </span>            :          became invalid, the second check will rely on proper defaults.  */
+<span class="lineNum">    1068 </span><span class="lineNoCov">          0 :       check_tuning (table);</span>
+<span class="lineNum">    1069 </span><span class="lineNoCov">          0 :       if (table-&gt;n_buckets_used</span>
+<span class="lineNum">    1070 </span><span class="lineNoCov">          0 :           &gt; table-&gt;tuning-&gt;growth_threshold * table-&gt;n_buckets)</span>
+<span class="lineNum">    1071 </span>            :         {
+<span class="lineNum">    1072 </span><span class="lineNoCov">          0 :           const Hash_tuning *tuning = table-&gt;tuning;</span>
+<span class="lineNum">    1073 </span><span class="lineNoCov">          0 :           float candidate =</span>
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :             (tuning-&gt;is_n_buckets</span>
+<span class="lineNum">    1075 </span><span class="lineNoCov">          0 :              ? (table-&gt;n_buckets * tuning-&gt;growth_factor)</span>
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :              : (table-&gt;n_buckets * tuning-&gt;growth_factor</span>
+<span class="lineNum">    1077 </span><span class="lineNoCov">          0 :                 * tuning-&gt;growth_threshold));</span>
+<span class="lineNum">    1078 </span>            : 
+<span class="lineNum">    1079 </span><span class="lineNoCov">          0 :           if (SIZE_MAX &lt;= candidate)</span>
+<span class="lineNum">    1080 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">    1081 </span>            : 
+<span class="lineNum">    1082 </span>            :           /* If the rehash fails, arrange to return NULL.  */
+<span class="lineNum">    1083 </span><span class="lineNoCov">          0 :           if (!hash_rehash (table, candidate))</span>
+<span class="lineNum">    1084 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">    1085 </span>            : 
+<span class="lineNum">    1086 </span>            :           /* Update the bucket we are interested in.  */
+<span class="lineNum">    1087 </span><span class="lineNoCov">          0 :           if (hash_find_entry (table, entry, &amp;bucket, false) != NULL)</span>
+<span class="lineNum">    1088 </span><span class="lineNoCov">          0 :             abort ();</span>
+<span class="lineNum">    1089 </span>            :         }
+<span class="lineNum">    1090 </span>            :     }
+<span class="lineNum">    1091 </span>            : 
+<span class="lineNum">    1092 </span>            :   /* ENTRY is not matched, it should be inserted.  */
+<span class="lineNum">    1093 </span>            : 
+<span class="lineNum">    1094 </span><span class="lineNoCov">          0 :   if (bucket-&gt;data)</span>
+<span class="lineNum">    1095 </span>            :     {
+<span class="lineNum">    1096 </span><span class="lineNoCov">          0 :       struct hash_entry *new_entry = allocate_entry (table);</span>
+<span class="lineNum">    1097 </span>            : 
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 :       if (new_entry == NULL)</span>
+<span class="lineNum">    1099 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">    1100 </span>            : 
+<span class="lineNum">    1101 </span>            :       /* Add ENTRY in the overflow of the bucket.  */
+<span class="lineNum">    1102 </span>            : 
+<span class="lineNum">    1103 </span><span class="lineNoCov">          0 :       new_entry-&gt;data = (void *) entry;</span>
+<span class="lineNum">    1104 </span><span class="lineNoCov">          0 :       new_entry-&gt;next = bucket-&gt;next;</span>
+<span class="lineNum">    1105 </span><span class="lineNoCov">          0 :       bucket-&gt;next = new_entry;</span>
+<span class="lineNum">    1106 </span><span class="lineNoCov">          0 :       table-&gt;n_entries++;</span>
+<span class="lineNum">    1107 </span><span class="lineNoCov">          0 :       return 1;</span>
+<span class="lineNum">    1108 </span>            :     }
+<span class="lineNum">    1109 </span>            : 
+<span class="lineNum">    1110 </span>            :   /* Add ENTRY right in the bucket head.  */
+<span class="lineNum">    1111 </span>            : 
+<span class="lineNum">    1112 </span><span class="lineNoCov">          0 :   bucket-&gt;data = (void *) entry;</span>
+<span class="lineNum">    1113 </span><span class="lineNoCov">          0 :   table-&gt;n_entries++;</span>
+<span class="lineNum">    1114 </span><span class="lineNoCov">          0 :   table-&gt;n_buckets_used++;</span>
+<span class="lineNum">    1115 </span>            : 
+<span class="lineNum">    1116 </span><span class="lineNoCov">          0 :   return 1;</span>
+<span class="lineNum">    1117 </span>            : }
+<span class="lineNum">    1118 </span>            : 
+<span class="lineNum">    1119 </span>            : /* If ENTRY matches an entry already in the hash table, return the pointer
+<span class="lineNum">    1120 </span>            :    to the entry from the table.  Otherwise, insert ENTRY and return ENTRY.
+<span class="lineNum">    1121 </span>            :    Return NULL if the storage required for insertion cannot be allocated.
+<span class="lineNum">    1122 </span>            :    This implementation does not support duplicate entries or insertion of
+<span class="lineNum">    1123 </span>            :    NULL.  */
+<a name="1124"><span class="lineNum">    1124 </span>            : </a>
+<span class="lineNum">    1125 </span>            : void *
+<span class="lineNum">    1126 </span><span class="lineNoCov">          0 : hash_insert (Hash_table *table, void const *entry)</span>
+<span class="lineNum">    1127 </span>            : {
+<span class="lineNum">    1128 </span>            :   void const *matched_ent;
+<span class="lineNum">    1129 </span><span class="lineNoCov">          0 :   int err = hash_insert_if_absent (table, entry, &amp;matched_ent);</span>
+<span class="lineNum">    1130 </span>            :   return (err == -1
+<span class="lineNum">    1131 </span>            :           ? NULL
+<span class="lineNum">    1132 </span><span class="lineNoCov">          0 :           : (void *) (err == 0 ? matched_ent : entry));</span>
+<span class="lineNum">    1133 </span>            : }
+<span class="lineNum">    1134 </span>            : 
+<span class="lineNum">    1135 </span>            : /* If ENTRY is already in the table, remove it and return the just-deleted
+<span class="lineNum">    1136 </span>            :    data (the user may want to deallocate its storage).  If ENTRY is not in the
+<span class="lineNum">    1137 </span>            :    table, don't modify the table and return NULL.  */
+<a name="1138"><span class="lineNum">    1138 </span>            : </a>
+<span class="lineNum">    1139 </span>            : void *
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 : hash_delete (Hash_table *table, const void *entry)</span>
+<span class="lineNum">    1141 </span>            : {
+<span class="lineNum">    1142 </span>            :   void *data;
+<span class="lineNum">    1143 </span>            :   struct hash_entry *bucket;
+<span class="lineNum">    1144 </span>            : 
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :   data = hash_find_entry (table, entry, &amp;bucket, true);</span>
+<span class="lineNum">    1146 </span><span class="lineNoCov">          0 :   if (!data)</span>
+<span class="lineNum">    1147 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">    1148 </span>            : 
+<span class="lineNum">    1149 </span><span class="lineNoCov">          0 :   table-&gt;n_entries--;</span>
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :   if (!bucket-&gt;data)</span>
+<span class="lineNum">    1151 </span>            :     {
+<span class="lineNum">    1152 </span><span class="lineNoCov">          0 :       table-&gt;n_buckets_used--;</span>
+<span class="lineNum">    1153 </span>            : 
+<span class="lineNum">    1154 </span>            :       /* If the shrink threshold of the buckets in use has been reached,
+<span class="lineNum">    1155 </span>            :          rehash into a smaller table.  */
+<span class="lineNum">    1156 </span>            : 
+<span class="lineNum">    1157 </span><span class="lineNoCov">          0 :       if (table-&gt;n_buckets_used</span>
+<span class="lineNum">    1158 </span><span class="lineNoCov">          0 :           &lt; table-&gt;tuning-&gt;shrink_threshold * table-&gt;n_buckets)</span>
+<span class="lineNum">    1159 </span>            :         {
+<span class="lineNum">    1160 </span>            :           /* Check more fully, before starting real work.  If tuning arguments
+<span class="lineNum">    1161 </span>            :              became invalid, the second check will rely on proper defaults.  */
+<span class="lineNum">    1162 </span><span class="lineNoCov">          0 :           check_tuning (table);</span>
+<span class="lineNum">    1163 </span><span class="lineNoCov">          0 :           if (table-&gt;n_buckets_used</span>
+<span class="lineNum">    1164 </span><span class="lineNoCov">          0 :               &lt; table-&gt;tuning-&gt;shrink_threshold * table-&gt;n_buckets)</span>
+<span class="lineNum">    1165 </span>            :             {
+<span class="lineNum">    1166 </span><span class="lineNoCov">          0 :               const Hash_tuning *tuning = table-&gt;tuning;</span>
+<span class="lineNum">    1167 </span><span class="lineNoCov">          0 :               size_t candidate =</span>
+<span class="lineNum">    1168 </span><span class="lineNoCov">          0 :                 (tuning-&gt;is_n_buckets</span>
+<span class="lineNum">    1169 </span><span class="lineNoCov">          0 :                  ? table-&gt;n_buckets * tuning-&gt;shrink_factor</span>
+<span class="lineNum">    1170 </span><span class="lineNoCov">          0 :                  : (table-&gt;n_buckets * tuning-&gt;shrink_factor</span>
+<span class="lineNum">    1171 </span><span class="lineNoCov">          0 :                     * tuning-&gt;growth_threshold));</span>
+<span class="lineNum">    1172 </span>            : 
+<span class="lineNum">    1173 </span><span class="lineNoCov">          0 :               if (!hash_rehash (table, candidate))</span>
+<span class="lineNum">    1174 </span>            :                 {
+<span class="lineNum">    1175 </span>            :                   /* Failure to allocate memory in an attempt to
+<span class="lineNum">    1176 </span>            :                      shrink the table is not fatal.  But since memory
+<span class="lineNum">    1177 </span>            :                      is low, we can at least be kind and free any
+<span class="lineNum">    1178 </span>            :                      spare entries, rather than keeping them tied up
+<span class="lineNum">    1179 </span>            :                      in the free entry list.  */
+<span class="lineNum">    1180 </span>            : #if ! USE_OBSTACK
+<span class="lineNum">    1181 </span><span class="lineNoCov">          0 :                   struct hash_entry *cursor = table-&gt;free_entry_list;</span>
+<span class="lineNum">    1182 </span>            :                   struct hash_entry *next;
+<span class="lineNum">    1183 </span><span class="lineNoCov">          0 :                   while (cursor)</span>
+<span class="lineNum">    1184 </span>            :                     {
+<span class="lineNum">    1185 </span><span class="lineNoCov">          0 :                       next = cursor-&gt;next;</span>
+<span class="lineNum">    1186 </span><span class="lineNoCov">          0 :                       free (cursor);</span>
+<span class="lineNum">    1187 </span><span class="lineNoCov">          0 :                       cursor = next;</span>
+<span class="lineNum">    1188 </span>            :                     }
+<span class="lineNum">    1189 </span><span class="lineNoCov">          0 :                   table-&gt;free_entry_list = NULL;</span>
+<span class="lineNum">    1190 </span>            : #endif
+<span class="lineNum">    1191 </span>            :                 }
+<span class="lineNum">    1192 </span>            :             }
+<span class="lineNum">    1193 </span>            :         }
+<span class="lineNum">    1194 </span>            :     }
+<span class="lineNum">    1195 </span>            : 
+<span class="lineNum">    1196 </span><span class="lineNoCov">          0 :   return data;</span>
+<span class="lineNum">    1197 </span>            : }
+<span class="lineNum">    1198 </span>            : 
+<span class="lineNum">    1199 </span>            : /* Testing.  */
+<span class="lineNum">    1200 </span>            : 
+<span class="lineNum">    1201 </span>            : #if TESTING
+<span class="lineNum">    1202 </span>            : 
+<span class="lineNum">    1203 </span>            : void
+<span class="lineNum">    1204 </span>            : hash_print (const Hash_table *table)
+<span class="lineNum">    1205 </span>            : {
+<span class="lineNum">    1206 </span>            :   struct hash_entry *bucket = (struct hash_entry *) table-&gt;bucket;
+<span class="lineNum">    1207 </span>            : 
+<span class="lineNum">    1208 </span>            :   for ( ; bucket &lt; table-&gt;bucket_limit; bucket++)
+<span class="lineNum">    1209 </span>            :     {
+<span class="lineNum">    1210 </span>            :       struct hash_entry *cursor;
+<span class="lineNum">    1211 </span>            : 
+<span class="lineNum">    1212 </span>            :       if (bucket)
+<span class="lineNum">    1213 </span>            :         printf (&quot;%lu:\n&quot;, (unsigned long int) (bucket - table-&gt;bucket));
+<span class="lineNum">    1214 </span>            : 
+<span class="lineNum">    1215 </span>            :       for (cursor = bucket; cursor; cursor = cursor-&gt;next)
+<span class="lineNum">    1216 </span>            :         {
+<span class="lineNum">    1217 </span>            :           char const *s = cursor-&gt;data;
+<span class="lineNum">    1218 </span>            :           /* FIXME */
+<span class="lineNum">    1219 </span>            :           if (s)
+<span class="lineNum">    1220 </span>            :             printf (&quot;  %s\n&quot;, s);
+<span class="lineNum">    1221 </span>            :         }
+<span class="lineNum">    1222 </span>            :     }
+<span class="lineNum">    1223 </span>            : }
+<span class="lineNum">    1224 </span>            : 
+<span class="lineNum">    1225 </span>            : #endif /* TESTING */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

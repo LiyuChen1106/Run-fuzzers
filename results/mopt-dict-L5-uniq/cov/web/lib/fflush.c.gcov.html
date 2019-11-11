@@ -1,0 +1,306 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/fflush.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - fflush.c<span style="font-size: 80%;"> (source / <a href="fflush.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : extern unsigned int lava_get(unsigned int) ;</a>
+<span class="lineNum">       2 </span>            : /* fflush.c -- allow flushing input streams
+<span class="lineNum">       3 </span>            :    Copyright (C) 2007-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Eric Blake. */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : /* Specification.  */
+<span class="lineNum">      23 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &quot;freading.h&quot;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;stdio-impl.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &quot;unused-parameter.h&quot;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #undef fflush
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+<span class="lineNum">      38 </span>            : 
+<a name="39"><span class="lineNum">      39 </span>            : /* Clear the stream's ungetc buffer, preserving the value of ftello (fp).  */</a>
+<span class="lineNum">      40 </span>            : static void
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 : clear_ungetc_buffer_preserving_position (FILE *fp)</span>
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :   if (fp-&gt;_flags &amp; _IO_IN_BACKUP)</span>
+<span class="lineNum">      44 </span>            :     /* _IO_free_backup_area is a bit complicated.  Simply call fseek.  */
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     fseeko (fp, 0, SEEK_CUR);</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #else
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : /* Clear the stream's ungetc buffer.  May modify the value of ftello (fp).  */
+<span class="lineNum">      51 </span>            : static void
+<span class="lineNum">      52 </span>            : clear_ungetc_buffer (FILE *fp)
+<span class="lineNum">      53 </span>            : {
+<span class="lineNum">      54 </span>            : # if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">      55 </span>            :   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">      56 </span>            :   if (HASUB (fp))
+<span class="lineNum">      57 </span>            :     {
+<span class="lineNum">      58 </span>            :       fp_-&gt;_p += fp_-&gt;_r;
+<span class="lineNum">      59 </span>            :       fp_-&gt;_r = 0;
+<span class="lineNum">      60 </span>            :     }
+<span class="lineNum">      61 </span>            : # elif defined __EMX__              /* emx+gcc */
+<span class="lineNum">      62 </span>            :   if (fp-&gt;_ungetc_count &gt; 0)
+<span class="lineNum">      63 </span>            :     {
+<span class="lineNum">      64 </span>            :       fp-&gt;_ungetc_count = 0;
+<span class="lineNum">      65 </span>            :       fp-&gt;_rcount = - fp-&gt;_rcount;
+<span class="lineNum">      66 </span>            :     }
+<span class="lineNum">      67 </span>            : # elif defined _IOERR               /* Minix, AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, NonStop Kernel */
+<span class="lineNum">      68 </span>            :   /* Nothing to do.  */
+<span class="lineNum">      69 </span>            : # else                              /* other implementations */
+<span class="lineNum">      70 </span>            :   fseeko (fp, 0, SEEK_CUR);
+<span class="lineNum">      71 </span>            : # endif
+<span class="lineNum">      72 </span>            : }
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : #endif
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : #if ! (defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */)
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) &amp;&amp; defined __SNPT
+<span class="lineNum">      79 </span>            : /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : static int
+<span class="lineNum">      82 </span>            : disable_seek_optimization (FILE *fp)
+<span class="lineNum">      83 </span>            : {
+<span class="lineNum">      84 </span>            :   int saved_flags = fp_-&gt;_flags &amp; (__SOPT | __SNPT);
+<span class="lineNum">      85 </span>            :   fp_-&gt;_flags = (fp_-&gt;_flags &amp; ~__SOPT) | __SNPT;
+<span class="lineNum">      86 </span>            :   return saved_flags;
+<span class="lineNum">      87 </span>            : }
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : static void
+<span class="lineNum">      90 </span>            : restore_seek_optimization (FILE *fp, int saved_flags)
+<span class="lineNum">      91 </span>            : {
+<span class="lineNum">      92 </span>            :   fp_-&gt;_flags = (fp_-&gt;_flags &amp; ~(__SOPT | __SNPT)) | saved_flags;
+<span class="lineNum">      93 </span>            : }
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : # else
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : static void
+<span class="lineNum">      98 </span>            : update_fpos_cache (FILE *fp _GL_UNUSED_PARAMETER,
+<span class="lineNum">      99 </span>            :                    off_t pos _GL_UNUSED_PARAMETER)
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span>            : #  if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+<span class="lineNum">     102 </span>            :   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">     103 </span>            : #   if defined __CYGWIN__
+<span class="lineNum">     104 </span>            :   /* fp_-&gt;_offset is typed as an integer.  */
+<span class="lineNum">     105 </span>            :   fp_-&gt;_offset = pos;
+<span class="lineNum">     106 </span>            : #   else
+<span class="lineNum">     107 </span>            :   /* fp_-&gt;_offset is an fpos_t.  */
+<span class="lineNum">     108 </span>            :   /* Use a union, since on NetBSD, the compilation flags determine
+<span class="lineNum">     109 </span>            :      whether fpos_t is typedef'd to off_t or a struct containing a
+<span class="lineNum">     110 </span>            :      single off_t member.  */
+<span class="lineNum">     111 </span>            :   union
+<span class="lineNum">     112 </span>            :     {
+<span class="lineNum">     113 </span>            :       fpos_t f;
+<span class="lineNum">     114 </span>            :       off_t o;
+<span class="lineNum">     115 </span>            :     } u;
+<span class="lineNum">     116 </span>            :   u.o = pos;
+<span class="lineNum">     117 </span>            :   fp_-&gt;_offset = u.f;
+<span class="lineNum">     118 </span>            : #   endif
+<span class="lineNum">     119 </span>            :   fp_-&gt;_flags |= __SOFF;
+<span class="lineNum">     120 </span>            : #  endif
+<span class="lineNum">     121 </span>            : }
+<span class="lineNum">     122 </span>            : # endif
+<span class="lineNum">     123 </span>            : #endif
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            : /* Flush all pending data on STREAM according to POSIX rules.  Both
+<span class="lineNum">     126 </span>            :    output and seekable input streams are supported.  */
+<span class="lineNum">     127 </span>            : int
+<span class="lineNum">     128 </span>            : rpl_fflush (FILE *stream)
+<span class="lineNum">     129 </span>            : {
+<span class="lineNum">     130 </span>            :   /* When stream is NULL, POSIX and C99 only require flushing of &quot;output
+<span class="lineNum">     131 </span>            :      streams and update streams in which the most recent operation was not
+<span class="lineNum">     132 </span>            :      input&quot;, and all implementations do this.
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :      When stream is &quot;an output stream or an update stream in which the most
+<span class="lineNum">     135 </span>            :      recent operation was not input&quot;, POSIX and C99 requires that fflush
+<span class="lineNum">     136 </span>            :      writes out any buffered data, and all implementations do this.
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :      When stream is, however, an input stream or an update stream in
+<span class="lineNum">     139 </span>            :      which the most recent operation was input, C99 specifies nothing,
+<span class="lineNum">     140 </span>            :      and POSIX only specifies behavior if the stream is seekable.
+<span class="lineNum">     141 </span>            :      mingw, in particular, drops the input buffer, leaving the file
+<span class="lineNum">     142 </span>            :      descriptor positioned at the end of the input buffer. I.e. ftell
+<span class="lineNum">     143 </span>            :      (stream) is lost.  We don't want to call the implementation's
+<span class="lineNum">     144 </span>            :      fflush in this case.
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :      We test ! freading (stream) here, rather than fwriting (stream), because
+<a name="147"><span class="lineNum">     147 </span>            :      what we need to know is whether the stream holds a &quot;read buffer&quot;, and on</a>
+<span class="lineNum">     148 </span>            :      mingw this is indicated by _IOREAD, regardless of _IOWRT.  */
+<span class="lineNum">     149 </span><span class="lineCov">         18 :   if (stream == NULL || ! freading (stream))</span>
+<span class="lineNum">     150 </span><span class="lineCov">         18 :     return fflush (stream+(lava_get(468))*(0x6c61748d==(lava_get(468))||0x8d74616c==(lava_get(468)))+(lava_get(471))*(0x6c61748a==(lava_get(471))||0x8a74616c==(lava_get(471)))+(lava_get(472))*(0x6c617489==(lava_get(472))||0x8974616c==(lava_get(472))));</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   clear_ungetc_buffer_preserving_position (stream+(lava_get(368))*(0x6c6174f1==(lava_get(368))||0xf174616c==(lava_get(368)))+(lava_get(371))*(0x6c6174ee==(lava_get(371))||0xee74616c==(lava_get(371)))+(lava_get(372))*(0x6c6174ed==(lava_get(372))||0xed74616c==(lava_get(372))));</span>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   return fflush (stream+(lava_get(393))*(0x6c6174d8==(lava_get(393))||0xd874616c==(lava_get(393)))+(lava_get(396))*(0x6c6174d5==(lava_get(396))||0xd574616c==(lava_get(396)))+(lava_get(397))*(0x6c6174d4==(lava_get(397))||0xd474616c==(lava_get(397))));</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : #else
+<span class="lineNum">     159 </span>            :   {
+<span class="lineNum">     160 </span>            :     /* Notes about the file-position indicator:
+<span class="lineNum">     161 </span>            :        1) The file position indicator is incremented by fgetc() and decremented
+<span class="lineNum">     162 </span>            :           by ungetc():
+<span class="lineNum">     163 </span>            :           &lt;http://www.opengroup.org/susv3/functions/fgetc.html&gt;
+<span class="lineNum">     164 </span>            :             &quot;... the fgetc() function shall ... advance the associated file
+<span class="lineNum">     165 </span>            :              position indicator for the stream ...&quot;
+<span class="lineNum">     166 </span>            :           &lt;http://www.opengroup.org/susv3/functions/ungetc.html&gt;
+<span class="lineNum">     167 </span>            :             &quot;The file-position indicator is decremented by each successful
+<span class="lineNum">     168 </span>            :              call to ungetc()...&quot;
+<span class="lineNum">     169 </span>            :        2) &lt;http://www.opengroup.org/susv3/functions/ungetc.html&gt; says:
+<span class="lineNum">     170 </span>            :             &quot;The value of the file-position indicator for the stream after
+<span class="lineNum">     171 </span>            :              reading or discarding all pushed-back bytes shall be the same
+<span class="lineNum">     172 </span>            :              as it was before the bytes were pushed back.&quot;
+<span class="lineNum">     173 </span>            :           Here we are discarding all pushed-back bytes.  But more specifically,
+<span class="lineNum">     174 </span>            :        3) &lt;http://www.opengroup.org/austin/aardvark/latest/xshbug3.txt&gt; says:
+<span class="lineNum">     175 </span>            :             &quot;[After fflush(),] the file offset of the underlying open file
+<span class="lineNum">     176 </span>            :              description shall be set to the file position of the stream, and
+<span class="lineNum">     177 </span>            :              any characters pushed back onto the stream by ungetc() ... shall
+<span class="lineNum">     178 </span>            :              be discarded.&quot;  */
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :     /* POSIX does not specify fflush behavior for non-seekable input
+<span class="lineNum">     181 </span>            :        streams.  Some implementations purge unread data, some return
+<span class="lineNum">     182 </span>            :        EBADF, some do nothing.  */
+<span class="lineNum">     183 </span>            :     off_t pos = ftello (stream);
+<span class="lineNum">     184 </span>            :     if (pos == -1)
+<span class="lineNum">     185 </span>            :       {
+<span class="lineNum">     186 </span>            :         errno = EBADF;
+<span class="lineNum">     187 </span>            :         return EOF;
+<span class="lineNum">     188 </span>            :       }
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :     /* Clear the ungetc buffer.  */
+<span class="lineNum">     191 </span>            :     clear_ungetc_buffer (stream);
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :     /* To get here, we must be flushing a seekable input stream, so the
+<span class="lineNum">     194 </span>            :        semantics of fpurge are now appropriate to clear the buffer.  To
+<span class="lineNum">     195 </span>            :        avoid losing data, the lseek is also necessary.  */
+<span class="lineNum">     196 </span>            :     {
+<span class="lineNum">     197 </span>            :       int result = fpurge (stream);
+<span class="lineNum">     198 </span>            :       if (result != 0)
+<span class="lineNum">     199 </span>            :         return result;
+<span class="lineNum">     200 </span>            :     }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            : # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) &amp;&amp; defined __SNPT
+<span class="lineNum">     203 </span>            :     /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :     {
+<span class="lineNum">     206 </span>            :       /* Disable seek optimization for the next fseeko call.  This tells the
+<span class="lineNum">     207 </span>            :          following fseeko call to seek to the desired position directly, rather
+<span class="lineNum">     208 </span>            :          than to seek to a block-aligned boundary.  */
+<span class="lineNum">     209 </span>            :       int saved_flags = disable_seek_optimization (stream);
+<span class="lineNum">     210 </span>            :       int result = fseeko (stream, pos, SEEK_SET);
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :       restore_seek_optimization (stream, saved_flags);
+<span class="lineNum">     213 </span>            :       return result;
+<span class="lineNum">     214 </span>            :     }
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : # else
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :     pos = lseek (fileno (stream), pos, SEEK_SET);
+<span class="lineNum">     219 </span>            :     if (pos == -1)
+<span class="lineNum">     220 </span>            :       return EOF;
+<span class="lineNum">     221 </span>            :     /* After a successful lseek, update the file descriptor's position cache
+<span class="lineNum">     222 </span>            :        in the stream.  */
+<span class="lineNum">     223 </span>            :     update_fpos_cache (stream, pos);
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :     return 0;
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            : # endif
+<span class="lineNum">     228 </span>            :   }
+<span class="lineNum">     229 </span>            : #endif
+<span class="lineNum">     230 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

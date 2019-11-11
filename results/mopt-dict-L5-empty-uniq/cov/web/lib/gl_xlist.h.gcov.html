@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/gl_xlist.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - gl_xlist.h<span style="font-size: 80%;"> (source / <a href="gl_xlist.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">52</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Abstract sequential list data type, with out-of-memory checking.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            :    Written by Bruno Haible &lt;bruno@clisp.org&gt;, 2009.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #ifndef _GL_XLIST_H
+<span class="lineNum">      19 </span>            : #define _GL_XLIST_H
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &quot;gl_list.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #ifndef _GL_INLINE_HEADER_BEGIN
+<span class="lineNum">      25 </span>            :  #error &quot;Please include config.h first.&quot;
+<span class="lineNum">      26 </span>            : #endif
+<span class="lineNum">      27 </span>            : _GL_INLINE_HEADER_BEGIN
+<span class="lineNum">      28 </span>            : #ifndef GL_XLIST_INLINE
+<span class="lineNum">      29 </span>            : # define GL_XLIST_INLINE _GL_INLINE
+<span class="lineNum">      30 </span>            : #endif
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #ifdef __cplusplus
+<span class="lineNum">      33 </span>            : extern &quot;C&quot; {
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : /* These functions are thin wrappers around the corresponding functions with
+<span class="lineNum">      37 </span>            :    _nx_ infix from gl_list.h.  Upon out-of-memory, they invoke xalloc_die (),
+<span class="lineNum">      38 </span>            :    instead of returning an error indicator.  */
+<span class="lineNum">      39 </span>            : #if 0 /* These are defined inline below.  */
+<span class="lineNum">      40 </span>            : extern gl_list_t gl_list_create_empty (gl_list_implementation_t implementation,
+<span class="lineNum">      41 </span>            :                                        gl_listelement_equals_fn equals_fn,
+<span class="lineNum">      42 </span>            :                                        gl_listelement_hashcode_fn hashcode_fn,
+<span class="lineNum">      43 </span>            :                                        gl_listelement_dispose_fn dispose_fn,
+<span class="lineNum">      44 </span>            :                                        bool allow_duplicates);
+<span class="lineNum">      45 </span>            : extern gl_list_t gl_list_create (gl_list_implementation_t implementation,
+<span class="lineNum">      46 </span>            :                                  gl_listelement_equals_fn equals_fn,
+<span class="lineNum">      47 </span>            :                                  gl_listelement_hashcode_fn hashcode_fn,
+<span class="lineNum">      48 </span>            :                                  gl_listelement_dispose_fn dispose_fn,
+<span class="lineNum">      49 </span>            :                                  bool allow_duplicates,
+<span class="lineNum">      50 </span>            :                                  size_t count, const void **contents);
+<span class="lineNum">      51 </span>            : extern void gl_list_node_set_value (gl_list_t list, gl_list_node_t node,
+<span class="lineNum">      52 </span>            :                                     const void *elt);
+<span class="lineNum">      53 </span>            : extern gl_list_node_t gl_list_set_at (gl_list_t list, size_t position,
+<span class="lineNum">      54 </span>            :                                       const void *elt);
+<span class="lineNum">      55 </span>            : extern gl_list_node_t gl_list_add_first (gl_list_t list, const void *elt);
+<span class="lineNum">      56 </span>            : extern gl_list_node_t gl_list_add_last (gl_list_t list, const void *elt);
+<span class="lineNum">      57 </span>            : extern gl_list_node_t gl_list_add_before (gl_list_t list, gl_list_node_t node,
+<span class="lineNum">      58 </span>            :                                           const void *elt);
+<span class="lineNum">      59 </span>            : extern gl_list_node_t gl_list_add_after (gl_list_t list, gl_list_node_t node,
+<span class="lineNum">      60 </span>            :                                          const void *elt);
+<span class="lineNum">      61 </span>            : extern gl_list_node_t gl_list_add_at (gl_list_t list, size_t position,
+<span class="lineNum">      62 </span>            :                                       const void *elt);
+<span class="lineNum">      63 </span>            : extern gl_list_node_t gl_sortedlist_add (gl_list_t list,
+<span class="lineNum">      64 </span>            :                                          gl_listelement_compar_fn compar,
+<span class="lineNum">      65 </span>            :                                          const void *elt);
+<span class="lineNum">      66 </span>            : #endif
+<a name="67"><span class="lineNum">      67 </span>            : </a>
+<span class="lineNum">      68 </span>            : GL_XLIST_INLINE gl_list_t
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 : gl_list_create_empty (gl_list_implementation_t implementation,</span>
+<span class="lineNum">      70 </span>            :                       gl_listelement_equals_fn equals_fn,
+<span class="lineNum">      71 </span>            :                       gl_listelement_hashcode_fn hashcode_fn,
+<span class="lineNum">      72 </span>            :                       gl_listelement_dispose_fn dispose_fn,
+<span class="lineNum">      73 </span>            :                       bool allow_duplicates)
+<span class="lineNum">      74 </span>            : {
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :   gl_list_t result =</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     gl_list_nx_create_empty (implementation, equals_fn, hashcode_fn, dispose_fn,</span>
+<span class="lineNum">      77 </span>            :                              allow_duplicates);
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">      81 </span>            : }
+<a name="82"><span class="lineNum">      82 </span>            : </a>
+<span class="lineNum">      83 </span>            : GL_XLIST_INLINE gl_list_t
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 : gl_list_create (gl_list_implementation_t implementation,</span>
+<span class="lineNum">      85 </span>            :                 gl_listelement_equals_fn equals_fn,
+<span class="lineNum">      86 </span>            :                 gl_listelement_hashcode_fn hashcode_fn,
+<span class="lineNum">      87 </span>            :                 gl_listelement_dispose_fn dispose_fn,
+<span class="lineNum">      88 </span>            :                 bool allow_duplicates,
+<span class="lineNum">      89 </span>            :                 size_t count, const void **contents)
+<span class="lineNum">      90 </span>            : {
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   gl_list_t result =</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     gl_list_nx_create (implementation, equals_fn, hashcode_fn, dispose_fn,</span>
+<span class="lineNum">      93 </span>            :                        allow_duplicates, count, contents);
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">      97 </span>            : }
+<a name="98"><span class="lineNum">      98 </span>            : </a>
+<span class="lineNum">      99 </span>            : GL_XLIST_INLINE void
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 : gl_list_node_set_value (gl_list_t list, gl_list_node_t node, const void *elt)</span>
+<span class="lineNum">     101 </span>            : {
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :   int result = gl_list_node_nx_set_value (list, node, elt);</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :   if (result &lt; 0)</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 : }</span>
+<a name="106"><span class="lineNum">     106 </span>            : </a>
+<span class="lineNum">     107 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 : gl_list_set_at (gl_list_t list, size_t position, const void *elt)</span>
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_list_nx_set_at (list, position, elt);</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     114 </span>            : }
+<a name="115"><span class="lineNum">     115 </span>            : </a>
+<span class="lineNum">     116 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 : gl_list_add_first (gl_list_t list, const void *elt)</span>
+<span class="lineNum">     118 </span>            : {
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_list_nx_add_first (list, elt);</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     123 </span>            : }
+<a name="124"><span class="lineNum">     124 </span>            : </a>
+<span class="lineNum">     125 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 : gl_list_add_last (gl_list_t list, const void *elt)</span>
+<span class="lineNum">     127 </span>            : {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_list_nx_add_last (list, elt);</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     132 </span>            : }
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<span class="lineNum">     134 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 : gl_list_add_before (gl_list_t list, gl_list_node_t node, const void *elt)</span>
+<span class="lineNum">     136 </span>            : {
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_list_nx_add_before (list, node, elt);</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     141 </span>            : }
+<a name="142"><span class="lineNum">     142 </span>            : </a>
+<span class="lineNum">     143 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 : gl_list_add_after (gl_list_t list, gl_list_node_t node, const void *elt)</span>
+<span class="lineNum">     145 </span>            : {
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_list_nx_add_after (list, node, elt);</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     150 </span>            : }
+<a name="151"><span class="lineNum">     151 </span>            : </a>
+<span class="lineNum">     152 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 : gl_list_add_at (gl_list_t list, size_t position, const void *elt)</span>
+<span class="lineNum">     154 </span>            : {
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_list_nx_add_at (list, position, elt);</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     159 </span>            : }
+<a name="160"><span class="lineNum">     160 </span>            : </a>
+<span class="lineNum">     161 </span>            : GL_XLIST_INLINE gl_list_node_t
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 : gl_sortedlist_add (gl_list_t list, gl_listelement_compar_fn compar,</span>
+<span class="lineNum">     163 </span>            :                    const void *elt)
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :   gl_list_node_t result = gl_sortedlist_nx_add (list, compar, elt);</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :     xalloc_die ();</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     169 </span>            : }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            : #ifdef __cplusplus
+<span class="lineNum">     172 </span>            : }
+<span class="lineNum">     173 </span>            : #endif
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : _GL_INLINE_HEADER_END
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : #endif /* _GL_XLIST_H */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/readtokens.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - readtokens.c<span style="font-size: 80%;"> (source / <a href="readtokens.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">63</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* readtokens.c  -- Functions for reading tokens from an input stream.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1990-1991, 1999-2004, 2006, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :    Written by Jim Meyering. */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : /* This almost supersedes xreadline stuff -- using delim=&quot;\n&quot;
+<span class="lineNum">      22 </span>            :    gives the same functionality, except that these functions
+<span class="lineNum">      23 </span>            :    would never return empty lines. */
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;readtokens.h&quot;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #if USE_UNLOCKED_IO
+<span class="lineNum">      38 </span>            : # include &quot;unlocked-io.h&quot;
+<span class="lineNum">      39 </span>            : #endif
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : /* Initialize a tokenbuffer. */
+<a name="42"><span class="lineNum">      42 </span>            : </a>
+<span class="lineNum">      43 </span>            : void
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 : init_tokenbuffer (token_buffer *tokenbuffer)</span>
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :   tokenbuffer-&gt;size = 0;</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   tokenbuffer-&gt;buffer = NULL;</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : typedef size_t word;
+<span class="lineNum">      51 </span>            : enum { bits_per_word = sizeof (word) * CHAR_BIT };
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<span class="lineNum">      53 </span>            : static bool
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 : get_nth_bit (size_t n, word const *bitset)</span>
+<span class="lineNum">      55 </span>            : {
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   return bitset[n / bits_per_word] &gt;&gt; n % bits_per_word &amp; 1;</span>
+<span class="lineNum">      57 </span>            : }
+<a name="58"><span class="lineNum">      58 </span>            : </a>
+<span class="lineNum">      59 </span>            : static void
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 : set_nth_bit (size_t n, word *bitset)</span>
+<span class="lineNum">      61 </span>            : {
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :   size_t one = 1;</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :   bitset[n / bits_per_word] |= one &lt;&lt; n % bits_per_word;</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : /* Read a token from STREAM into TOKENBUFFER.
+<span class="lineNum">      67 </span>            :    A token is delimited by any of the N_DELIM bytes in DELIM.
+<span class="lineNum">      68 </span>            :    Upon return, the token is in tokenbuffer-&gt;buffer and
+<span class="lineNum">      69 </span>            :    has a trailing '\0' instead of any original delimiter.
+<span class="lineNum">      70 </span>            :    The function value is the length of the token not including
+<span class="lineNum">      71 </span>            :    the final '\0'.  Upon EOF (i.e. on the call after the last
+<span class="lineNum">      72 </span>            :    token is read) or error, return -1 without modifying tokenbuffer.
+<span class="lineNum">      73 </span>            :    The EOF and error conditions may be distinguished in the caller
+<span class="lineNum">      74 </span>            :    by testing ferror (STREAM).
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :    This function works properly on lines containing NUL bytes
+<span class="lineNum">      77 </span>            :    and on files that do not end with a delimiter.  */
+<a name="78"><span class="lineNum">      78 </span>            : </a>
+<span class="lineNum">      79 </span>            : size_t
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 : readtoken (FILE *stream,</span>
+<span class="lineNum">      81 </span>            :            const char *delim,
+<span class="lineNum">      82 </span>            :            size_t n_delim,
+<span class="lineNum">      83 </span>            :            token_buffer *tokenbuffer)
+<span class="lineNum">      84 </span>            : {
+<span class="lineNum">      85 </span>            :   char *p;
+<span class="lineNum">      86 </span>            :   int c;
+<span class="lineNum">      87 </span>            :   size_t i, n;
+<span class="lineNum">      88 </span>            :   word isdelim[(UCHAR_MAX + bits_per_word) / bits_per_word];
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :   memset (isdelim, 0, sizeof isdelim);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   for (i = 0; i &lt; n_delim; i++)</span>
+<span class="lineNum">      92 </span>            :     {
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :       unsigned char ch = delim[i];</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :       set_nth_bit (ch, isdelim);</span>
+<span class="lineNum">      95 </span>            :     }
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :   /* skip over any leading delimiters */
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   for (c = getc (stream); c &gt;= 0 &amp;&amp; get_nth_bit (c, isdelim); c = getc (stream))</span>
+<span class="lineNum">      99 </span>            :     {
+<span class="lineNum">     100 </span>            :       /* empty */
+<span class="lineNum">     101 </span>            :     }
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :   p = tokenbuffer-&gt;buffer;</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :   n = tokenbuffer-&gt;size;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   i = 0;</span>
+<span class="lineNum">     106 </span>            :   for (;;)
+<span class="lineNum">     107 </span>            :     {
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :       if (c &lt; 0 &amp;&amp; i == 0)</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :       if (i == n)</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :         p = x2nrealloc (p, &amp;n, sizeof *p);</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :       if (c &lt; 0)</span>
+<span class="lineNum">     115 </span>            :         {
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :           p[i] = 0;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     118 </span>            :         }
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :       if (get_nth_bit (c, isdelim))</span>
+<span class="lineNum">     120 </span>            :         {
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :           p[i] = 0;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     123 </span>            :         }
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       p[i++] = c;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       c = getc (stream);</span>
+<span class="lineNum">     126 </span>            :     }
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   tokenbuffer-&gt;buffer = p;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   tokenbuffer-&gt;size = n;</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :   return i;</span>
+<span class="lineNum">     131 </span>            : }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : /* Build a NULL-terminated array of pointers to tokens
+<span class="lineNum">     134 </span>            :    read from STREAM.  Return the number of tokens read.
+<span class="lineNum">     135 </span>            :    All storage is obtained through calls to xmalloc-like functions.
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :    %%% Question: is it worth it to do a single
+<span class="lineNum">     138 </span>            :    %%% realloc() of 'tokens' just before returning? */
+<a name="139"><span class="lineNum">     139 </span>            : </a>
+<span class="lineNum">     140 </span>            : size_t
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 : readtokens (FILE *stream,</span>
+<span class="lineNum">     142 </span>            :             size_t projected_n_tokens,
+<span class="lineNum">     143 </span>            :             const char *delim,
+<span class="lineNum">     144 </span>            :             size_t n_delim,
+<span class="lineNum">     145 </span>            :             char ***tokens_out,
+<span class="lineNum">     146 </span>            :             size_t **token_lengths)
+<span class="lineNum">     147 </span>            : {
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :   token_buffer tb, *token = &amp;tb;</span>
+<span class="lineNum">     149 </span>            :   char **tokens;
+<span class="lineNum">     150 </span>            :   size_t *lengths;
+<span class="lineNum">     151 </span>            :   size_t sz;
+<span class="lineNum">     152 </span>            :   size_t n_tokens;
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   if (projected_n_tokens == 0)</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :     projected_n_tokens = 64;</span>
+<span class="lineNum">     156 </span>            :   else
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     projected_n_tokens++;       /* add one for trailing NULL pointer */</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :   sz = projected_n_tokens;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :   tokens = xnmalloc (sz, sizeof *tokens);</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :   lengths = xnmalloc (sz, sizeof *lengths);</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :   n_tokens = 0;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :   init_tokenbuffer (token);</span>
+<span class="lineNum">     165 </span>            :   for (;;)
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     167 </span>            :       char *tmp;
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :       size_t token_length = readtoken (stream, delim, n_delim, token);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :       if (n_tokens &gt;= sz)</span>
+<span class="lineNum">     170 </span>            :         {
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :           tokens = x2nrealloc (tokens, &amp;sz, sizeof *tokens);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :           lengths = xnrealloc (lengths, sz, sizeof *lengths);</span>
+<span class="lineNum">     173 </span>            :         }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :       if (token_length == (size_t) -1)</span>
+<span class="lineNum">     176 </span>            :         {
+<span class="lineNum">     177 </span>            :           /* don't increment n_tokens for NULL entry */
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :           tokens[n_tokens] = NULL;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :           lengths[n_tokens] = 0;</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     181 </span>            :         }
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :       tmp = xnmalloc (token_length + 1, sizeof *tmp);</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :       lengths[n_tokens] = token_length;</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :       tokens[n_tokens] = memcpy (tmp, token-&gt;buffer, token_length + 1);</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :       n_tokens++;</span>
+<span class="lineNum">     186 </span>            :     }
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :   free (token-&gt;buffer);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :   *tokens_out = tokens;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   if (token_lengths != NULL)</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :     *token_lengths = lengths;</span>
+<span class="lineNum">     192 </span>            :   else
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :     free (lengths);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :   return n_tokens;</span>
+<span class="lineNum">     195 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/utimensat.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - utimensat.c<span style="font-size: 80%;"> (source / <a href="utimensat.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Set the access and modification time of a file relative to directory fd.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* written by Eric Blake */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;stat-time.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;timespec.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;utimens.h&quot;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #if HAVE_UTIMENSAT
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : # undef utimensat
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : /* If we have a native utimensat, but are compiling this file, then
+<span class="lineNum">      35 </span>            :    utimensat was defined to rpl_utimensat by our replacement
+<span class="lineNum">      36 </span>            :    sys/stat.h.  We assume the native version might fail with ENOSYS,
+<span class="lineNum">      37 </span>            :    or succeed without properly affecting ctime (as is the case when
+<span class="lineNum">      38 </span>            :    using newer glibc but older Linux kernel).  In this scenario,
+<span class="lineNum">      39 </span>            :    rpl_utimensat checks whether the native version is usable, and
+<span class="lineNum">      40 </span>            :    local_utimensat provides the fallback manipulation.  */
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : static int local_utimensat (int, char const *, struct timespec const[2], int);
+<span class="lineNum">      43 </span>            : # define AT_FUNC_NAME local_utimensat
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : /* Like utimensat, but work around native bugs.  */
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : int
+<span class="lineNum">      48 </span>            : rpl_utimensat (int fd, char const *file, struct timespec const times[2],
+<span class="lineNum">      49 </span>            :                int flag)
+<span class="lineNum">      50 </span>            : {
+<span class="lineNum">      51 </span>            : # if defined __linux__ || defined __sun
+<span class="lineNum">      52 </span>            :   struct timespec ts[2];
+<span class="lineNum">      53 </span>            : # endif
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :   /* See comments in utimens.c for details.  */
+<span class="lineNum">      56 </span>            :   static int utimensat_works_really; /* 0 = unknown, 1 = yes, -1 = no.  */
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :   if (0 &lt;= utimensat_works_really)</span>
+<span class="lineNum">      58 </span>            :     {
+<span class="lineNum">      59 </span>            :       int result;
+<span class="lineNum">      60 </span>            : # if defined __linux__ || defined __sun
+<span class="lineNum">      61 </span>            :       struct stat st;
+<span class="lineNum">      62 </span>            :       /* As recently as Linux kernel 2.6.32 (Dec 2009), several file
+<span class="lineNum">      63 </span>            :          systems (xfs, ntfs-3g) have bugs with a single UTIME_OMIT,
+<span class="lineNum">      64 </span>            :          but work if both times are either explicitly specified or
+<span class="lineNum">      65 </span>            :          UTIME_NOW.  Work around it with a preparatory [l]stat prior
+<span class="lineNum">      66 </span>            :          to calling utimensat; fortunately, there is not much timing
+<span class="lineNum">      67 </span>            :          impact due to the extra syscall even on file systems where
+<span class="lineNum">      68 </span>            :          UTIME_OMIT would have worked.
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :          The same bug occurs in Solaris 11.1 (Apr 2013).
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :          FIXME: Simplify this for Linux in 2016 and for Solaris in
+<span class="lineNum">      73 </span>            :          2024, when file system bugs are no longer common.  */
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       if (times &amp;&amp; (times[0].tv_nsec == UTIME_OMIT</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :                     || times[1].tv_nsec == UTIME_OMIT))</span>
+<span class="lineNum">      76 </span>            :         {
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :           if (fstatat (fd, file, &amp;st, flag))</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :           if (times[0].tv_nsec == UTIME_OMIT &amp;&amp; times[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :             return 0;</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :           if (times[0].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :             ts[0] = get_stat_atime (&amp;st);</span>
+<span class="lineNum">      83 </span>            :           else
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :             ts[0] = times[0];</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :           if (times[1].tv_nsec == UTIME_OMIT)</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :             ts[1] = get_stat_mtime (&amp;st);</span>
+<span class="lineNum">      87 </span>            :           else
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :             ts[1] = times[1];</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :           times = ts;</span>
+<span class="lineNum">      90 </span>            :         }
+<span class="lineNum">      91 </span>            : #  ifdef __hppa__
+<span class="lineNum">      92 </span>            :       /* Linux kernel 2.6.22.19 on hppa does not reject invalid tv_nsec
+<span class="lineNum">      93 </span>            :          values.  */
+<span class="lineNum">      94 </span>            :       else if (times
+<span class="lineNum">      95 </span>            :                &amp;&amp; ((times[0].tv_nsec != UTIME_NOW
+<span class="lineNum">      96 </span>            :                     &amp;&amp; ! (0 &lt;= times[0].tv_nsec
+<span class="lineNum">      97 </span>            :                           &amp;&amp; times[0].tv_nsec &lt; TIMESPEC_RESOLUTION))
+<span class="lineNum">      98 </span>            :                    || (times[1].tv_nsec != UTIME_NOW
+<span class="lineNum">      99 </span>            :                        &amp;&amp; ! (0 &lt;= times[1].tv_nsec
+<span class="lineNum">     100 </span>            :                              &amp;&amp; times[1].tv_nsec &lt; TIMESPEC_RESOLUTION))))
+<span class="lineNum">     101 </span>            :         {
+<span class="lineNum">     102 </span>            :           errno = EINVAL;
+<span class="lineNum">     103 </span>            :           return -1;
+<span class="lineNum">     104 </span>            :         }
+<span class="lineNum">     105 </span>            : #  endif
+<span class="lineNum">     106 </span>            : # endif
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       result = utimensat (fd, file, times, flag);</span>
+<span class="lineNum">     108 </span>            :       /* Linux kernel 2.6.25 has a bug where it returns EINVAL for
+<span class="lineNum">     109 </span>            :          UTIME_NOW or UTIME_OMIT with non-zero tv_sec, which
+<span class="lineNum">     110 </span>            :          local_utimensat works around.  Meanwhile, EINVAL for a bad
+<span class="lineNum">     111 </span>            :          flag is indeterminate whether the native utimensat works, but
+<span class="lineNum">     112 </span>            :          local_utimensat will also reject it.  */
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :       if (result == -1 &amp;&amp; errno == EINVAL &amp;&amp; (flag &amp; ~AT_SYMLINK_NOFOLLOW))</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         return result;</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :       if (result == 0 || (errno != ENOSYS &amp;&amp; errno != EINVAL))</span>
+<span class="lineNum">     116 </span>            :         {
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :           utimensat_works_really = 1;</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :           return result;</span>
+<span class="lineNum">     119 </span>            :         }
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span>            :   /* No point in trying openat/futimens, since on Linux, futimens is
+<span class="lineNum">     122 </span>            :      implemented with the same syscall as utimensat.  Only avoid the
+<span class="lineNum">     123 </span>            :      native utimensat due to an ENOSYS failure; an EINVAL error was
+<span class="lineNum">     124 </span>            :      data-dependent, and the next caller may pass valid data.  */
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :   if (0 &lt;= utimensat_works_really &amp;&amp; errno == ENOSYS)</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     utimensat_works_really = -1;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :   return local_utimensat (fd, file, times, flag);</span>
+<span class="lineNum">     128 </span>            : }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : #else /* !HAVE_UTIMENSAT */
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : # define AT_FUNC_NAME utimensat
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            : #endif /* !HAVE_UTIMENSAT */
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : /* Set the access and modification time stamps of FILE to be
+<span class="lineNum">     137 </span>            :    TIMESPEC[0] and TIMESPEC[1], respectively; relative to directory
+<span class="lineNum">     138 </span>            :    FD.  If flag is AT_SYMLINK_NOFOLLOW, change the times of a symlink,
+<span class="lineNum">     139 </span>            :    or fail with ENOSYS if not possible.  If TIMESPEC is null, set the
+<span class="lineNum">     140 </span>            :    time stamps to the current time.  If possible, do it without
+<span class="lineNum">     141 </span>            :    changing the working directory.  Otherwise, resort to using
+<span class="lineNum">     142 </span>            :    save_cwd/fchdir, then utimens/restore_cwd.  If either the save_cwd
+<span class="lineNum">     143 </span>            :    or the restore_cwd fails, then give a diagnostic and exit nonzero.
+<span class="lineNum">     144 </span>            :    Return 0 on success, -1 (setting errno) on failure.  */
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : /* AT_FUNC_NAME is now utimensat or local_utimensat.  */
+<span class="lineNum">     147 </span>            : #define AT_FUNC_F1 lutimens
+<span class="lineNum">     148 </span>            : #define AT_FUNC_F2 utimens
+<span class="lineNum">     149 </span>            : #define AT_FUNC_USE_F1_COND AT_SYMLINK_NOFOLLOW
+<span class="lineNum">     150 </span>            : #define AT_FUNC_POST_FILE_PARAM_DECLS , struct timespec const ts[2], int flag
+<span class="lineNum">     151 </span>            : #define AT_FUNC_POST_FILE_ARGS        , ts
+<span class="lineNum">     152 </span>            : #include &quot;at-func.copy5.c&quot;
+<span class="lineNum">     153 </span>            : #undef AT_FUNC_NAME
+<span class="lineNum">     154 </span>            : #undef AT_FUNC_F1
+<span class="lineNum">     155 </span>            : #undef AT_FUNC_F2
+<span class="lineNum">     156 </span>            : #undef AT_FUNC_USE_F1_COND
+<span class="lineNum">     157 </span>            : #undef AT_FUNC_POST_FILE_PARAM_DECLS
+<span class="lineNum">     158 </span>            : #undef AT_FUNC_POST_FILE_ARGS
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

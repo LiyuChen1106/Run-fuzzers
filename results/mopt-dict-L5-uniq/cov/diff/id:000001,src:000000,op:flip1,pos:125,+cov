@@ -1,0 +1,24 @@
+diff id:000000,orig:TODO -> id:000001,src:000000,op:flip1,pos:125,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/lib/linebuffer.c
+  New 'line' coverage: 100
+  New 'line' coverage: 101
+  New 'line' coverage: 102
+  New 'line' coverage: 103
+  New 'line' coverage: 87
+  New 'line' coverage: 88
+  New 'line' coverage: 89
+  New 'line' coverage: 90
+  New 'line' coverage: 91
+  New 'line' coverage: 92
+  New 'line' coverage: 93
+  New 'line' coverage: 95
+  New 'line' coverage: 96
+  New 'line' coverage: 97
+  New 'line' coverage: 98
+  New 'line' coverage: 99
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/src/uniq.c
+  New 'function' coverage: lava_set()
+  New 'line' coverage: 6
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/lib/xalloc.h
+  New 'line' coverage: 203
+  New 'line' coverage: 205

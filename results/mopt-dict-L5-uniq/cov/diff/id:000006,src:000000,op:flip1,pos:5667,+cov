@@ -1,0 +1,4 @@
+diff id:000005,src:000000,op:flip1,pos:3420 -> id:000006,src:000000,op:flip1,pos:5667,+cov
+Src file: /home/ubuntu/lava_corpus/LAVA-M/uniq/coreutils-8.24-lava-safe-gcov/lib/linebuffer.c
+  New 'line' coverage: 79
+  New 'line' coverage: 81

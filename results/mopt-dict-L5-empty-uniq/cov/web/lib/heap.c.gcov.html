@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/heap.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - heap.c<span style="font-size: 80%;"> (source / <a href="heap.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">50</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Barebones heap implementation supporting only insert and pop.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2010-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Full implementation: GDSL (http://gna.org/projects/gdsl/) by Nicolas
+<span class="lineNum">      19 </span>            :    Darnis &lt;ndarnis@free.fr&gt;. */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &quot;heap.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;stdlib--.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : static int heap_default_compare (void const *, void const *);
+<span class="lineNum">      28 </span>            : static size_t heapify_down (void **, size_t, size_t,
+<span class="lineNum">      29 </span>            :                             int (*) (void const *, void const *));
+<span class="lineNum">      30 </span>            : static void heapify_up (void **, size_t,
+<span class="lineNum">      31 </span>            :                         int (*) (void const *, void const *));
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : struct heap
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            :   void **array;     /* array[0] is not used */
+<span class="lineNum">      36 </span>            :   size_t capacity;  /* Array size */
+<span class="lineNum">      37 </span>            :   size_t count;     /* Used as index to last element. Also is num of items. */
+<span class="lineNum">      38 </span>            :   int (*compare) (void const *, void const *);
+<span class="lineNum">      39 </span>            : };
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : /* Allocate memory for the heap. */
+<a name="42"><span class="lineNum">      42 </span>            : </a>
+<span class="lineNum">      43 </span>            : struct heap *
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 : heap_alloc (int (*compare) (void const *, void const *), size_t n_reserve)</span>
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :   struct heap *heap = xmalloc (sizeof *heap);</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :   if (n_reserve == 0)</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     n_reserve = 1;</span>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :   heap-&gt;array = xnmalloc (n_reserve, sizeof *(heap-&gt;array));</span>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   heap-&gt;array[0] = NULL;</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :   heap-&gt;capacity = n_reserve;</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   heap-&gt;count = 0;</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   heap-&gt;compare = compare ? compare : heap_default_compare;</span>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :   return heap;</span>
+<span class="lineNum">      59 </span>            : }
+<span class="lineNum">      60 </span>            : 
+<a name="61"><span class="lineNum">      61 </span>            : </a>
+<span class="lineNum">      62 </span>            : static int
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 : heap_default_compare (void const *a, void const *b)</span>
+<span class="lineNum">      64 </span>            : {
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">      66 </span>            : }
+<span class="lineNum">      67 </span>            : 
+<a name="68"><span class="lineNum">      68 </span>            : </a>
+<span class="lineNum">      69 </span>            : void
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 : heap_free (struct heap *heap)</span>
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   free (heap-&gt;array);</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :   free (heap);</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : /* Insert element into heap. */
+<a name="77"><span class="lineNum">      77 </span>            : </a>
+<span class="lineNum">      78 </span>            : int
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 : heap_insert (struct heap *heap, void *item)</span>
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   if (heap-&gt;capacity - 1 &lt;= heap-&gt;count)</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     heap-&gt;array = x2nrealloc (heap-&gt;array, &amp;heap-&gt;capacity,</span>
+<span class="lineNum">      83 </span>            :                               sizeof *(heap-&gt;array));
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :   heap-&gt;array[++heap-&gt;count] = item;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   heapify_up (heap-&gt;array, heap-&gt;count, heap-&gt;compare);</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">      89 </span>            : }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            : /* Pop top element off heap. */
+<a name="92"><span class="lineNum">      92 </span>            : </a>
+<span class="lineNum">      93 </span>            : void *
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 : heap_remove_top (struct heap *heap)</span>
+<span class="lineNum">      95 </span>            : {
+<span class="lineNum">      96 </span>            :   void *top;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   if (heap-&gt;count == 0)</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   top = heap-&gt;array[1];</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :   heap-&gt;array[1] = heap-&gt;array[heap-&gt;count--];</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :   heapify_down (heap-&gt;array, heap-&gt;count, 1, heap-&gt;compare);</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   return top;</span>
+<span class="lineNum">     106 </span>            : }
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : /* Move element down into appropriate position in heap. */
+<a name="109"><span class="lineNum">     109 </span>            : </a>
+<span class="lineNum">     110 </span>            : static size_t
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 : heapify_down (void **array, size_t count, size_t initial,</span>
+<span class="lineNum">     112 </span>            :               int (*compare) (void const *, void const *))
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   void *element = array[initial];</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   size_t parent = initial;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :   while (parent &lt;= count / 2)</span>
+<span class="lineNum">     118 </span>            :     {
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :       size_t child = 2 * parent;</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :       if (child &lt; count &amp;&amp; compare (array[child], array[child+1]) &lt; 0)</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :         child++;</span>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       if (compare (array[child], element) &lt;= 0)</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :       array[parent] = array[child];</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :       parent = child;</span>
+<span class="lineNum">     129 </span>            :     }
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :   array[parent] = element;</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :   return parent;</span>
+<span class="lineNum">     133 </span>            : }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : /* Move element up into appropriate position in heap. */
+<a name="136"><span class="lineNum">     136 </span>            : </a>
+<span class="lineNum">     137 </span>            : static void
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 : heapify_up (void **array, size_t count,</span>
+<span class="lineNum">     139 </span>            :             int (*compare) (void const *, void const *))
+<span class="lineNum">     140 </span>            : {
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   size_t k = count;</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   void *new_element = array[k];</span>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   while (k != 1 &amp;&amp; compare (array[k/2], new_element) &lt;= 0)</span>
+<span class="lineNum">     145 </span>            :     {
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :       array[k] = array[k/2];</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       k /= 2;</span>
+<span class="lineNum">     148 </span>            :     }
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :   array[k] = new_element;</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/xstrtol.copy2.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - xstrtol.copy2.c<span style="font-size: 80%;"> (source / <a href="xstrtol.copy2.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">93</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* A more useful interface to strtol.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1995-1996, 1998-2001, 2003-2007, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by Jim Meyering. */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #ifndef __strtol
+<span class="lineNum">      22 </span>            : # define __strtol strtol
+<span class="lineNum">      23 </span>            : # define __strtol_t long int
+<span class="lineNum">      24 </span>            : # define __xstrtol xstrtol
+<span class="lineNum">      25 </span>            : # define STRTOL_T_MINIMUM LONG_MIN
+<span class="lineNum">      26 </span>            : # define STRTOL_T_MAXIMUM LONG_MAX
+<span class="lineNum">      27 </span>            : #endif
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #include &quot;xstrtol.h&quot;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : /* Some pre-ANSI implementations (e.g. SunOS 4)
+<span class="lineNum">      34 </span>            :    need stderr defined if assertion checking is enabled.  */
+<span class="lineNum">      35 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">      38 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      39 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      40 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      41 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #include &quot;assure.h&quot;
+<span class="lineNum">      44 </span>            : #include &quot;intprops.h&quot;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : /* xstrtoll.c and xstrtoull.c, which include this file, require that
+<span class="lineNum">      47 </span>            :    ULLONG_MAX, LLONG_MAX, LLONG_MIN are defined, but &lt;limits.h&gt; does not
+<span class="lineNum">      48 </span>            :    define them on all platforms.  */
+<span class="lineNum">      49 </span>            : #ifndef ULLONG_MAX
+<span class="lineNum">      50 </span>            : # define ULLONG_MAX TYPE_MAXIMUM (unsigned long long)
+<span class="lineNum">      51 </span>            : #endif
+<span class="lineNum">      52 </span>            : #ifndef LLONG_MAX
+<span class="lineNum">      53 </span>            : # define LLONG_MAX TYPE_MAXIMUM (long long int)
+<span class="lineNum">      54 </span>            : #endif
+<span class="lineNum">      55 </span>            : #ifndef LLONG_MIN
+<span class="lineNum">      56 </span>            : # define LLONG_MIN TYPE_MINIMUM (long long int)
+<span class="lineNum">      57 </span>            : #endif
+<a name="58"><span class="lineNum">      58 </span>            : </a>
+<span class="lineNum">      59 </span>            : static strtol_error
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 : bkm_scale (__strtol_t *x, int scale_factor)</span>
+<span class="lineNum">      61 </span>            : {
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :   if (TYPE_SIGNED (__strtol_t) &amp;&amp; *x &lt; STRTOL_T_MINIMUM / scale_factor)</span>
+<span class="lineNum">      63 </span>            :     {
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :       *x = STRTOL_T_MINIMUM;</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       return LONGINT_OVERFLOW;</span>
+<span class="lineNum">      66 </span>            :     }
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   if (STRTOL_T_MAXIMUM / scale_factor &lt; *x)</span>
+<span class="lineNum">      68 </span>            :     {
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       *x = STRTOL_T_MAXIMUM;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       return LONGINT_OVERFLOW;</span>
+<span class="lineNum">      71 </span>            :     }
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   *x *= scale_factor;</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :   return LONGINT_OK;</span>
+<span class="lineNum">      74 </span>            : }
+<a name="75"><span class="lineNum">      75 </span>            : </a>
+<span class="lineNum">      76 </span>            : static strtol_error
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 : bkm_scale_by_power (__strtol_t *x, int base, int power)</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :   strtol_error err = LONGINT_OK;</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   while (power--)</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     err |= bkm_scale (x, base);</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   return err;</span>
+<span class="lineNum">      83 </span>            : }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : /* FIXME: comment.  */
+<a name="86"><span class="lineNum">      86 </span>            : </a>
+<span class="lineNum">      87 </span>            : strtol_error
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 : __xstrtol (const char *s, char **ptr, int strtol_base,</span>
+<span class="lineNum">      89 </span>            :            __strtol_t *val, const char *valid_suffixes)
+<span class="lineNum">      90 </span>            : {
+<span class="lineNum">      91 </span>            :   char *t_ptr;
+<span class="lineNum">      92 </span>            :   char **p;
+<span class="lineNum">      93 </span>            :   __strtol_t tmp;
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   strtol_error err = LONGINT_OK;</span>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   assure (0 &lt;= strtol_base &amp;&amp; strtol_base &lt;= 36);</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   p = (ptr ? ptr : &amp;t_ptr);</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   errno = 0;</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :   if (! TYPE_SIGNED (__strtol_t))
+<span class="lineNum">     103 </span>            :     {
+<span class="lineNum">     104 </span>            :       const char *q = s;
+<span class="lineNum">     105 </span>            :       unsigned char ch = *q;
+<span class="lineNum">     106 </span>            :       while (isspace (ch))
+<span class="lineNum">     107 </span>            :         ch = *++q;
+<span class="lineNum">     108 </span>            :       if (ch == '-')
+<span class="lineNum">     109 </span>            :         return LONGINT_INVALID;
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :   tmp = __strtol (s, p, strtol_base);</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   if (*p == s)</span>
+<span class="lineNum">     115 </span>            :     {
+<span class="lineNum">     116 </span>            :       /* If there is no number but there is a valid suffix, assume the
+<span class="lineNum">     117 </span>            :          number is 1.  The string is invalid otherwise.  */
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       if (valid_suffixes &amp;&amp; **p &amp;&amp; strchr (valid_suffixes, **p))</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :         tmp = 1;</span>
+<span class="lineNum">     120 </span>            :       else
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :         return LONGINT_INVALID;</span>
+<span class="lineNum">     122 </span>            :     }
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :   else if (errno != 0)</span>
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       if (errno != ERANGE)</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :         return LONGINT_INVALID;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :       err = LONGINT_OVERFLOW;</span>
+<span class="lineNum">     128 </span>            :     }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :   /* Let valid_suffixes == NULL mean &quot;allow any suffix&quot;.  */
+<span class="lineNum">     131 </span>            :   /* FIXME: update all callers except the ones that allow suffixes
+<span class="lineNum">     132 </span>            :      after the number, changing last parameter NULL to &quot;&quot;.  */
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :   if (!valid_suffixes)</span>
+<span class="lineNum">     134 </span>            :     {
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :       *val = tmp;</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :       return err;</span>
+<span class="lineNum">     137 </span>            :     }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   if (**p != '\0')</span>
+<span class="lineNum">     140 </span>            :     {
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       int base = 1024;</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :       int suffixes = 1;</span>
+<span class="lineNum">     143 </span>            :       strtol_error overflow;
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       if (!strchr (valid_suffixes, **p))</span>
+<span class="lineNum">     146 </span>            :         {
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :           *val = tmp;</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :           return err | LONGINT_INVALID_SUFFIX_CHAR;</span>
+<span class="lineNum">     149 </span>            :         }
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       if (strchr (valid_suffixes, '0'))</span>
+<span class="lineNum">     152 </span>            :         {
+<span class="lineNum">     153 </span>            :           /* The &quot;valid suffix&quot; '0' is a special flag meaning that
+<span class="lineNum">     154 </span>            :              an optional second suffix is allowed, which can change
+<span class="lineNum">     155 </span>            :              the base.  A suffix &quot;B&quot; (e.g. &quot;100MB&quot;) stands for a power
+<span class="lineNum">     156 </span>            :              of 1000, whereas a suffix &quot;iB&quot; (e.g. &quot;100MiB&quot;) stands for
+<span class="lineNum">     157 </span>            :              a power of 1024.  If no suffix (e.g. &quot;100M&quot;), assume
+<span class="lineNum">     158 </span>            :              power-of-1024.  */
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :           switch (p[0][1])</span>
+<span class="lineNum">     161 </span>            :             {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :             case 'i':</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :               if (p[0][2] == 'B')</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                 suffixes += 2;</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :             case 'B':</span>
+<span class="lineNum">     168 </span>            :             case 'D': /* 'D' is obsolescent */
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :               base = 1000;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :               suffixes++;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     172 </span>            :             }
+<span class="lineNum">     173 </span>            :         }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :       switch (**p)</span>
+<span class="lineNum">     176 </span>            :         {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :         case 'b':</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :           overflow = bkm_scale (&amp;tmp, 512);</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         case 'B':</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :           overflow = bkm_scale (&amp;tmp, 1024);</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :         case 'c':</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :           overflow = LONGINT_OK;</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         case 'E': /* exa or exbi */</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 6);</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :         case 'G': /* giga or gibi */</span>
+<span class="lineNum">     194 </span>            :         case 'g': /* 'g' is undocumented; for compatibility only */
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 3);</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         case 'k': /* kilo */</span>
+<span class="lineNum">     199 </span>            :         case 'K': /* kibi */
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 1);</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :         case 'M': /* mega or mebi */</span>
+<span class="lineNum">     204 </span>            :         case 'm': /* 'm' is undocumented; for compatibility only */
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 2);</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :         case 'P': /* peta or pebi */</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 5);</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :         case 'T': /* tera or tebi */</span>
+<span class="lineNum">     213 </span>            :         case 't': /* 't' is undocumented; for compatibility only */
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 4);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         case 'w':</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :           overflow = bkm_scale (&amp;tmp, 2);</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :         case 'Y': /* yotta or 2**80 */</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 8);</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :         case 'Z': /* zetta or 2**70 */</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :           overflow = bkm_scale_by_power (&amp;tmp, base, 7);</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :           *val = tmp;</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :           return err | LONGINT_INVALID_SUFFIX_CHAR;</span>
+<span class="lineNum">     232 </span>            :         }
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :       err |= overflow;</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :       *p += suffixes;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :       if (**p)</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         err |= LONGINT_INVALID_SUFFIX_CHAR;</span>
+<span class="lineNum">     238 </span>            :     }
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :   *val = tmp;</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :   return err;</span>
+<span class="lineNum">     242 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

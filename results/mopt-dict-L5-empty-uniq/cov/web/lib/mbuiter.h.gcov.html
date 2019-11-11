@@ -1,0 +1,308 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/mbuiter.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - mbuiter.h<span style="font-size: 80%;"> (source / <a href="mbuiter.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Iterating through multibyte strings: macros for multi-byte encodings.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2001, 2005, 2007, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* Written by Bruno Haible &lt;bruno@clisp.org&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* The macros in this file implement forward iteration through a
+<span class="lineNum">      20 </span>            :    multi-byte string, without knowing its length a-priori.
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :    With these macros, an iteration loop that looks like
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :       char *iter;
+<span class="lineNum">      25 </span>            :       for (iter = buf; *iter != '\0'; iter++)
+<span class="lineNum">      26 </span>            :         {
+<span class="lineNum">      27 </span>            :           do_something (*iter);
+<span class="lineNum">      28 </span>            :         }
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :    becomes
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :       mbui_iterator_t iter;
+<span class="lineNum">      33 </span>            :       for (mbui_init (iter, buf); mbui_avail (iter); mbui_advance (iter))
+<span class="lineNum">      34 </span>            :         {
+<span class="lineNum">      35 </span>            :           do_something (mbui_cur_ptr (iter), mb_len (mbui_cur (iter)));
+<span class="lineNum">      36 </span>            :         }
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :    The benefit of these macros over plain use of mbrtowc is:
+<span class="lineNum">      39 </span>            :    - Handling of invalid multibyte sequences is possible without
+<span class="lineNum">      40 </span>            :      making the code more complicated, while still preserving the
+<span class="lineNum">      41 </span>            :      invalid multibyte sequences.
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :    Compared to mbiter.h, the macros here don't need to know the string's
+<span class="lineNum">      44 </span>            :    length a-priori.  The downside is that at each step, the look-ahead
+<span class="lineNum">      45 </span>            :    that guards against overrunning the terminating '\0' is more expensive.
+<span class="lineNum">      46 </span>            :    The mbui_* macros are therefore suitable when there is a high probability
+<span class="lineNum">      47 </span>            :    that only the first few multibyte characters need to be inspected.
+<span class="lineNum">      48 </span>            :    Whereas the mbi_* macros are better if usually the iteration runs
+<span class="lineNum">      49 </span>            :    through the entire string.
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :    mbui_iterator_t
+<span class="lineNum">      52 </span>            :      is a type usable for variable declarations.
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :    mbui_init (iter, startptr)
+<span class="lineNum">      55 </span>            :      initializes the iterator, starting at startptr.
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :    mbui_avail (iter)
+<span class="lineNum">      58 </span>            :      returns true if there are more multibyte characters available before
+<span class="lineNum">      59 </span>            :      the end of string is reached. In this case, mbui_cur (iter) is
+<span class="lineNum">      60 </span>            :      initialized to the next multibyte character.
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :    mbui_advance (iter)
+<span class="lineNum">      63 </span>            :      advances the iterator by one multibyte character.
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :    mbui_cur (iter)
+<span class="lineNum">      66 </span>            :      returns the current multibyte character, of type mbchar_t.  All the
+<span class="lineNum">      67 </span>            :      macros defined in mbchar.h can be used on it.
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :    mbui_cur_ptr (iter)
+<span class="lineNum">      70 </span>            :      return a pointer to the beginning of the current multibyte character.
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :    mbui_reloc (iter, ptrdiff)
+<span class="lineNum">      73 </span>            :      relocates iterator when the string is moved by ptrdiff bytes.
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :    mbui_copy (&amp;destiter, &amp;srciter)
+<span class="lineNum">      76 </span>            :      copies srciter to destiter.
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :    Here are the function prototypes of the macros.
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :    extern void          mbui_init (mbui_iterator_t iter, const char *startptr);
+<span class="lineNum">      81 </span>            :    extern bool          mbui_avail (mbui_iterator_t iter);
+<span class="lineNum">      82 </span>            :    extern void          mbui_advance (mbui_iterator_t iter);
+<span class="lineNum">      83 </span>            :    extern mbchar_t      mbui_cur (mbui_iterator_t iter);
+<span class="lineNum">      84 </span>            :    extern const char *  mbui_cur_ptr (mbui_iterator_t iter);
+<span class="lineNum">      85 </span>            :    extern void          mbui_reloc (mbui_iterator_t iter, ptrdiff_t ptrdiff);
+<span class="lineNum">      86 </span>            :    extern void          mbui_copy (mbui_iterator_t *new, const mbui_iterator_t *old);
+<span class="lineNum">      87 </span>            :  */
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : #ifndef _MBUITER_H
+<span class="lineNum">      90 </span>            : #define _MBUITER_H 1
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            : #include &lt;assert.h&gt;
+<span class="lineNum">      93 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      94 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">      95 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      96 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : /* Tru64 with Desktop Toolkit C has a bug: &lt;stdio.h&gt; must be included before
+<span class="lineNum">      99 </span>            :    &lt;wchar.h&gt;.
+<span class="lineNum">     100 </span>            :    BSD/OS 4.1 has a bug: &lt;stdio.h&gt; and &lt;time.h&gt; must be included before
+<span class="lineNum">     101 </span>            :    &lt;wchar.h&gt;.  */
+<span class="lineNum">     102 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">     103 </span>            : #include &lt;time.h&gt;
+<span class="lineNum">     104 </span>            : #include &lt;wchar.h&gt;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : #include &quot;mbchar.h&quot;
+<span class="lineNum">     107 </span>            : #include &quot;strnlen1.h&quot;
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            : #ifndef _GL_INLINE_HEADER_BEGIN
+<span class="lineNum">     110 </span>            :  #error &quot;Please include config.h first.&quot;
+<span class="lineNum">     111 </span>            : #endif
+<span class="lineNum">     112 </span>            : _GL_INLINE_HEADER_BEGIN
+<span class="lineNum">     113 </span>            : #ifndef MBUITER_INLINE
+<span class="lineNum">     114 </span>            : # define MBUITER_INLINE _GL_INLINE
+<span class="lineNum">     115 </span>            : #endif
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : struct mbuiter_multi
+<span class="lineNum">     118 </span>            : {
+<span class="lineNum">     119 </span>            :   bool in_shift;        /* true if next byte may not be interpreted as ASCII */
+<span class="lineNum">     120 </span>            :   mbstate_t state;      /* if in_shift: current shift state */
+<span class="lineNum">     121 </span>            :   bool next_done;       /* true if mbui_avail has already filled the following */
+<span class="lineNum">     122 </span>            :   struct mbchar cur;    /* the current character:
+<span class="lineNum">     123 </span>            :         const char *cur.ptr             pointer to current character
+<span class="lineNum">     124 </span>            :         The following are only valid after mbui_avail.
+<span class="lineNum">     125 </span>            :         size_t cur.bytes                number of bytes of current character
+<span class="lineNum">     126 </span>            :         bool cur.wc_valid               true if wc is a valid wide character
+<span class="lineNum">     127 </span>            :         wchar_t cur.wc                  if wc_valid: the current character
+<span class="lineNum">     128 </span>            :         */
+<span class="lineNum">     129 </span>            : };
+<a name="130"><span class="lineNum">     130 </span>            : </a>
+<span class="lineNum">     131 </span>            : MBUITER_INLINE void
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 : mbuiter_multi_next (struct mbuiter_multi *iter)</span>
+<span class="lineNum">     133 </span>            : {
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   if (iter-&gt;next_done)</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :   if (iter-&gt;in_shift)</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :     goto with_shift;</span>
+<span class="lineNum">     138 </span>            :   /* Handle most ASCII characters quickly, without calling mbrtowc().  */
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   if (is_basic (*iter-&gt;cur.ptr))</span>
+<span class="lineNum">     140 </span>            :     {
+<span class="lineNum">     141 </span>            :       /* These characters are part of the basic character set.  ISO C 99
+<span class="lineNum">     142 </span>            :          guarantees that their wide character code is identical to their
+<span class="lineNum">     143 </span>            :          char code.  */
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :       iter-&gt;cur.bytes = 1;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       iter-&gt;cur.wc = *iter-&gt;cur.ptr;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :       iter-&gt;cur.wc_valid = true;</span>
+<span class="lineNum">     147 </span>            :     }
+<span class="lineNum">     148 </span>            :   else
+<span class="lineNum">     149 </span>            :     {
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :       assert (mbsinit (&amp;iter-&gt;state));</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       iter-&gt;in_shift = true;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     with_shift:</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       iter-&gt;cur.bytes = mbrtowc (&amp;iter-&gt;cur.wc, iter-&gt;cur.ptr,</span>
+<span class="lineNum">     154 </span>            :                                  strnlen1 (iter-&gt;cur.ptr, MB_CUR_MAX),
+<span class="lineNum">     155 </span>            :                                  &amp;iter-&gt;state);
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       if (iter-&gt;cur.bytes == (size_t) -1)</span>
+<span class="lineNum">     157 </span>            :         {
+<span class="lineNum">     158 </span>            :           /* An invalid multibyte sequence was encountered.  */
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :           iter-&gt;cur.bytes = 1;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :           iter-&gt;cur.wc_valid = false;</span>
+<span class="lineNum">     161 </span>            :           /* Whether to set iter-&gt;in_shift = false and reset iter-&gt;state
+<span class="lineNum">     162 </span>            :              or not is not very important; the string is bogus anyway.  */
+<span class="lineNum">     163 </span>            :         }
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :       else if (iter-&gt;cur.bytes == (size_t) -2)</span>
+<span class="lineNum">     165 </span>            :         {
+<span class="lineNum">     166 </span>            :           /* An incomplete multibyte character at the end.  */
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :           iter-&gt;cur.bytes = strlen (iter-&gt;cur.ptr);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :           iter-&gt;cur.wc_valid = false;</span>
+<span class="lineNum">     169 </span>            :           /* Whether to set iter-&gt;in_shift = false and reset iter-&gt;state
+<span class="lineNum">     170 </span>            :              or not is not important; the string end is reached anyway.  */
+<span class="lineNum">     171 </span>            :         }
+<span class="lineNum">     172 </span>            :       else
+<span class="lineNum">     173 </span>            :         {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :           if (iter-&gt;cur.bytes == 0)</span>
+<span class="lineNum">     175 </span>            :             {
+<span class="lineNum">     176 </span>            :               /* A null wide character was encountered.  */
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :               iter-&gt;cur.bytes = 1;</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :               assert (*iter-&gt;cur.ptr == '\0');</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :               assert (iter-&gt;cur.wc == 0);</span>
+<span class="lineNum">     180 </span>            :             }
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :           iter-&gt;cur.wc_valid = true;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :           /* When in the initial state, we can go back treating ASCII
+<span class="lineNum">     184 </span>            :              characters more quickly.  */
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :           if (mbsinit (&amp;iter-&gt;state))</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :             iter-&gt;in_shift = false;</span>
+<span class="lineNum">     187 </span>            :         }
+<span class="lineNum">     188 </span>            :     }
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :   iter-&gt;next_done = true;</span>
+<span class="lineNum">     190 </span>            : }
+<a name="191"><span class="lineNum">     191 </span>            : </a>
+<span class="lineNum">     192 </span>            : MBUITER_INLINE void
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 : mbuiter_multi_reloc (struct mbuiter_multi *iter, ptrdiff_t ptrdiff)</span>
+<span class="lineNum">     194 </span>            : {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :   iter-&gt;cur.ptr += ptrdiff;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 : }</span>
+<a name="197"><span class="lineNum">     197 </span>            : </a>
+<span class="lineNum">     198 </span>            : MBUITER_INLINE void
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 : mbuiter_multi_copy (struct mbuiter_multi *new_iter, const struct mbuiter_multi *old_iter)</span>
+<span class="lineNum">     200 </span>            : {
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :   if ((new_iter-&gt;in_shift = old_iter-&gt;in_shift))</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     memcpy (&amp;new_iter-&gt;state, &amp;old_iter-&gt;state, sizeof (mbstate_t));</span>
+<span class="lineNum">     203 </span>            :   else
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :     memset (&amp;new_iter-&gt;state, 0, sizeof (mbstate_t));</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   new_iter-&gt;next_done = old_iter-&gt;next_done;</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :   mb_copy (&amp;new_iter-&gt;cur, &amp;old_iter-&gt;cur);</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            : /* Iteration macros.  */
+<span class="lineNum">     210 </span>            : typedef struct mbuiter_multi mbui_iterator_t;
+<span class="lineNum">     211 </span>            : #define mbui_init(iter, startptr) \
+<span class="lineNum">     212 </span>            :   ((iter).cur.ptr = (startptr), \
+<span class="lineNum">     213 </span>            :    (iter).in_shift = false, memset (&amp;(iter).state, '\0', sizeof (mbstate_t)), \
+<span class="lineNum">     214 </span>            :    (iter).next_done = false)
+<span class="lineNum">     215 </span>            : #define mbui_avail(iter) \
+<span class="lineNum">     216 </span>            :   (mbuiter_multi_next (&amp;(iter)), !mb_isnul ((iter).cur))
+<span class="lineNum">     217 </span>            : #define mbui_advance(iter) \
+<span class="lineNum">     218 </span>            :   ((iter).cur.ptr += (iter).cur.bytes, (iter).next_done = false)
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            : /* Access to the current character.  */
+<span class="lineNum">     221 </span>            : #define mbui_cur(iter) (iter).cur
+<span class="lineNum">     222 </span>            : #define mbui_cur_ptr(iter) (iter).cur.ptr
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            : /* Relocation.  */
+<span class="lineNum">     225 </span>            : #define mbui_reloc(iter, ptrdiff) mbuiter_multi_reloc (&amp;iter, ptrdiff)
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            : /* Copying an iterator.  */
+<span class="lineNum">     228 </span>            : #define mbui_copy mbuiter_multi_copy
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            : _GL_INLINE_HEADER_END
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            : #endif /* _MBUITER_H */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/copy-acl.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - copy-acl.c<span style="font-size: 80%;"> (source / <a href="copy-acl.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* copy-acl.c - copy access control list from one file to another file</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2002-2003, 2005-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :    Written by Paul Eggert, Andreas Grünbacher, and Bruno Haible.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &quot;acl.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;quote.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;error.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      29 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : /* Copy access control lists from one file to another. If SOURCE_DESC is
+<span class="lineNum">      33 </span>            :    a valid file descriptor, use file descriptor operations, else use
+<span class="lineNum">      34 </span>            :    filename based operations on SRC_NAME. Likewise for DEST_DESC and
+<span class="lineNum">      35 </span>            :    DST_NAME.
+<span class="lineNum">      36 </span>            :    If access control lists are not available, fchmod the target file to
+<span class="lineNum">      37 </span>            :    MODE.  Also sets the non-permission bits of the destination file
+<span class="lineNum">      38 </span>            :    (S_ISUID, S_ISGID, S_ISVTX) to those from MODE if any are set.
+<span class="lineNum">      39 </span>            :    Return 0 if successful, otherwise output a diagnostic and return a
+<span class="lineNum">      40 </span>            :    negative error code.  */
+<a name="41"><span class="lineNum">      41 </span>            : </a>
+<span class="lineNum">      42 </span>            : int
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 : copy_acl (const char *src_name, int source_desc, const char *dst_name,</span>
+<span class="lineNum">      44 </span>            :           int dest_desc, mode_t mode)
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :   int ret = qcopy_acl (src_name, source_desc, dst_name, dest_desc, mode);</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   switch (ret)</span>
+<span class="lineNum">      48 </span>            :     {
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     case -2:</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       error (0, errno, &quot;%s&quot;, quote (src_name));</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :     case -1:</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :       error (0, errno, _(&quot;preserving permissions for %s&quot;), quote (dst_name));</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     default:</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">      59 </span>            :     }
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :   return ret;</span>
+<span class="lineNum">      61 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

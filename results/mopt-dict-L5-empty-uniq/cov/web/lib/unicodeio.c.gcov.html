@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/unicodeio.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - unicodeio.c<span style="font-size: 80%;"> (source / <a href="unicodeio.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Unicode character output to streams with locale dependent encoding.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2000-2003, 2006, 2008-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Bruno Haible &lt;haible@clisp.cons.org&gt;.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : /* Specification.  */
+<span class="lineNum">      23 </span>            : #include &quot;unicodeio.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #if HAVE_ICONV
+<span class="lineNum">      30 </span>            : # include &lt;iconv.h&gt;
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &lt;error.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      36 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      37 </span>            : #define N_(msgid) msgid
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #include &quot;localcharset.h&quot;
+<span class="lineNum">      40 </span>            : #include &quot;unistr.h&quot;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : /* When we pass a Unicode character to iconv(), we must pass it in a
+<span class="lineNum">      43 </span>            :    suitable encoding. The standardized Unicode encodings are
+<span class="lineNum">      44 </span>            :    UTF-8, UCS-2, UCS-4, UTF-16, UTF-16BE, UTF-16LE, UTF-7.
+<span class="lineNum">      45 </span>            :    UCS-2 supports only characters up to \U0000FFFF.
+<span class="lineNum">      46 </span>            :    UTF-16 and variants support only characters up to \U0010FFFF.
+<span class="lineNum">      47 </span>            :    UTF-7 is way too complex and not supported by glibc-2.1.
+<span class="lineNum">      48 </span>            :    UCS-4 specification leaves doubts about endianness and byte order
+<span class="lineNum">      49 </span>            :    mark. glibc currently interprets it as big endian without byte order
+<span class="lineNum">      50 </span>            :    mark, but this is not backed by an RFC.
+<span class="lineNum">      51 </span>            :    So we use UTF-8. It supports characters up to \U7FFFFFFF and is
+<span class="lineNum">      52 </span>            :    unambiguously defined.  */
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : /* Luckily, the encoding's name is platform independent.  */
+<span class="lineNum">      55 </span>            : #define UTF8_NAME &quot;UTF-8&quot;
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : /* Converts the Unicode character CODE to its multibyte representation
+<span class="lineNum">      58 </span>            :    in the current locale and calls the SUCCESS callback on the resulting
+<span class="lineNum">      59 </span>            :    byte sequence.  If an error occurs, invokes the FAILURE callback instead,
+<span class="lineNum">      60 </span>            :    passing it CODE and an English error string.
+<span class="lineNum">      61 </span>            :    Returns whatever the callback returned.
+<a name="62"><span class="lineNum">      62 </span>            :    Assumes that the locale doesn't change between two calls.  */</a>
+<span class="lineNum">      63 </span>            : long
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 : unicode_to_mb (unsigned int code,</span>
+<span class="lineNum">      65 </span>            :                long (*success) (const char *buf, size_t buflen,
+<span class="lineNum">      66 </span>            :                                 void *callback_arg),
+<span class="lineNum">      67 </span>            :                long (*failure) (unsigned int code, const char *msg,
+<span class="lineNum">      68 </span>            :                                 void *callback_arg),
+<span class="lineNum">      69 </span>            :                void *callback_arg)
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :   static int initialized;
+<span class="lineNum">      72 </span>            :   static int is_utf8;
+<span class="lineNum">      73 </span>            : #if HAVE_ICONV
+<span class="lineNum">      74 </span>            :   static iconv_t utf8_to_local;
+<span class="lineNum">      75 </span>            : #endif
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   char inbuf[6];
+<span class="lineNum">      78 </span>            :   int count;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   if (!initialized)</span>
+<span class="lineNum">      81 </span>            :     {
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       const char *charset = locale_charset ();</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       is_utf8 = !strcmp (charset, UTF8_NAME);</span>
+<span class="lineNum">      85 </span>            : #if HAVE_ICONV
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       if (!is_utf8)</span>
+<span class="lineNum">      87 </span>            :         {
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :           utf8_to_local = iconv_open (charset, UTF8_NAME);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :           if (utf8_to_local == (iconv_t)(-1))</span>
+<span class="lineNum">      90 </span>            :             /* For an unknown encoding, assume ASCII.  */
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :             utf8_to_local = iconv_open (&quot;ASCII&quot;, UTF8_NAME);</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span>            : #endif
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :       initialized = 1;</span>
+<span class="lineNum">      95 </span>            :     }
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :   /* Test whether the utf8_to_local converter is available at all.  */
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   if (!is_utf8)</span>
+<span class="lineNum">      99 </span>            :     {
+<span class="lineNum">     100 </span>            : #if HAVE_ICONV
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       if (utf8_to_local == (iconv_t)(-1))</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :         return failure (code, N_(&quot;iconv function not usable&quot;), callback_arg);</span>
+<span class="lineNum">     103 </span>            : #else
+<span class="lineNum">     104 </span>            :       return failure (code, N_(&quot;iconv function not available&quot;), callback_arg);
+<span class="lineNum">     105 </span>            : #endif
+<span class="lineNum">     106 </span>            :     }
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :   /* Convert the character to UTF-8.  */
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   count = u8_uctomb ((unsigned char *) inbuf, code, sizeof (inbuf));</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   if (count &lt; 0)</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     return failure (code, N_(&quot;character out of range&quot;), callback_arg);</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : #if HAVE_ICONV
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   if (!is_utf8)</span>
+<span class="lineNum">     115 </span>            :     {
+<span class="lineNum">     116 </span>            :       char outbuf[25];
+<span class="lineNum">     117 </span>            :       const char *inptr;
+<span class="lineNum">     118 </span>            :       size_t inbytesleft;
+<span class="lineNum">     119 </span>            :       char *outptr;
+<span class="lineNum">     120 </span>            :       size_t outbytesleft;
+<span class="lineNum">     121 </span>            :       size_t res;
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :       inptr = inbuf;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       inbytesleft = count;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       outptr = outbuf;</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :       outbytesleft = sizeof (outbuf);</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :       /* Convert the character from UTF-8 to the locale's charset.  */
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :       res = iconv (utf8_to_local,</span>
+<span class="lineNum">     130 </span>            :                    (ICONV_CONST char **)&amp;inptr, &amp;inbytesleft,
+<span class="lineNum">     131 </span>            :                    &amp;outptr, &amp;outbytesleft);
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :       if (inbytesleft &gt; 0 || res == (size_t)(-1)</span>
+<span class="lineNum">     133 </span>            :           /* Irix iconv() inserts a NUL byte if it cannot convert. */
+<span class="lineNum">     134 </span>            : # if !defined _LIBICONV_VERSION &amp;&amp; (defined sgi || defined __sgi)
+<span class="lineNum">     135 </span>            :           || (res &gt; 0 &amp;&amp; code != 0 &amp;&amp; outptr - outbuf == 1 &amp;&amp; *outbuf == '\0')
+<span class="lineNum">     136 </span>            : # endif
+<span class="lineNum">     137 </span>            :          )
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :         return failure (code, NULL, callback_arg);</span>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            :       /* Avoid glibc-2.1 bug and Solaris 7 bug.  */
+<span class="lineNum">     141 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">     142 </span>            :     || !(((__GLIBC__ - 0 == 2 &amp;&amp; __GLIBC_MINOR__ - 0 &lt;= 1) \
+<span class="lineNum">     143 </span>            :           &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     144 </span>            :          || defined __sun)
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :       /* Get back to the initial shift state.  */
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       res = iconv (utf8_to_local, NULL, NULL, &amp;outptr, &amp;outbytesleft);</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :       if (res == (size_t)(-1))</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :         return failure (code, NULL, callback_arg);</span>
+<span class="lineNum">     150 </span>            : # endif
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :       return success (outbuf, outptr - outbuf, callback_arg);</span>
+<span class="lineNum">     153 </span>            :     }
+<span class="lineNum">     154 </span>            : #endif
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :   /* At this point, is_utf8 is true, so no conversion is needed.  */
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   return success (inbuf, count, callback_arg);</span>
+<span class="lineNum">     158 </span>            : }
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : /* Simple success callback that outputs the converted string.
+<a name="161"><span class="lineNum">     161 </span>            :    The STREAM is passed as callback_arg.  */</a>
+<span class="lineNum">     162 </span>            : long
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 : fwrite_success_callback (const char *buf, size_t buflen, void *callback_arg)</span>
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :   FILE *stream = (FILE *) callback_arg;</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :   /* The return value of fwrite can be ignored here, because under normal
+<span class="lineNum">     168 </span>            :      conditions (STREAM is an open stream and not wide-character oriented)
+<span class="lineNum">     169 </span>            :      when fwrite() returns a value != buflen it also sets STREAM's error
+<span class="lineNum">     170 </span>            :      indicator.  */
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   fwrite (buf, 1, buflen, stream);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     173 </span>            : }
+<span class="lineNum">     174 </span>            : 
+<a name="175"><span class="lineNum">     175 </span>            : /* Simple failure callback that displays an error and exits.  */</a>
+<span class="lineNum">     176 </span>            : static long
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 : exit_failure_callback (unsigned int code, const char *msg,</span>
+<span class="lineNum">     178 </span>            :                        void *callback_arg _GL_UNUSED)
+<span class="lineNum">     179 </span>            : {
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   if (msg == NULL)</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :     error (1, 0, _(&quot;cannot convert U+%04X to local character set&quot;), code);</span>
+<span class="lineNum">     182 </span>            :   else
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     error (1, 0, _(&quot;cannot convert U+%04X to local character set: %s&quot;), code,</span>
+<span class="lineNum">     184 </span>            :            gettext (msg));
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   return -1;</span>
+<span class="lineNum">     186 </span>            : }
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            : /* Simple failure callback that displays a fallback representation in plain
+<a name="189"><span class="lineNum">     189 </span>            :    ASCII, using the same notation as ISO C99 strings.  */</a>
+<span class="lineNum">     190 </span>            : static long
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 : fallback_failure_callback (unsigned int code,</span>
+<span class="lineNum">     192 </span>            :                            const char *msg _GL_UNUSED,
+<span class="lineNum">     193 </span>            :                            void *callback_arg)
+<span class="lineNum">     194 </span>            : {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :   FILE *stream = (FILE *) callback_arg;</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :   if (code &lt; 0x10000)</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :     fprintf (stream, &quot;\\u%04X&quot;, code);</span>
+<span class="lineNum">     199 </span>            :   else
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :     fprintf (stream, &quot;\\U%08X&quot;, code);</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :   return -1;</span>
+<span class="lineNum">     202 </span>            : }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : /* Outputs the Unicode character CODE to the output stream STREAM.
+<span class="lineNum">     205 </span>            :    Upon failure, exit if exit_on_error is true, otherwise output a fallback
+<a name="206"><span class="lineNum">     206 </span>            :    notation.  */</a>
+<span class="lineNum">     207 </span>            : void
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 : print_unicode_char (FILE *stream, unsigned int code, int exit_on_error)</span>
+<span class="lineNum">     209 </span>            : {
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :   unicode_to_mb (code, fwrite_success_callback,</span>
+<span class="lineNum">     211 </span>            :                  exit_on_error
+<span class="lineNum">     212 </span>            :                  ? exit_failure_callback
+<span class="lineNum">     213 </span>            :                  : fallback_failure_callback,
+<span class="lineNum">     214 </span>            :                  stream);
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

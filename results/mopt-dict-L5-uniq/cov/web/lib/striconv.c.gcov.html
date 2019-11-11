@@ -1,0 +1,539 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/striconv.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - striconv.c<span style="font-size: 80%;"> (source / <a href="striconv.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">143</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Charset conversion.</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2001-2007, 2010-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            :    Written by Bruno Haible and Simon Josefsson.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software; you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       8 </span>            :    any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program; if not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* Specification.  */
+<span class="lineNum">      21 </span>            : #include &quot;striconv.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #if HAVE_ICONV
+<span class="lineNum">      28 </span>            : # include &lt;iconv.h&gt;
+<span class="lineNum">      29 </span>            : /* Get MB_LEN_MAX, CHAR_BIT.  */
+<span class="lineNum">      30 </span>            : # include &lt;limits.h&gt;
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &quot;c-strcase.h&quot;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #ifndef SIZE_MAX
+<span class="lineNum">      36 </span>            : # define SIZE_MAX ((size_t) -1)
+<span class="lineNum">      37 </span>            : #endif
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #if HAVE_ICONV
+<a name="41"><span class="lineNum">      41 </span>            : </a>
+<span class="lineNum">      42 </span>            : int
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 : mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,</span>
+<span class="lineNum">      44 </span>            :               char **resultp, size_t *lengthp)
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span>            : # define tmpbufsize 4096
+<span class="lineNum">      47 </span>            :   size_t length;
+<span class="lineNum">      48 </span>            :   char *result;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :   /* Avoid glibc-2.1 bug and Solaris 2.7-2.9 bug.  */
+<span class="lineNum">      51 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">      52 </span>            :      || !(((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">      53 </span>            :           || defined __sun)
+<span class="lineNum">      54 </span>            :   /* Set to the initial state.  */
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   iconv (cd, NULL, NULL, NULL, NULL);</span>
+<span class="lineNum">      56 </span>            : # endif
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :   /* Determine the length we need.  */
+<span class="lineNum">      59 </span>            :   {
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     size_t count = 0;</span>
+<span class="lineNum">      61 </span>            :     /* The alignment is needed when converting e.g. to glibc's WCHAR_T or
+<span class="lineNum">      62 </span>            :        libiconv's UCS-4-INTERNAL encoding.  */
+<span class="lineNum">      63 </span>            :     union { unsigned int align; char buf[tmpbufsize]; } tmp;
+<span class="lineNum">      64 </span>            : # define tmpbuf tmp.buf
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :     const char *inptr = src;</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     size_t insize = srclen;</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     while (insize &gt; 0)</span>
+<span class="lineNum">      69 </span>            :       {
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :         char *outptr = tmpbuf;</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :         size_t outsize = tmpbufsize;</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :         size_t res = iconv (cd,</span>
+<span class="lineNum">      73 </span>            :                             (ICONV_CONST char **) &amp;inptr, &amp;insize,
+<span class="lineNum">      74 </span>            :                             &amp;outptr, &amp;outsize);
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :         if (res == (size_t)(-1))</span>
+<span class="lineNum">      77 </span>            :           {
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :             if (errno == E2BIG)</span>
+<span class="lineNum">      79 </span>            :               ;
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :             else if (errno == EINVAL)</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">      82 </span>            :             else
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :               return -1;</span>
+<span class="lineNum">      84 </span>            :           }
+<span class="lineNum">      85 </span>            : # if !defined _LIBICONV_VERSION &amp;&amp; !(defined __GLIBC__ &amp;&amp; !defined __UCLIBC__)
+<span class="lineNum">      86 </span>            :         /* Irix iconv() inserts a NUL byte if it cannot convert.
+<span class="lineNum">      87 </span>            :            NetBSD iconv() inserts a question mark if it cannot convert.
+<span class="lineNum">      88 </span>            :            Only GNU libiconv and GNU libc are known to prefer to fail rather
+<span class="lineNum">      89 </span>            :            than doing a lossy conversion.  */
+<span class="lineNum">      90 </span>            :         else if (res &gt; 0)
+<span class="lineNum">      91 </span>            :           {
+<span class="lineNum">      92 </span>            :             errno = EILSEQ;
+<span class="lineNum">      93 </span>            :             return -1;
+<span class="lineNum">      94 </span>            :           }
+<span class="lineNum">      95 </span>            : # endif
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :         count += outptr - tmpbuf;</span>
+<span class="lineNum">      97 </span>            :       }
+<span class="lineNum">      98 </span>            :     /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
+<span class="lineNum">      99 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">     100 </span>            :      || !(((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     101 </span>            :           || defined __sun)
+<span class="lineNum">     102 </span>            :     {
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       char *outptr = tmpbuf;</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :       size_t outsize = tmpbufsize;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :       size_t res = iconv (cd, NULL, NULL, &amp;outptr, &amp;outsize);</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       if (res == (size_t)(-1))</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :       count += outptr - tmpbuf;</span>
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span>            : # endif
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :     length = count;</span>
+<span class="lineNum">     113 </span>            : # undef tmpbuf
+<span class="lineNum">     114 </span>            :   }
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   if (length == 0)</span>
+<span class="lineNum">     117 </span>            :     {
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       *lengthp = 0;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :       return 0;</span>
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   if (*resultp != NULL &amp;&amp; *lengthp &gt;= length)</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     result = *resultp;</span>
+<span class="lineNum">     123 </span>            :   else
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       result = (char *) malloc (length);</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :       if (result == NULL)</span>
+<span class="lineNum">     127 </span>            :         {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :           errno = ENOMEM;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :           return -1;</span>
+<span class="lineNum">     130 </span>            :         }
+<span class="lineNum">     131 </span>            :     }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :   /* Avoid glibc-2.1 bug and Solaris 2.7-2.9 bug.  */
+<span class="lineNum">     134 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">     135 </span>            :      || !(((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     136 </span>            :           || defined __sun)
+<span class="lineNum">     137 </span>            :   /* Return to the initial state.  */
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   iconv (cd, NULL, NULL, NULL, NULL);</span>
+<span class="lineNum">     139 </span>            : # endif
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :   /* Do the conversion for real.  */
+<span class="lineNum">     142 </span>            :   {
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     const char *inptr = src;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     size_t insize = srclen;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     char *outptr = result;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     size_t outsize = length;</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     while (insize &gt; 0)</span>
+<span class="lineNum">     149 </span>            :       {
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :         size_t res = iconv (cd,</span>
+<span class="lineNum">     151 </span>            :                             (ICONV_CONST char **) &amp;inptr, &amp;insize,
+<span class="lineNum">     152 </span>            :                             &amp;outptr, &amp;outsize);
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :         if (res == (size_t)(-1))</span>
+<span class="lineNum">     155 </span>            :           {
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :             if (errno == EINVAL)</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     158 </span>            :             else
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :               goto fail;</span>
+<span class="lineNum">     160 </span>            :           }
+<span class="lineNum">     161 </span>            : # if !defined _LIBICONV_VERSION &amp;&amp; !(defined __GLIBC__ &amp;&amp; !defined __UCLIBC__)
+<span class="lineNum">     162 </span>            :         /* Irix iconv() inserts a NUL byte if it cannot convert.
+<span class="lineNum">     163 </span>            :            NetBSD iconv() inserts a question mark if it cannot convert.
+<span class="lineNum">     164 </span>            :            Only GNU libiconv and GNU libc are known to prefer to fail rather
+<span class="lineNum">     165 </span>            :            than doing a lossy conversion.  */
+<span class="lineNum">     166 </span>            :         else if (res &gt; 0)
+<span class="lineNum">     167 </span>            :           {
+<span class="lineNum">     168 </span>            :             errno = EILSEQ;
+<span class="lineNum">     169 </span>            :             goto fail;
+<span class="lineNum">     170 </span>            :           }
+<span class="lineNum">     171 </span>            : # endif
+<span class="lineNum">     172 </span>            :       }
+<span class="lineNum">     173 </span>            :     /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
+<span class="lineNum">     174 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">     175 </span>            :      || !(((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     176 </span>            :           || defined __sun)
+<span class="lineNum">     177 </span>            :     {
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       size_t res = iconv (cd, NULL, NULL, &amp;outptr, &amp;outsize);</span>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :       if (res == (size_t)(-1))</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         goto fail;</span>
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span>            : # endif
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :     if (outsize != 0)</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :       abort ();</span>
+<span class="lineNum">     186 </span>            :   }
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :   *resultp = result;</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :   *lengthp = length;</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :  fail:</span>
+<span class="lineNum">     194 </span>            :   {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :     if (result != *resultp)</span>
+<span class="lineNum">     196 </span>            :       {
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :         int saved_errno = errno;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         free (result);</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :         errno = saved_errno;</span>
+<span class="lineNum">     200 </span>            :       }
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     202 </span>            :   }
+<span class="lineNum">     203 </span>            : # undef tmpbufsize
+<span class="lineNum">     204 </span>            : }
+<a name="205"><span class="lineNum">     205 </span>            : </a>
+<span class="lineNum">     206 </span>            : char *
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 : str_cd_iconv (const char *src, iconv_t cd)</span>
+<span class="lineNum">     208 </span>            : {
+<span class="lineNum">     209 </span>            :   /* For most encodings, a trailing NUL byte in the input will be converted
+<span class="lineNum">     210 </span>            :      to a trailing NUL byte in the output.  But not for UTF-7.  So that this
+<span class="lineNum">     211 </span>            :      function is usable for UTF-7, we have to exclude the NUL byte from the
+<span class="lineNum">     212 </span>            :      conversion and add it by hand afterwards.  */
+<span class="lineNum">     213 </span>            : # if !defined _LIBICONV_VERSION &amp;&amp; !(defined __GLIBC__ &amp;&amp; !defined __UCLIBC__)
+<span class="lineNum">     214 </span>            :   /* Irix iconv() inserts a NUL byte if it cannot convert.
+<span class="lineNum">     215 </span>            :      NetBSD iconv() inserts a question mark if it cannot convert.
+<span class="lineNum">     216 </span>            :      Only GNU libiconv and GNU libc are known to prefer to fail rather
+<span class="lineNum">     217 </span>            :      than doing a lossy conversion.  For other iconv() implementations,
+<span class="lineNum">     218 </span>            :      we have to look at the number of irreversible conversions returned;
+<span class="lineNum">     219 </span>            :      but this information is lost when iconv() returns for an E2BIG reason.
+<span class="lineNum">     220 </span>            :      Therefore we cannot use the second, faster algorithm.  */
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :   char *result = NULL;
+<span class="lineNum">     223 </span>            :   size_t length = 0;
+<span class="lineNum">     224 </span>            :   int retval = mem_cd_iconv (src, strlen (src), cd, &amp;result, &amp;length);
+<span class="lineNum">     225 </span>            :   char *final_result;
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :   if (retval &lt; 0)
+<span class="lineNum">     228 </span>            :     {
+<span class="lineNum">     229 </span>            :       if (result != NULL)
+<span class="lineNum">     230 </span>            :         abort ();
+<span class="lineNum">     231 </span>            :       return NULL;
+<span class="lineNum">     232 </span>            :     }
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :   /* Add the terminating NUL byte.  */
+<span class="lineNum">     235 </span>            :   final_result =
+<span class="lineNum">     236 </span>            :     (result != NULL ? realloc (result, length + 1) : malloc (length + 1));
+<span class="lineNum">     237 </span>            :   if (final_result == NULL)
+<span class="lineNum">     238 </span>            :     {
+<span class="lineNum">     239 </span>            :       free (result);
+<span class="lineNum">     240 </span>            :       errno = ENOMEM;
+<span class="lineNum">     241 </span>            :       return NULL;
+<span class="lineNum">     242 </span>            :     }
+<span class="lineNum">     243 </span>            :   final_result[length] = '\0';
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            :   return final_result;
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            : # else
+<span class="lineNum">     248 </span>            :   /* This algorithm is likely faster than the one above.  But it may produce
+<span class="lineNum">     249 </span>            :      iconv() returns for an E2BIG reason, when the output size guess is too
+<span class="lineNum">     250 </span>            :      small.  Therefore it can only be used when we don't need the number of
+<span class="lineNum">     251 </span>            :      irreversible conversions performed.  */
+<span class="lineNum">     252 </span>            :   char *result;
+<span class="lineNum">     253 </span>            :   size_t result_size;
+<span class="lineNum">     254 </span>            :   size_t length;
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :   const char *inptr = src;</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :   size_t inbytes_remaining = strlen (src);</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :   /* Make a guess for the worst-case output size, in order to avoid a
+<span class="lineNum">     259 </span>            :      realloc.  It's OK if the guess is wrong as long as it is not zero and
+<span class="lineNum">     260 </span>            :      doesn't lead to an integer overflow.  */
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :   result_size = inbytes_remaining;</span>
+<span class="lineNum">     262 </span>            :   {
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :     size_t approx_sqrt_SIZE_MAX = SIZE_MAX &gt;&gt; (sizeof (size_t) * CHAR_BIT / 2);</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :     if (result_size &lt;= approx_sqrt_SIZE_MAX / MB_LEN_MAX)</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :       result_size *= MB_LEN_MAX;</span>
+<span class="lineNum">     266 </span>            :   }
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :   result_size += 1; /* for the terminating NUL */</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :   result = (char *) malloc (result_size);</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :   if (result == NULL)</span>
+<span class="lineNum">     271 </span>            :     {
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :       errno = ENOMEM;</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       return NULL;</span>
+<span class="lineNum">     274 </span>            :     }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :   /* Avoid glibc-2.1 bug and Solaris 2.7-2.9 bug.  */
+<span class="lineNum">     277 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">     278 </span>            :      || !(((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     279 </span>            :           || defined __sun)
+<span class="lineNum">     280 </span>            :   /* Set to the initial state.  */
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :   iconv (cd, NULL, NULL, NULL, NULL);</span>
+<span class="lineNum">     282 </span>            : # endif
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :   /* Do the conversion.  */
+<span class="lineNum">     285 </span>            :   {
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :     char *outptr = result;</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     size_t outbytes_remaining = result_size - 1;</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :     for (;;)
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :       {</span>
+<span class="lineNum">     291 </span>            :         /* Here inptr + inbytes_remaining = src + strlen (src),
+<span class="lineNum">     292 </span>            :                 outptr + outbytes_remaining = result + result_size - 1.  */
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :         size_t res = iconv (cd,</span>
+<span class="lineNum">     294 </span>            :                             (ICONV_CONST char **) &amp;inptr, &amp;inbytes_remaining,
+<span class="lineNum">     295 </span>            :                             &amp;outptr, &amp;outbytes_remaining);
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :         if (res == (size_t)(-1))</span>
+<span class="lineNum">     298 </span>            :           {
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :             if (errno == EINVAL)</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :             else if (errno == E2BIG)</span>
+<span class="lineNum">     302 </span>            :               {
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :                 size_t used = outptr - result;</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                 size_t newsize = result_size * 2;</span>
+<span class="lineNum">     305 </span>            :                 char *newresult;
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                 if (!(newsize &gt; result_size))</span>
+<span class="lineNum">     308 </span>            :                   {
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :                     errno = ENOMEM;</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                     goto failed;</span>
+<span class="lineNum">     311 </span>            :                   }
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :                 newresult = (char *) realloc (result, newsize);</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                 if (newresult == NULL)</span>
+<span class="lineNum">     314 </span>            :                   {
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                     errno = ENOMEM;</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                     goto failed;</span>
+<span class="lineNum">     317 </span>            :                   }
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :                 result = newresult;</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                 result_size = newsize;</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                 outptr = result + used;</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :                 outbytes_remaining = result_size - 1 - used;</span>
+<span class="lineNum">     322 </span>            :               }
+<span class="lineNum">     323 </span>            :             else
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :               goto failed;</span>
+<span class="lineNum">     325 </span>            :           }
+<span class="lineNum">     326 </span>            :         else
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     328 </span>            :       }
+<span class="lineNum">     329 </span>            :     /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
+<span class="lineNum">     330 </span>            : # if defined _LIBICONV_VERSION \
+<span class="lineNum">     331 </span>            :      || !(((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     332 </span>            :           || defined __sun)
+<span class="lineNum">     333 </span>            :     for (;;)
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :       {</span>
+<span class="lineNum">     335 </span>            :         /* Here outptr + outbytes_remaining = result + result_size - 1.  */
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :         size_t res = iconv (cd, NULL, NULL, &amp;outptr, &amp;outbytes_remaining);</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :         if (res == (size_t)(-1))</span>
+<span class="lineNum">     339 </span>            :           {
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :             if (errno == E2BIG)</span>
+<span class="lineNum">     341 </span>            :               {
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                 size_t used = outptr - result;</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                 size_t newsize = result_size * 2;</span>
+<span class="lineNum">     344 </span>            :                 char *newresult;
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                 if (!(newsize &gt; result_size))</span>
+<span class="lineNum">     347 </span>            :                   {
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                     errno = ENOMEM;</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                     goto failed;</span>
+<span class="lineNum">     350 </span>            :                   }
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                 newresult = (char *) realloc (result, newsize);</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                 if (newresult == NULL)</span>
+<span class="lineNum">     353 </span>            :                   {
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                     errno = ENOMEM;</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                     goto failed;</span>
+<span class="lineNum">     356 </span>            :                   }
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                 result = newresult;</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                 result_size = newsize;</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :                 outptr = result + used;</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                 outbytes_remaining = result_size - 1 - used;</span>
+<span class="lineNum">     361 </span>            :               }
+<span class="lineNum">     362 </span>            :             else
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :               goto failed;</span>
+<span class="lineNum">     364 </span>            :           }
+<span class="lineNum">     365 </span>            :         else
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     367 </span>            :       }
+<span class="lineNum">     368 </span>            : # endif
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :     /* Add the terminating NUL byte.  */
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :     *outptr++ = '\0';</span>
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :     length = outptr - result;</span>
+<span class="lineNum">     374 </span>            :   }
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :   /* Give away unused memory.  */
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :   if (length &lt; result_size)</span>
+<span class="lineNum">     378 </span>            :     {
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :       char *smaller_result = (char *) realloc (result, length);</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :       if (smaller_result != NULL)</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :         result = smaller_result;</span>
+<span class="lineNum">     383 </span>            :     }
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :  failed:</span>
+<span class="lineNum">     388 </span>            :   {
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :     int saved_errno = errno;</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :     free (result);</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     errno = saved_errno;</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     393 </span>            :   }
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            : # endif
+<span class="lineNum">     396 </span>            : }
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            : #endif
+<a name="399"><span class="lineNum">     399 </span>            : </a>
+<span class="lineNum">     400 </span>            : char *
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 : str_iconv (const char *src, const char *from_codeset, const char *to_codeset)</span>
+<span class="lineNum">     402 </span>            : {
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :   if (*src == '\0' || c_strcasecmp (from_codeset, to_codeset) == 0)</span>
+<span class="lineNum">     404 </span>            :     {
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :       char *result = strdup (src);</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :       if (result == NULL)</span>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :         errno = ENOMEM;</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :       return result;</span>
+<span class="lineNum">     410 </span>            :     }
+<span class="lineNum">     411 </span>            :   else
+<span class="lineNum">     412 </span>            :     {
+<span class="lineNum">     413 </span>            : #if HAVE_ICONV
+<span class="lineNum">     414 </span>            :       iconv_t cd;
+<span class="lineNum">     415 </span>            :       char *result;
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            :       /* Avoid glibc-2.1 bug with EUC-KR.  */
+<span class="lineNum">     418 </span>            : # if ((__GLIBC__ == 2 &amp;&amp; __GLIBC_MINOR__ &lt;= 1) &amp;&amp; !defined __UCLIBC__) \
+<span class="lineNum">     419 </span>            :      &amp;&amp; !defined _LIBICONV_VERSION
+<span class="lineNum">     420 </span>            :       if (c_strcasecmp (from_codeset, &quot;EUC-KR&quot;) == 0
+<span class="lineNum">     421 </span>            :           || c_strcasecmp (to_codeset, &quot;EUC-KR&quot;) == 0)
+<span class="lineNum">     422 </span>            :         {
+<span class="lineNum">     423 </span>            :           errno = EINVAL;
+<span class="lineNum">     424 </span>            :           return NULL;
+<span class="lineNum">     425 </span>            :         }
+<span class="lineNum">     426 </span>            : # endif
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :       cd = iconv_open (to_codeset, from_codeset);</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :       if (cd == (iconv_t) -1)</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :         return NULL;</span>
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :       result = str_cd_iconv (src, cd);</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :       if (result == NULL)</span>
+<span class="lineNum">     434 </span>            :         {
+<span class="lineNum">     435 </span>            :           /* Close cd, but preserve the errno from str_cd_iconv.  */
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :           int saved_errno = errno;</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :           iconv_close (cd);</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :           errno = saved_errno;</span>
+<span class="lineNum">     439 </span>            :         }
+<span class="lineNum">     440 </span>            :       else
+<span class="lineNum">     441 </span>            :         {
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :           if (iconv_close (cd) &lt; 0)</span>
+<span class="lineNum">     443 </span>            :             {
+<span class="lineNum">     444 </span>            :               /* Return NULL, but free the allocated memory, and while doing
+<span class="lineNum">     445 </span>            :                  that, preserve the errno from iconv_close.  */
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :               int saved_errno = errno;</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :               free (result);</span>
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :               errno = saved_errno;</span>
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :               return NULL;</span>
+<span class="lineNum">     450 </span>            :             }
+<span class="lineNum">     451 </span>            :         }
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :       return result;</span>
+<span class="lineNum">     453 </span>            : #else
+<span class="lineNum">     454 </span>            :       /* This is a different error code than if iconv_open existed but didn't
+<span class="lineNum">     455 </span>            :          support from_codeset and to_codeset, so that the caller can emit
+<span class="lineNum">     456 </span>            :          an error message such as
+<span class="lineNum">     457 </span>            :            &quot;iconv() is not supported. Installing GNU libiconv and
+<span class="lineNum">     458 </span>            :             then reinstalling this package would fix this.&quot;  */
+<span class="lineNum">     459 </span>            :       errno = ENOSYS;
+<span class="lineNum">     460 </span>            :       return NULL;
+<span class="lineNum">     461 </span>            : #endif
+<span class="lineNum">     462 </span>            :     }
+<span class="lineNum">     463 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

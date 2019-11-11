@@ -1,0 +1,490 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/modechange.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - modechange.c<span style="font-size: 80%;"> (source / <a href="modechange.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">168</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* modechange.c -- file mode manipulation</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1989-1990, 1997-1999, 2001, 2003-2006, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by David MacKenzie &lt;djm@ai.mit.edu&gt; */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : /* The ASCII mode string is compiled into an array of 'struct
+<span class="lineNum">      22 </span>            :    modechange', which can then be applied to each file to be changed.
+<span class="lineNum">      23 </span>            :    We do this instead of re-parsing the ASCII string for each file
+<span class="lineNum">      24 </span>            :    because the compiled form requires less computation to use; when
+<span class="lineNum">      25 </span>            :    changing the mode of many files, this probably results in a
+<span class="lineNum">      26 </span>            :    performance gain.  */
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;modechange.h&quot;
+<span class="lineNum">      31 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      32 </span>            : #include &quot;stat-macros.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      34 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : /* The traditional octal values corresponding to each mode bit.  */
+<span class="lineNum">      37 </span>            : #define SUID 04000
+<span class="lineNum">      38 </span>            : #define SGID 02000
+<span class="lineNum">      39 </span>            : #define SVTX 01000
+<span class="lineNum">      40 </span>            : #define RUSR 00400
+<span class="lineNum">      41 </span>            : #define WUSR 00200
+<span class="lineNum">      42 </span>            : #define XUSR 00100
+<span class="lineNum">      43 </span>            : #define RGRP 00040
+<span class="lineNum">      44 </span>            : #define WGRP 00020
+<span class="lineNum">      45 </span>            : #define XGRP 00010
+<span class="lineNum">      46 </span>            : #define ROTH 00004
+<span class="lineNum">      47 </span>            : #define WOTH 00002
+<span class="lineNum">      48 </span>            : #define XOTH 00001
+<span class="lineNum">      49 </span>            : #define ALLM 07777 /* all octal mode bits */
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : /* Convert OCTAL, which uses one of the traditional octal values, to
+<a name="52"><span class="lineNum">      52 </span>            :    an internal mode_t value.  */</a>
+<span class="lineNum">      53 </span>            : static mode_t
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 : octal_to_mode (unsigned int octal)</span>
+<span class="lineNum">      55 </span>            : {
+<span class="lineNum">      56 </span>            :   /* Help the compiler optimize the usual case where mode_t uses
+<span class="lineNum">      57 </span>            :      the traditional octal representation.  */
+<span class="lineNum">      58 </span>            :   return ((S_ISUID == SUID &amp;&amp; S_ISGID == SGID &amp;&amp; S_ISVTX == SVTX
+<span class="lineNum">      59 </span>            :            &amp;&amp; S_IRUSR == RUSR &amp;&amp; S_IWUSR == WUSR &amp;&amp; S_IXUSR == XUSR
+<span class="lineNum">      60 </span>            :            &amp;&amp; S_IRGRP == RGRP &amp;&amp; S_IWGRP == WGRP &amp;&amp; S_IXGRP == XGRP
+<span class="lineNum">      61 </span>            :            &amp;&amp; S_IROTH == ROTH &amp;&amp; S_IWOTH == WOTH &amp;&amp; S_IXOTH == XOTH)
+<span class="lineNum">      62 </span>            :           ? octal
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :           : (mode_t) ((octal &amp; SUID ? S_ISUID : 0)</span>
+<span class="lineNum">      64 </span>            :                       | (octal &amp; SGID ? S_ISGID : 0)
+<span class="lineNum">      65 </span>            :                       | (octal &amp; SVTX ? S_ISVTX : 0)
+<span class="lineNum">      66 </span>            :                       | (octal &amp; RUSR ? S_IRUSR : 0)
+<span class="lineNum">      67 </span>            :                       | (octal &amp; WUSR ? S_IWUSR : 0)
+<span class="lineNum">      68 </span>            :                       | (octal &amp; XUSR ? S_IXUSR : 0)
+<span class="lineNum">      69 </span>            :                       | (octal &amp; RGRP ? S_IRGRP : 0)
+<span class="lineNum">      70 </span>            :                       | (octal &amp; WGRP ? S_IWGRP : 0)
+<span class="lineNum">      71 </span>            :                       | (octal &amp; XGRP ? S_IXGRP : 0)
+<span class="lineNum">      72 </span>            :                       | (octal &amp; ROTH ? S_IROTH : 0)
+<span class="lineNum">      73 </span>            :                       | (octal &amp; WOTH ? S_IWOTH : 0)
+<span class="lineNum">      74 </span>            :                       | (octal &amp; XOTH ? S_IXOTH : 0)));
+<span class="lineNum">      75 </span>            : }
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : /* Special operations flags.  */
+<span class="lineNum">      78 </span>            : enum
+<span class="lineNum">      79 </span>            :   {
+<span class="lineNum">      80 </span>            :     /* For the sentinel at the end of the mode changes array.  */
+<span class="lineNum">      81 </span>            :     MODE_DONE,
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     /* The typical case.  */
+<span class="lineNum">      84 </span>            :     MODE_ORDINARY_CHANGE,
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :     /* In addition to the typical case, affect the execute bits if at
+<span class="lineNum">      87 </span>            :        least one execute bit is set already, or if the file is a
+<span class="lineNum">      88 </span>            :        directory.  */
+<span class="lineNum">      89 </span>            :     MODE_X_IF_ANY_X,
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     /* Instead of the typical case, copy some existing permissions for
+<span class="lineNum">      92 </span>            :        u, g, or o onto the other two.  Which of u, g, or o is copied
+<span class="lineNum">      93 </span>            :        is determined by which bits are set in the 'value' field.  */
+<span class="lineNum">      94 </span>            :     MODE_COPY_EXISTING
+<span class="lineNum">      95 </span>            :   };
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : /* Description of a mode change.  */
+<span class="lineNum">      98 </span>            : struct mode_change
+<span class="lineNum">      99 </span>            : {
+<span class="lineNum">     100 </span>            :   char op;                      /* One of &quot;=+-&quot;.  */
+<span class="lineNum">     101 </span>            :   char flag;                    /* Special operations flag.  */
+<span class="lineNum">     102 </span>            :   mode_t affected;              /* Set for u, g, o, or a.  */
+<span class="lineNum">     103 </span>            :   mode_t value;                 /* Bits to add/remove.  */
+<span class="lineNum">     104 </span>            :   mode_t mentioned;             /* Bits explicitly mentioned.  */
+<span class="lineNum">     105 </span>            : };
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : /* Return a mode_change array with the specified &quot;=ddd&quot;-style
+<span class="lineNum">     108 </span>            :    mode change operation, where NEW_MODE is &quot;ddd&quot; and MENTIONED
+<span class="lineNum">     109 </span>            :    contains the bits explicitly mentioned in the mode are MENTIONED.  */
+<a name="110"><span class="lineNum">     110 </span>            : </a>
+<span class="lineNum">     111 </span>            : static struct mode_change *
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 : make_node_op_equals (mode_t new_mode, mode_t mentioned)</span>
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   struct mode_change *p = xmalloc (2 * sizeof *p);</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :   p-&gt;op = '=';</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   p-&gt;flag = MODE_ORDINARY_CHANGE;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :   p-&gt;affected = CHMOD_MODE_BITS;</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :   p-&gt;value = new_mode;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   p-&gt;mentioned = mentioned;</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   p[1].flag = MODE_DONE;</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   return p;</span>
+<span class="lineNum">     122 </span>            : }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : /* Return a pointer to an array of file mode change operations created from
+<span class="lineNum">     125 </span>            :    MODE_STRING, an ASCII string that contains either an octal number
+<span class="lineNum">     126 </span>            :    specifying an absolute mode, or symbolic mode change operations with
+<span class="lineNum">     127 </span>            :    the form:
+<span class="lineNum">     128 </span>            :    [ugoa...][[+-=][rwxXstugo...]...][,...]
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :    Return NULL if 'mode_string' does not contain a valid
+<span class="lineNum">     131 </span>            :    representation of file mode change operations.  */
+<a name="132"><span class="lineNum">     132 </span>            : </a>
+<span class="lineNum">     133 </span>            : struct mode_change *
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 : mode_compile (char const *mode_string)</span>
+<span class="lineNum">     135 </span>            : {
+<span class="lineNum">     136 </span>            :   /* The array of mode-change directives to be returned.  */
+<span class="lineNum">     137 </span>            :   struct mode_change *mc;
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   size_t used = 0;</span>
+<span class="lineNum">     139 </span>            :   char const *p;
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   if ('0' &lt;= *mode_string &amp;&amp; *mode_string &lt; '8')</span>
+<span class="lineNum">     142 </span>            :     {
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :       unsigned int octal_mode = 0;</span>
+<span class="lineNum">     144 </span>            :       mode_t mode;
+<span class="lineNum">     145 </span>            :       mode_t mentioned;
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       p = mode_string;</span>
+<span class="lineNum">     148 </span>            :       do
+<span class="lineNum">     149 </span>            :         {
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :           octal_mode = 8 * octal_mode + *p++ - '0';</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :           if (ALLM &lt; octal_mode)</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :             return NULL;</span>
+<span class="lineNum">     153 </span>            :         }
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       while ('0' &lt;= *p &amp;&amp; *p &lt; '8');</span>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       if (*p)</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :         return NULL;</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       mode = octal_to_mode (octal_mode);</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       mentioned = (p - mode_string &lt; 5</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :                    ? (mode &amp; (S_ISUID | S_ISGID)) | S_ISVTX | S_IRWXUGO</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :                    : CHMOD_MODE_BITS);</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :       return make_node_op_equals (mode, mentioned);</span>
+<span class="lineNum">     164 </span>            :     }
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   /* Allocate enough space to hold the result.  */
+<span class="lineNum">     167 </span>            :   {
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :     size_t needed = 1;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     for (p = mode_string; *p; p++)</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :       needed += (*p == '=' || *p == '+' || *p == '-');</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :     mc = xnmalloc (needed, sizeof *mc);</span>
+<span class="lineNum">     172 </span>            :   }
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :   /* One loop iteration for each
+<span class="lineNum">     175 </span>            :      '[ugoa]*([-+=]([rwxXst]*|[ugo]))+|[-+=][0-7]+'.  */
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :   for (p = mode_string; ; p++)</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     178 </span>            :       /* Which bits in the mode are operated on.  */
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :       mode_t affected = 0;</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :       /* Turn on all the bits in 'affected' for each group given.  */
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :       for (;; p++)</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :         switch (*p)</span>
+<span class="lineNum">     184 </span>            :           {
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :           default:</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :             goto invalid;</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :           case 'u':</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :             affected |= S_ISUID | S_IRWXU;</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :           case 'g':</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :             affected |= S_ISGID | S_IRWXG;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :           case 'o':</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :             affected |= S_ISVTX | S_IRWXO;</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :           case 'a':</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :             affected |= CHMOD_MODE_BITS;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :           case '=': case '+': case '-':</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :             goto no_more_affected;</span>
+<span class="lineNum">     201 </span>            :           }
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     no_more_affected:;</span>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :       do
+<span class="lineNum">     205 </span>            :         {
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :           char op = *p++;</span>
+<span class="lineNum">     207 </span>            :           mode_t value;
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :           mode_t mentioned = 0;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :           char flag = MODE_COPY_EXISTING;</span>
+<span class="lineNum">     210 </span>            :           struct mode_change *change;
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :           switch (*p)</span>
+<span class="lineNum">     213 </span>            :             {
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :             case '0': case '1': case '2': case '3':</span>
+<span class="lineNum">     215 </span>            :             case '4': case '5': case '6': case '7':
+<span class="lineNum">     216 </span>            :               {
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                 unsigned int octal_mode = 0;</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :                 do
+<span class="lineNum">     220 </span>            :                   {
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                     octal_mode = 8 * octal_mode + *p++ - '0';</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                     if (ALLM &lt; octal_mode)</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                       goto invalid;</span>
+<span class="lineNum">     224 </span>            :                   }
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                 while ('0' &lt;= *p &amp;&amp; *p &lt; '8');</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                 if (affected || (*p &amp;&amp; *p != ','))</span>
+<span class="lineNum">     228 </span>            :                   goto invalid;
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                 affected = mentioned = CHMOD_MODE_BITS;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                 value = octal_to_mode (octal_mode);</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :                 flag = MODE_ORDINARY_CHANGE;</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     233 </span>            :               }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :             case 'u':</span>
+<span class="lineNum">     236 </span>            :               /* Set the affected bits to the value of the &quot;u&quot; bits
+<span class="lineNum">     237 </span>            :                  on the same file.  */
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :               value = S_IRWXU;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :               p++;</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :             case 'g':</span>
+<span class="lineNum">     242 </span>            :               /* Set the affected bits to the value of the &quot;g&quot; bits
+<span class="lineNum">     243 </span>            :                  on the same file.  */
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :               value = S_IRWXG;</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :               p++;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :             case 'o':</span>
+<span class="lineNum">     248 </span>            :               /* Set the affected bits to the value of the &quot;o&quot; bits
+<span class="lineNum">     249 </span>            :                  on the same file.  */
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :               value = S_IRWXO;</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :               p++;</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :             default:</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :               value = 0;</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :               flag = MODE_ORDINARY_CHANGE;</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :               for (;; p++)</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 switch (*p)</span>
+<span class="lineNum">     260 </span>            :                   {
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :                   case 'r':</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :                     value |= S_IRUSR | S_IRGRP | S_IROTH;</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :                   case 'w':</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :                     value |= S_IWUSR | S_IWGRP | S_IWOTH;</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                   case 'x':</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                     value |= S_IXUSR | S_IXGRP | S_IXOTH;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                   case 'X':</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                     flag = MODE_X_IF_ANY_X;</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                   case 's':</span>
+<span class="lineNum">     274 </span>            :                     /* Set the setuid/gid bits if 'u' or 'g' is selected.  */
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                     value |= S_ISUID | S_ISGID;</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :                   case 't':</span>
+<span class="lineNum">     278 </span>            :                     /* Set the &quot;save text image&quot; bit if 'o' is selected.  */
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                     value |= S_ISVTX;</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :                   default:</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :                     goto no_more_values;</span>
+<span class="lineNum">     283 </span>            :                   }
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :             no_more_values:;</span>
+<span class="lineNum">     285 </span>            :             }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :           change = &amp;mc[used++];</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :           change-&gt;op = op;</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :           change-&gt;flag = flag;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :           change-&gt;affected = affected;</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :           change-&gt;value = value;</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :           change-&gt;mentioned =</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :             (mentioned ? mentioned : affected ? affected &amp; value : value);</span>
+<span class="lineNum">     294 </span>            :         }
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :       while (*p == '=' || *p == '+' || *p == '-');</span>
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :       if (*p != ',')</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     299 </span>            :     }
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :   if (*p == 0)</span>
+<span class="lineNum">     302 </span>            :     {
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :       mc[used].flag = MODE_DONE;</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :       return mc;</span>
+<span class="lineNum">     305 </span>            :     }
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 : invalid:</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :   free (mc);</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :   return NULL;</span>
+<span class="lineNum">     310 </span>            : }
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            : /* Return a file mode change operation that sets permissions to match those
+<span class="lineNum">     313 </span>            :    of REF_FILE.  Return NULL (setting errno) if REF_FILE can't be accessed.  */
+<a name="314"><span class="lineNum">     314 </span>            : </a>
+<span class="lineNum">     315 </span>            : struct mode_change *
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 : mode_create_from_ref (const char *ref_file)</span>
+<span class="lineNum">     317 </span>            : {
+<span class="lineNum">     318 </span>            :   struct stat ref_stats;
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :   if (stat (ref_file, &amp;ref_stats) != 0)</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   return make_node_op_equals (ref_stats.st_mode, CHMOD_MODE_BITS);</span>
+<span class="lineNum">     323 </span>            : }
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : /* Return the file mode bits of OLDMODE (which is the mode of a
+<span class="lineNum">     326 </span>            :    directory if DIR), assuming the umask is UMASK_VALUE, adjusted as
+<span class="lineNum">     327 </span>            :    indicated by the list of change operations CHANGES.  If DIR, the
+<span class="lineNum">     328 </span>            :    type 'X' change affects the returned value even if no execute bits
+<span class="lineNum">     329 </span>            :    were set in OLDMODE, and set user and group ID bits are preserved
+<span class="lineNum">     330 </span>            :    unless CHANGES mentioned them.  If PMODE_BITS is not null, store into
+<span class="lineNum">     331 </span>            :    *PMODE_BITS a mask denoting file mode bits that are affected by
+<span class="lineNum">     332 </span>            :    CHANGES.
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :    The returned value and *PMODE_BITS contain only file mode bits.
+<span class="lineNum">     335 </span>            :    For example, they have the S_IFMT bits cleared on a standard
+<span class="lineNum">     336 </span>            :    Unix-like host.  */
+<a name="337"><span class="lineNum">     337 </span>            : </a>
+<span class="lineNum">     338 </span>            : mode_t
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 : mode_adjust (mode_t oldmode, bool dir, mode_t umask_value,</span>
+<span class="lineNum">     340 </span>            :              struct mode_change const *changes, mode_t *pmode_bits)
+<span class="lineNum">     341 </span>            : {
+<span class="lineNum">     342 </span>            :   /* The adjusted mode.  */
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :   mode_t newmode = oldmode &amp; CHMOD_MODE_BITS;</span>
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :   /* File mode bits that CHANGES cares about.  */
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :   mode_t mode_bits = 0;</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :   for (; changes-&gt;flag != MODE_DONE; changes++)</span>
+<span class="lineNum">     349 </span>            :     {
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :       mode_t affected = changes-&gt;affected;</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :       mode_t omit_change =</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :         (dir ? S_ISUID | S_ISGID : 0) &amp; ~ changes-&gt;mentioned;</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :       mode_t value = changes-&gt;value;</span>
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :       switch (changes-&gt;flag)</span>
+<span class="lineNum">     356 </span>            :         {
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :         case MODE_ORDINARY_CHANGE:</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :         case MODE_COPY_EXISTING:</span>
+<span class="lineNum">     361 </span>            :           /* Isolate in 'value' the bits in 'newmode' to copy.  */
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :           value &amp;= newmode;</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :           /* Copy the isolated bits to the other two parts.  */
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :           value |= ((value &amp; (S_IRUSR | S_IRGRP | S_IROTH)</span>
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                      ? S_IRUSR | S_IRGRP | S_IROTH : 0)</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                     | (value &amp; (S_IWUSR | S_IWGRP | S_IWOTH)</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                        ? S_IWUSR | S_IWGRP | S_IWOTH : 0)</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                     | (value &amp; (S_IXUSR | S_IXGRP | S_IXOTH)</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                        ? S_IXUSR | S_IXGRP | S_IXOTH : 0));</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :         case MODE_X_IF_ANY_X:</span>
+<span class="lineNum">     374 </span>            :           /* Affect the execute bits if execute bits are already set
+<span class="lineNum">     375 </span>            :              or if the file is a directory.  */
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :           if ((newmode &amp; (S_IXUSR | S_IXGRP | S_IXOTH)) | dir)</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :             value |= S_IXUSR | S_IXGRP | S_IXOTH;</span>
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     379 </span>            :         }
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :       /* If WHO was specified, limit the change to the affected bits.
+<span class="lineNum">     382 </span>            :          Otherwise, apply the umask.  Either way, omit changes as
+<span class="lineNum">     383 </span>            :          requested.  */
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :       value &amp;= (affected ? affected : ~umask_value) &amp; ~ omit_change;</span>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :       switch (changes-&gt;op)</span>
+<span class="lineNum">     387 </span>            :         {
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         case '=':</span>
+<span class="lineNum">     389 </span>            :           /* If WHO was specified, preserve the previous values of
+<span class="lineNum">     390 </span>            :              bits that are not affected by this change operation.
+<span class="lineNum">     391 </span>            :              Otherwise, clear all the bits.  */
+<span class="lineNum">     392 </span>            :           {
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :             mode_t preserved = (affected ? ~affected : 0) | omit_change;</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :             mode_bits |= CHMOD_MODE_BITS &amp; ~preserved;</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :             newmode = (newmode &amp; preserved) | value;</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     397 </span>            :           }
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :         case '+':</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :           mode_bits |= value;</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :           newmode |= value;</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :         case '-':</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :           mode_bits |= value;</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :           newmode &amp;= ~value;</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     408 </span>            :         }
+<span class="lineNum">     409 </span>            :     }
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :   if (pmode_bits)</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :     *pmode_bits = mode_bits;</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :   return newmode;</span>
+<span class="lineNum">     414 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

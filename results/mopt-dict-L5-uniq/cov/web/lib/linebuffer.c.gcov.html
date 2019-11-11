@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/linebuffer.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - linebuffer.c<span style="font-size: 80%;"> (source / <a href="linebuffer.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntry">49</td>
+            <td class="headerCovTableEntryMed">85.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : void lava_set(unsigned int bn, unsigned int val);</a>
+<span class="lineNum">       2 </span>            : extern unsigned int lava_get(unsigned int) ;
+<span class="lineNum">       3 </span>            : /* linebuffer.c -- read arbitrarily long lines
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    Copyright (C) 1986, 1991, 1998-1999, 2001, 2003-2004, 2006-2007, 2009-2015
+<span class="lineNum">       6 </span>            :    Free Software Foundation, Inc.
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       9 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">      10 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">      11 </span>            :    (at your option) any later version.
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      14 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      15 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      16 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      19 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : /* Written by Richard Stallman. */
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      29 </span>            : #include &quot;linebuffer.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #if USE_UNLOCKED_IO
+<span class="lineNum">      33 </span>            : # include &quot;unlocked-io.h&quot;
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : /* Initialize linebuffer LINEBUFFER for use. */
+<a name="37"><span class="lineNum">      37 </span>            : </a>
+<span class="lineNum">      38 </span>            : void
+<span class="lineNum">      39 </span><span class="lineCov">         18 : initbuffer (struct linebuffer *linebuffer)</span>
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span><span class="lineCov">         18 :   memset (linebuffer, 0, sizeof *linebuffer);</span>
+<span class="lineNum">      42 </span><span class="lineCov">         18 : }</span>
+<a name="43"><span class="lineNum">      43 </span>            : </a>
+<span class="lineNum">      44 </span>            : struct linebuffer *
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 : readlinebuffer (struct linebuffer *linebuffer, FILE *stream)</span>
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   return readlinebuffer_delim (linebuffer, stream, '\n');</span>
+<span class="lineNum">      48 </span>            : }
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : /* Read an arbitrarily long line of text from STREAM into LINEBUFFER.
+<span class="lineNum">      51 </span>            :    Consider lines to be terminated by DELIMITER.
+<span class="lineNum">      52 </span>            :    Keep the delimiter; append DELIMITER if it's the last line of a file
+<span class="lineNum">      53 </span>            :    that ends in a character other than DELIMITER.  Do not NUL-terminate.
+<span class="lineNum">      54 </span>            :    Therefore the stream can contain NUL bytes, and the length
+<span class="lineNum">      55 </span>            :    (including the delimiter) is returned in linebuffer-&gt;length.
+<span class="lineNum">      56 </span>            :    Return NULL when stream is empty.  Return NULL and set errno upon
+<span class="lineNum">      57 </span>            :    error; callers can distinguish this case from the empty case by
+<span class="lineNum">      58 </span>            :    invoking ferror (stream).
+<a name="59"><span class="lineNum">      59 </span>            :    Otherwise, return LINEBUFFER.  */</a>
+<span class="lineNum">      60 </span>            : struct linebuffer *
+<span class="lineNum">      61 </span><span class="lineCov">       1238 : readlinebuffer_delim (struct linebuffer *linebuffer, FILE *stream,</span>
+<span class="lineNum">      62 </span>            :                       char delimiter)
+<span class="lineNum">      63 </span>            : {
+<span class="lineNum">      64 </span>            :   int c;
+<span class="lineNum">      65 </span><span class="lineCov">       1238 :   char *buffer = linebuffer-&gt;buffer;</span>
+<span class="lineNum">      66 </span><span class="lineCov">       1238 :   char *p = linebuffer-&gt;buffer;</span>
+<span class="lineNum">      67 </span><span class="lineCov">       1238 :   char *end = buffer + linebuffer-&gt;size; /* Sentinel. */</span>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">       1238 :   if (feof (stream))</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     return NULL;</span>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :   do
+<span class="lineNum">      73 </span>            :     {
+<span class="lineNum">      74 </span><span class="lineCov">      51021 :       c = getc (stream);</span>
+<span class="lineNum">      75 </span><span class="lineCov">      51021 :       if (c == EOF)</span>
+<span class="lineNum">      76 </span>            :         {
+<span class="lineNum">      77 </span><span class="lineCov">          9 :           if (p == buffer || ferror (stream))</span>
+<span class="lineNum">      78 </span><span class="lineCov">          8 :             return NULL;</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :           if (p[-1] == delimiter)</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :           c = delimiter;</span>
+<span class="lineNum">      82 </span>            :         }
+<span class="lineNum">      83 </span><span class="lineCov">      51013 :       if (p == end)</span>
+<span class="lineNum">      84 </span>            :         {
+<span class="lineNum">      85 </span><span class="lineCov">         22 :           size_t oldsize = linebuffer-&gt;size;</span>
+<span class="lineNum">      86 </span><span class="lineCov">         44 :           buffer = ({if (((buffer)) &amp;&amp; ((buffer)))  {int lava_130 = 0;</span>
+<span class="lineNum">      87 </span><span class="lineCov">          4 :           lava_130 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_130 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_130 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_130 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(130,lava_130);</span>
+<span class="lineNum">      88 </span><span class="lineCov">          4 :           int lava_112 = 0;</span>
+<span class="lineNum">      89 </span><span class="lineCov">          4 :           lava_112 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_112 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_112 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_112 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(112,lava_112);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          4 :           int lava_215 = 0;</span>
+<span class="lineNum">      91 </span><span class="lineCov">          4 :           lava_215 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_215 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_215 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_215 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(215,lava_215);</span>
+<span class="lineNum">      92 </span><span class="lineCov">          4 :           int lava_169 = 0;</span>
+<span class="lineNum">      93 </span><span class="lineCov">          4 :           lava_169 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_169 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_169 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_169 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(169,lava_169);</span>
+<span class="lineNum">      94 </span><span class="lineCov">         22 :           }void * kbcieiubweuhc1681692777 = x2realloc (buffer, &amp;linebuffer-&gt;size+(lava_get(112))*(0x6c6175f1==(lava_get(112))||0xf175616c==(lava_get(112)))+(lava_get(166))*(0x6c6175bb==(lava_get(166))||0xbb75616c==(lava_get(166)))+(lava_get(222))*(0x6c617583==(lava_get(222))||0x8375616c==(lava_get(222))));if (((buffer)) &amp;&amp; ((buffer)))  {int lava_166 = 0;</span>
+<span class="lineNum">      95 </span><span class="lineCov">          4 : lava_166 |= ((unsigned char *) (buffer))[8] &lt;&lt; (0*8);lava_166 |= ((unsigned char *) (buffer))[9] &lt;&lt; (1*8);lava_166 |= ((unsigned char *) (buffer))[10] &lt;&lt; (2*8);lava_166 |= ((unsigned char *) (buffer))[11] &lt;&lt; (3*8);lava_set(166,lava_166);</span>
+<span class="lineNum">      96 </span><span class="lineCov">          4 : int lava_171 = 0;</span>
+<span class="lineNum">      97 </span><span class="lineCov">          4 : lava_171 |= ((unsigned char *) (buffer))[8] &lt;&lt; (0*8);lava_171 |= ((unsigned char *) (buffer))[9] &lt;&lt; (1*8);lava_171 |= ((unsigned char *) (buffer))[10] &lt;&lt; (2*8);lava_171 |= ((unsigned char *) (buffer))[11] &lt;&lt; (3*8);lava_set(171,lava_171);</span>
+<span class="lineNum">      98 </span><span class="lineCov">          4 : int lava_227 = 0;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          4 : lava_227 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_227 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_227 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_227 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(227,lava_227);</span>
+<span class="lineNum">     100 </span><span class="lineCov">          4 : int lava_222 = 0;</span>
+<span class="lineNum">     101 </span><span class="lineCov">          4 : lava_222 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_222 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_222 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_222 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(222,lava_222);</span>
+<span class="lineNum">     102 </span><span class="lineCov">          4 : int lava_170 = 0;</span>
+<span class="lineNum">     103 </span><span class="lineCov">          4 : lava_170 |= ((unsigned char *) (buffer))[0] &lt;&lt; (0*8);lava_170 |= ((unsigned char *) (buffer))[1] &lt;&lt; (1*8);lava_170 |= ((unsigned char *) (buffer))[2] &lt;&lt; (2*8);lava_170 |= ((unsigned char *) (buffer))[3] &lt;&lt; (3*8);lava_set(170,lava_170);</span>
+<span class="lineNum">     104 </span><span class="lineCov">         22 : }kbcieiubweuhc1681692777;});</span>
+<span class="lineNum">     105 </span><span class="lineCov">         22 :           p = buffer + oldsize;</span>
+<span class="lineNum">     106 </span><span class="lineCov">         22 :           linebuffer-&gt;buffer = buffer;</span>
+<span class="lineNum">     107 </span><span class="lineCov">         22 :           end = buffer + linebuffer-&gt;size;</span>
+<span class="lineNum">     108 </span>            :         }
+<span class="lineNum">     109 </span><span class="lineCov">      51013 :       *p++ = c;</span>
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span><span class="lineCov">      51013 :   while (c != delimiter);</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">       1230 :   linebuffer-&gt;length = p - buffer;</span>
+<span class="lineNum">     114 </span><span class="lineCov">       1230 :   return linebuffer;</span>
+<span class="lineNum">     115 </span>            : }
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : /* Free the buffer that was allocated for linebuffer LINEBUFFER.  */
+<a name="118"><span class="lineNum">     118 </span>            : </a>
+<span class="lineNum">     119 </span>            : void
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 : freebuffer (struct linebuffer *linebuffer)</span>
+<span class="lineNum">     121 </span>            : {
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :   free (linebuffer-&gt;buffer);</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

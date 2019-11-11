@@ -1,0 +1,343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/chdir-long.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - chdir-long.c<span style="font-size: 80%;"> (source / <a href="chdir-long.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">71</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* provide a chdir function that tries not to fail due to ENAMETOOLONG</a>
+<span class="lineNum">       2 </span>            :    Copyright (C) 2004-2015 Free Software Foundation, Inc.
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       5 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       6 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       7 </span>            :    (at your option) any later version.
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      10 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      11 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      12 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      15 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* written by Jim Meyering */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &quot;chdir-long.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      24 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;assure.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #ifndef PATH_MAX
+<span class="lineNum">      33 </span>            : # error &quot;compile this file only if your system defines PATH_MAX&quot;
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : /* The results of openat() in this file are not leaked to any
+<span class="lineNum">      37 </span>            :    single-threaded code that could use stdio.
+<span class="lineNum">      38 </span>            :    FIXME - if the kernel ever adds support for multi-thread safety for
+<span class="lineNum">      39 </span>            :    avoiding standard fds, then we should use openat_safer.  */
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : struct cd_buf
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span>            :   int fd;
+<span class="lineNum">      44 </span>            : };
+<a name="45"><span class="lineNum">      45 </span>            : </a>
+<span class="lineNum">      46 </span>            : static void
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 : cdb_init (struct cd_buf *cdb)</span>
+<span class="lineNum">      48 </span>            : {
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :   cdb-&gt;fd = AT_FDCWD;</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 : }</span>
+<a name="51"><span class="lineNum">      51 </span>            : </a>
+<span class="lineNum">      52 </span>            : static int
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 : cdb_fchdir (struct cd_buf const *cdb)</span>
+<span class="lineNum">      54 </span>            : {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   return fchdir (cdb-&gt;fd);</span>
+<span class="lineNum">      56 </span>            : }
+<a name="57"><span class="lineNum">      57 </span>            : </a>
+<span class="lineNum">      58 </span>            : static void
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 : cdb_free (struct cd_buf const *cdb)</span>
+<span class="lineNum">      60 </span>            : {
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :   if (0 &lt;= cdb-&gt;fd)</span>
+<span class="lineNum">      62 </span>            :     {
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       bool close_fail = close (cdb-&gt;fd);</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :       assure (! close_fail);</span>
+<span class="lineNum">      65 </span>            :     }
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            : /* Given a file descriptor of an open directory (or AT_FDCWD), CDB-&gt;fd,
+<span class="lineNum">      69 </span>            :    try to open the CDB-&gt;fd-relative directory, DIR.  If the open succeeds,
+<span class="lineNum">      70 </span>            :    update CDB-&gt;fd with the resulting descriptor, close the incoming file
+<a name="71"><span class="lineNum">      71 </span>            :    descriptor, and return zero.  Upon failure, return -1 and set errno.  */</a>
+<span class="lineNum">      72 </span>            : static int
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 : cdb_advance_fd (struct cd_buf *cdb, char const *dir)</span>
+<span class="lineNum">      74 </span>            : {
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :   int new_fd = openat (cdb-&gt;fd, dir,</span>
+<span class="lineNum">      76 </span>            :                        O_SEARCH | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :   if (new_fd &lt; 0)</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   cdb_free (cdb);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   cdb-&gt;fd = new_fd;</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">      84 </span>            : }
+<span class="lineNum">      85 </span>            : 
+<a name="86"><span class="lineNum">      86 </span>            : /* Return a pointer to the first non-slash in S.  */</a>
+<span class="lineNum">      87 </span>            : static char * _GL_ATTRIBUTE_PURE
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 : find_non_slash (char const *s)</span>
+<span class="lineNum">      89 </span>            : {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :   size_t n_slash = strspn (s, &quot;/&quot;);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   return (char *) s + n_slash;</span>
+<span class="lineNum">      92 </span>            : }
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : /* This is a function much like chdir, but without the PATH_MAX limitation
+<span class="lineNum">      95 </span>            :    on the length of the directory name.  A significant difference is that
+<span class="lineNum">      96 </span>            :    it must be able to modify (albeit only temporarily) the directory
+<span class="lineNum">      97 </span>            :    name.  It handles an arbitrarily long directory name by operating
+<span class="lineNum">      98 </span>            :    on manageable portions of the name.  On systems without the openat
+<span class="lineNum">      99 </span>            :    syscall, this means changing the working directory to more and more
+<span class="lineNum">     100 </span>            :    &quot;distant&quot; points along the long directory name and then restoring
+<span class="lineNum">     101 </span>            :    the working directory.  If any of those attempts to save or restore
+<span class="lineNum">     102 </span>            :    the working directory fails, this function exits nonzero.
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :    Note that this function may still fail with errno == ENAMETOOLONG, but
+<span class="lineNum">     105 </span>            :    only if the specified directory name contains a component that is long
+<span class="lineNum">     106 </span>            :    enough to provoke such a failure all by itself (e.g. if the component
+<span class="lineNum">     107 </span>            :    has length PATH_MAX or greater on systems that define PATH_MAX).  */
+<a name="108"><span class="lineNum">     108 </span>            : </a>
+<span class="lineNum">     109 </span>            : int
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 : chdir_long (char *dir)</span>
+<span class="lineNum">     111 </span>            : {
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :   int e = chdir (dir);</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   if (e == 0 || errno != ENAMETOOLONG)</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :     return e;</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   {
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :     size_t len = strlen (dir);</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :     char *dir_end = dir + len;</span>
+<span class="lineNum">     119 </span>            :     struct cd_buf cdb;
+<span class="lineNum">     120 </span>            :     size_t n_leading_slash;
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     cdb_init (&amp;cdb);</span>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :     /* If DIR is the empty string, then the chdir above
+<span class="lineNum">     125 </span>            :        must have failed and set errno to ENOENT.  */
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     assure (0 &lt; len);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :     assure (PATH_MAX &lt;= len);</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :     /* Count leading slashes.  */
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     n_leading_slash = strspn (dir, &quot;/&quot;);</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :     /* Handle any leading slashes as well as any name that matches
+<span class="lineNum">     133 </span>            :        the regular expression, m!^//hostname[/]*! .  Handling this
+<span class="lineNum">     134 </span>            :        prefix separately usually results in a single additional
+<span class="lineNum">     135 </span>            :        cdb_advance_fd call, but it's worthwhile, since it makes the
+<span class="lineNum">     136 </span>            :        code in the following loop cleaner.  */
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :     if (n_leading_slash == 2)</span>
+<span class="lineNum">     138 </span>            :       {
+<span class="lineNum">     139 </span>            :         int err;
+<span class="lineNum">     140 </span>            :         /* Find next slash.
+<span class="lineNum">     141 </span>            :            We already know that dir[2] is neither a slash nor '\0'.  */
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         char *slash = memchr (dir + 3, '/', dir_end - (dir + 3));</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :         if (slash == NULL)</span>
+<span class="lineNum">     144 </span>            :           {
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :             errno = ENAMETOOLONG;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">     147 </span>            :           }
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :         *slash = '\0';</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :         err = cdb_advance_fd (&amp;cdb, dir);</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :         *slash = '/';</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :         if (err != 0)</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :           goto Fail;</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :         dir = find_non_slash (slash + 1);</span>
+<span class="lineNum">     154 </span>            :       }
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :     else if (n_leading_slash)</span>
+<span class="lineNum">     156 </span>            :       {
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :         if (cdb_advance_fd (&amp;cdb, &quot;/&quot;) != 0)</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :           goto Fail;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         dir += n_leading_slash;</span>
+<span class="lineNum">     160 </span>            :       }
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :     assure (*dir != '/');</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     assure (dir &lt;= dir_end);</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :     while (PATH_MAX &lt;= dir_end - dir)</span>
+<span class="lineNum">     166 </span>            :       {
+<span class="lineNum">     167 </span>            :         int err;
+<span class="lineNum">     168 </span>            :         /* Find a slash that is PATH_MAX or fewer bytes away from dir.
+<span class="lineNum">     169 </span>            :            I.e. see if there is a slash that will give us a name of
+<span class="lineNum">     170 </span>            :            length PATH_MAX-1 or less.  */
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :         char *slash = memrchr (dir, '/', PATH_MAX);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :         if (slash == NULL)</span>
+<span class="lineNum">     173 </span>            :           {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :             errno = ENAMETOOLONG;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :             return -1;</span>
+<span class="lineNum">     176 </span>            :           }
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :         *slash = '\0';</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :         assure (slash - dir &lt; PATH_MAX);</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :         err = cdb_advance_fd (&amp;cdb, dir);</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         *slash = '/';</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :         if (err != 0)</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :           goto Fail;</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :         dir = find_non_slash (slash + 1);</span>
+<span class="lineNum">     186 </span>            :       }
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :     if (dir &lt; dir_end)</span>
+<span class="lineNum">     189 </span>            :       {
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :         if (cdb_advance_fd (&amp;cdb, dir) != 0)</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :           goto Fail;</span>
+<span class="lineNum">     192 </span>            :       }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :     if (cdb_fchdir (&amp;cdb) != 0)</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       goto Fail;</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :     cdb_free (&amp;cdb);</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :    Fail:</span>
+<span class="lineNum">     201 </span>            :     {
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :       int saved_errno = errno;</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       cdb_free (&amp;cdb);</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :       errno = saved_errno;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :       return -1;</span>
+<span class="lineNum">     206 </span>            :     }
+<span class="lineNum">     207 </span>            :   }
+<span class="lineNum">     208 </span>            : }
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : #if TEST_CHDIR
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : # include &quot;closeout.h&quot;
+<span class="lineNum">     213 </span>            : # include &quot;error.h&quot;
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : char *program_name;
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            : int
+<span class="lineNum">     218 </span>            : main (int argc, char *argv[])
+<span class="lineNum">     219 </span>            : {
+<span class="lineNum">     220 </span>            :   char *line = NULL;
+<span class="lineNum">     221 </span>            :   size_t n = 0;
+<span class="lineNum">     222 </span>            :   int len;
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :   program_name = argv[0];
+<span class="lineNum">     225 </span>            :   atexit (close_stdout);
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :   len = getline (&amp;line, &amp;n, stdin);
+<span class="lineNum">     228 </span>            :   if (len &lt; 0)
+<span class="lineNum">     229 </span>            :     {
+<span class="lineNum">     230 </span>            :       int saved_errno = errno;
+<span class="lineNum">     231 </span>            :       if (feof (stdin))
+<span class="lineNum">     232 </span>            :         exit (0);
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :       error (EXIT_FAILURE, saved_errno,
+<span class="lineNum">     235 </span>            :              &quot;reading standard input&quot;);
+<span class="lineNum">     236 </span>            :     }
+<span class="lineNum">     237 </span>            :   else if (len == 0)
+<span class="lineNum">     238 </span>            :     exit (0);
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            :   if (line[len-1] == '\n')
+<span class="lineNum">     241 </span>            :     line[len-1] = '\0';
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :   if (chdir_long (line) != 0)
+<span class="lineNum">     244 </span>            :     error (EXIT_FAILURE, errno,
+<span class="lineNum">     245 </span>            :            &quot;chdir_long failed: %s&quot;, line);
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            :   if (argc &lt;= 1)
+<span class="lineNum">     248 </span>            :     {
+<span class="lineNum">     249 </span>            :       /* Using 'pwd' here makes sense only if it is a robust implementation,
+<span class="lineNum">     250 </span>            :          like the one in coreutils after the 2004-04-19 changes.  */
+<span class="lineNum">     251 </span>            :       char const *cmd = &quot;pwd&quot;;
+<span class="lineNum">     252 </span>            :       execlp (cmd, (char *) NULL);
+<span class="lineNum">     253 </span>            :       error (EXIT_FAILURE, errno, &quot;%s&quot;, cmd);
+<span class="lineNum">     254 </span>            :     }
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   fclose (stdin);
+<span class="lineNum">     257 </span>            :   fclose (stderr);
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   exit (EXIT_SUCCESS);
+<span class="lineNum">     260 </span>            : }
+<span class="lineNum">     261 </span>            : #endif
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            : /*
+<span class="lineNum">     264 </span>            : Local Variables:
+<span class="lineNum">     265 </span>            : compile-command: &quot;gcc -DTEST_CHDIR=1 -g -O -W -Wall chdir-long.c libcoreutils.a&quot;
+<span class="lineNum">     266 </span>            : End:
+<span class="lineNum">     267 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

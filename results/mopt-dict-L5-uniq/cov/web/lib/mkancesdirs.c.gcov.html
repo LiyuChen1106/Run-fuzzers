@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/mkancesdirs.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - mkancesdirs.c<span style="font-size: 80%;"> (source / <a href="mkancesdirs.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:16:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Make a file's ancestor directories.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2006, 2009-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &quot;mkancesdirs.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      25 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #include &quot;dirname.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;savewd.h&quot;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : /* Ensure that the ancestor directories of FILE exist, using an
+<span class="lineNum">      35 </span>            :    algorithm that should work even if two processes execute this
+<span class="lineNum">      36 </span>            :    function in parallel.  Modify FILE as necessary to access the
+<span class="lineNum">      37 </span>            :    ancestor directories, but restore FILE to an equivalent value
+<span class="lineNum">      38 </span>            :    if successful.
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :    WD points to the working directory, using the conventions of
+<span class="lineNum">      41 </span>            :    savewd.
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :    Create any ancestor directories that don't already exist, by
+<span class="lineNum">      44 </span>            :    invoking MAKE_DIR (FILE, COMPONENT, MAKE_DIR_ARG).  This function
+<span class="lineNum">      45 </span>            :    should return 0 if successful and the resulting directory is
+<span class="lineNum">      46 </span>            :    readable, 1 if successful but the resulting directory might not be
+<span class="lineNum">      47 </span>            :    readable, -1 (setting errno) otherwise.  If COMPONENT is relative,
+<span class="lineNum">      48 </span>            :    it is relative to the temporary working directory, which may differ
+<span class="lineNum">      49 </span>            :    from *WD.
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :    Ordinarily MAKE_DIR is executed with the working directory changed
+<span class="lineNum">      52 </span>            :    to reflect the already-made prefix, and mkancesdirs returns with
+<span class="lineNum">      53 </span>            :    the working directory changed a prefix of FILE.  However, if the
+<span class="lineNum">      54 </span>            :    initial working directory cannot be saved in a file descriptor,
+<span class="lineNum">      55 </span>            :    MAKE_DIR is invoked in a subprocess and this function returns in
+<span class="lineNum">      56 </span>            :    both the parent and child process, so the caller should not assume
+<span class="lineNum">      57 </span>            :    any changed state survives other than the EXITMAX component of WD,
+<span class="lineNum">      58 </span>            :    and the caller should take care that the parent does not attempt to
+<span class="lineNum">      59 </span>            :    do the work that the child is doing.
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :    If successful and if this process can go ahead and create FILE,
+<span class="lineNum">      62 </span>            :    return the length of the prefix of FILE that has already been made.
+<span class="lineNum">      63 </span>            :    If successful so far but a child process is doing the actual work,
+<span class="lineNum">      64 </span>            :    return -2.  If unsuccessful, return -1 and set errno.  */
+<a name="65"><span class="lineNum">      65 </span>            : </a>
+<span class="lineNum">      66 </span>            : ptrdiff_t
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 : mkancesdirs (char *file, struct savewd *wd,</span>
+<span class="lineNum">      68 </span>            :              int (*make_dir) (char const *, char const *, void *),
+<span class="lineNum">      69 </span>            :              void *make_dir_arg)
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :   /* Address of the previous directory separator that follows an
+<span class="lineNum">      72 </span>            :      ordinary byte in a file name in the left-to-right scan, or NULL
+<span class="lineNum">      73 </span>            :      if no such separator precedes the current location P.  */
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :   char *sep = NULL;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   /* Address of the leftmost file name component that has not yet
+<span class="lineNum">      77 </span>            :      been processed.  */
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :   char *component = file;</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   char *p = file + FILE_SYSTEM_PREFIX_LEN (file);</span>
+<span class="lineNum">      81 </span>            :   char c;
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   bool made_dir = false;</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   /* Scan forward through FILE, creating and chdiring into directories
+<span class="lineNum">      85 </span>            :      along the way.  Try MAKE_DIR before chdir, so that the procedure
+<span class="lineNum">      86 </span>            :      works even when two or more processes are executing it in
+<span class="lineNum">      87 </span>            :      parallel.  Isolate each file name component by having COMPONENT
+<span class="lineNum">      88 </span>            :      point to its start and SEP point just after its end.  */
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :   while ((c = *p++))</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     if (ISSLASH (*p))</span>
+<span class="lineNum">      92 </span>            :       {
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :         if (! ISSLASH (c))</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :           sep = p;</span>
+<span class="lineNum">      95 </span>            :       }
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :     else if (ISSLASH (c) &amp;&amp; *p &amp;&amp; sep)</span>
+<span class="lineNum">      97 </span>            :       {
+<span class="lineNum">      98 </span>            :         /* Don't bother to make or test for &quot;.&quot; since it does not
+<span class="lineNum">      99 </span>            :            affect the algorithm.  */
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :         if (! (sep - component == 1 &amp;&amp; component[0] == '.'))</span>
+<span class="lineNum">     101 </span>            :           {
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :             int make_dir_errno = 0;</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :             int savewd_chdir_options = 0;</span>
+<span class="lineNum">     104 </span>            :             int chdir_result;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :             /* Temporarily modify FILE to isolate this file name
+<span class="lineNum">     107 </span>            :                component.  */
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :             *sep = '\0';</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :             /* Invoke MAKE_DIR on this component, except don't bother
+<span class="lineNum">     111 </span>            :                with &quot;..&quot; since it must exist if its &quot;parent&quot; does.  */
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :             if (sep - component == 2</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                 &amp;&amp; component[0] == '.' &amp;&amp; component[1] == '.')</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :               made_dir = false;</span>
+<span class="lineNum">     115 </span>            :             else
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :               switch (make_dir (file, component, make_dir_arg))</span>
+<span class="lineNum">     117 </span>            :                 {
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                 case -1:</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :                   make_dir_errno = errno;</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                   break;</span>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                 case 0:</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                   savewd_chdir_options |= SAVEWD_CHDIR_READABLE;</span>
+<span class="lineNum">     124 </span>            :                   /* Fall through.  */
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                 case 1:</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                   made_dir = true;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                   break;</span>
+<span class="lineNum">     128 </span>            :                 }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :             if (made_dir)</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :               savewd_chdir_options |= SAVEWD_CHDIR_NOFOLLOW;</span>
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :             chdir_result =</span>
+<span class="lineNum">     134 </span>            :               savewd_chdir (wd, component, savewd_chdir_options, NULL);
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :             /* Undo the temporary modification to FILE, unless there
+<span class="lineNum">     137 </span>            :                was a failure.  */
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :             if (chdir_result != -1)</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :               *sep = '/';</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :             if (chdir_result != 0)</span>
+<span class="lineNum">     142 </span>            :               {
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                 if (make_dir_errno != 0 &amp;&amp; errno == ENOENT)</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                   errno = make_dir_errno;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                 return chdir_result;</span>
+<span class="lineNum">     146 </span>            :               }
+<span class="lineNum">     147 </span>            :           }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :         component = p;</span>
+<span class="lineNum">     150 </span>            :       }
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :   return component - file;</span>
+<span class="lineNum">     153 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

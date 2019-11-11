@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/mkdir-p.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - mkdir-p.c<span style="font-size: 80%;"> (source / <a href="mkdir-p.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">51</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* mkdir-p.c -- Ensure that a directory and its parents exist.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 1990, 1997-2000, 2002-2007, 2009-2015 Free Software
+<span class="lineNum">       4 </span>            :    Foundation, Inc.
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       7 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       8 </span>            :    the Free Software Foundation; either version 3 of the License, or
+<span class="lineNum">       9 </span>            :    (at your option) any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      17 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /* Written by Paul Eggert, David MacKenzie, and Jim Meyering.  */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &quot;mkdir-p.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      26 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      30 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &quot;dirchownmod.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;dirname.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;error.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;quote.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;mkancesdirs.h&quot;
+<span class="lineNum">      37 </span>            : #include &quot;savewd.h&quot;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #ifndef HAVE_FCHMOD
+<span class="lineNum">      40 </span>            : # define HAVE_FCHMOD false
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : /* Ensure that the directory DIR exists.
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :    WD is the working directory, as in savewd.c.
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :    If MAKE_ANCESTOR is not null, create any ancestor directories that
+<span class="lineNum">      48 </span>            :    don't already exist, by invoking MAKE_ANCESTOR (DIR, ANCESTOR, OPTIONS).
+<span class="lineNum">      49 </span>            :    This function should return zero if successful, -1 (setting errno)
+<span class="lineNum">      50 </span>            :    otherwise.  In this case, DIR may be modified by storing '\0' bytes
+<span class="lineNum">      51 </span>            :    into it, to access the ancestor directories, and this modification
+<span class="lineNum">      52 </span>            :    is retained on return if the ancestor directories could not be
+<span class="lineNum">      53 </span>            :    created.
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :    Create DIR as a new directory, using mkdir with permissions MODE;
+<span class="lineNum">      56 </span>            :    here, MODE is affected by the umask in the usual way.  It is also
+<span class="lineNum">      57 </span>            :    OK if MAKE_ANCESTOR is not null and a directory DIR already exists.
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :    Call ANNOUNCE (DIR, OPTIONS) just after successfully making DIR,
+<span class="lineNum">      60 </span>            :    even if some of the following actions fail.
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :    Set DIR's owner to OWNER and group to GROUP, but leave the owner
+<span class="lineNum">      63 </span>            :    alone if OWNER is (uid_t) -1, and similarly for GROUP.
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :    Set DIR's mode bits to MODE, except preserve any of the bits that
+<span class="lineNum">      66 </span>            :    correspond to zero bits in MODE_BITS.  In other words, MODE_BITS is
+<span class="lineNum">      67 </span>            :    a mask that specifies which of DIR's mode bits should be set or
+<span class="lineNum">      68 </span>            :    cleared.  Changing the mode in this way is necessary if DIR already
+<span class="lineNum">      69 </span>            :    existed, if MODE and MODE_BITS specify non-permissions bits like
+<span class="lineNum">      70 </span>            :    S_ISUID, or if MODE and MODE_BITS specify permissions bits that are
+<span class="lineNum">      71 </span>            :    masked out by the umask.  MODE_BITS should be a subset of
+<span class="lineNum">      72 </span>            :    CHMOD_MODE_BITS.
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :    However, if PRESERVE_EXISTING is true and DIR already exists,
+<span class="lineNum">      75 </span>            :    do not attempt to set DIR's ownership and file mode bits.
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :    Return true if DIR exists as a directory with the proper ownership
+<span class="lineNum">      78 </span>            :    and file mode bits when done, or if a child process has been
+<span class="lineNum">      79 </span>            :    dispatched to do the real work (though the child process may not
+<span class="lineNum">      80 </span>            :    have finished yet -- it is the caller's responsibility to handle
+<span class="lineNum">      81 </span>            :    this).  Report a diagnostic and return false on failure, storing
+<span class="lineNum">      82 </span>            :    '\0' into *DIR if an ancestor directory had problems.  */
+<a name="83"><span class="lineNum">      83 </span>            : </a>
+<span class="lineNum">      84 </span>            : bool
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 : make_dir_parents (char *dir,</span>
+<span class="lineNum">      86 </span>            :                   struct savewd *wd,
+<span class="lineNum">      87 </span>            :                   int (*make_ancestor) (char const *, char const *, void *),
+<span class="lineNum">      88 </span>            :                   void *options,
+<span class="lineNum">      89 </span>            :                   mode_t mode,
+<span class="lineNum">      90 </span>            :                   void (*announce) (char const *, void *),
+<span class="lineNum">      91 </span>            :                   mode_t mode_bits,
+<span class="lineNum">      92 </span>            :                   uid_t owner,
+<span class="lineNum">      93 </span>            :                   gid_t group,
+<span class="lineNum">      94 </span>            :                   bool preserve_existing)
+<span class="lineNum">      95 </span>            : {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   int mkdir_errno = (IS_ABSOLUTE_FILE_NAME (dir) ? 0 : savewd_errno (wd));</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   if (mkdir_errno == 0)</span>
+<span class="lineNum">      99 </span>            :     {
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       ptrdiff_t prefix_len = 0;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       int savewd_chdir_options = (HAVE_FCHMOD ? SAVEWD_CHDIR_SKIP_READABLE : 0);</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       if (make_ancestor)</span>
+<span class="lineNum">     104 </span>            :         {
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :           prefix_len = mkancesdirs (dir, wd, make_ancestor, options);</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :           if (prefix_len &lt; 0)</span>
+<span class="lineNum">     107 </span>            :             {
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :               if (prefix_len &lt; -1)</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                 return true;</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :               mkdir_errno = errno;</span>
+<span class="lineNum">     111 </span>            :             }
+<span class="lineNum">     112 </span>            :         }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :       if (0 &lt;= prefix_len)</span>
+<span class="lineNum">     115 </span>            :         {
+<span class="lineNum">     116 </span>            :           /* If the ownership might change, or if the directory will be
+<span class="lineNum">     117 </span>            :              writable to other users and its special mode bits may
+<span class="lineNum">     118 </span>            :              change after the directory is created, create it with
+<span class="lineNum">     119 </span>            :              more restrictive permissions at first, so unauthorized
+<span class="lineNum">     120 </span>            :              users cannot nip in before the directory is ready.  */
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :           bool keep_owner = owner == (uid_t) -1 &amp;&amp; group == (gid_t) -1;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :           bool keep_special_mode_bits =</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :             ((mode_bits &amp; (S_ISUID | S_ISGID)) | (mode &amp; S_ISVTX)) == 0;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :           mode_t mkdir_mode = mode;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :           if (! keep_owner)</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :             mkdir_mode &amp;= ~ (S_IRWXG | S_IRWXO);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :           else if (! keep_special_mode_bits)</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :             mkdir_mode &amp;= ~ (S_IWGRP | S_IWOTH);</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :           if (mkdir (dir + prefix_len, mkdir_mode) == 0)</span>
+<span class="lineNum">     131 </span>            :             {
+<span class="lineNum">     132 </span>            :               /* True if the caller does not care about the umask's
+<span class="lineNum">     133 </span>            :                  effect on the permissions.  */
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :               bool umask_must_be_ok = (mode &amp; mode_bits &amp; S_IRWXUGO) == 0;</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :               announce (dir, options);</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :               preserve_existing = (keep_owner &amp; keep_special_mode_bits</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                                    &amp; umask_must_be_ok);</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :               savewd_chdir_options |=</span>
+<span class="lineNum">     140 </span>            :                 (SAVEWD_CHDIR_NOFOLLOW
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                  | (mode &amp; S_IRUSR ? SAVEWD_CHDIR_READABLE : 0));</span>
+<span class="lineNum">     142 </span>            :             }
+<span class="lineNum">     143 </span>            :           else
+<span class="lineNum">     144 </span>            :             {
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :               mkdir_errno = errno;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :               mkdir_mode = -1;</span>
+<span class="lineNum">     147 </span>            :             }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :           if (preserve_existing)</span>
+<span class="lineNum">     150 </span>            :             {
+<span class="lineNum">     151 </span>            :               struct stat st;
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :               if (mkdir_errno == 0</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                   || (mkdir_errno != ENOENT &amp;&amp; make_ancestor</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                       &amp;&amp; stat (dir + prefix_len, &amp;st) == 0</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                       &amp;&amp; S_ISDIR (st.st_mode)))</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :                 return true;</span>
+<span class="lineNum">     157 </span>            :             }
+<span class="lineNum">     158 </span>            :           else
+<span class="lineNum">     159 </span>            :             {
+<span class="lineNum">     160 </span>            :               int open_result[2];
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :               int chdir_result =</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :                 savewd_chdir (wd, dir + prefix_len,</span>
+<span class="lineNum">     163 </span>            :                               savewd_chdir_options, open_result);
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :               if (chdir_result &lt; -1)</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                 return true;</span>
+<span class="lineNum">     166 </span>            :               else
+<span class="lineNum">     167 </span>            :                 {
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                   bool chdir_ok = (chdir_result == 0);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                   char const *subdir = (chdir_ok ? &quot;.&quot; : dir + prefix_len);</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                   if (dirchownmod (open_result[0], subdir, mkdir_mode,</span>
+<span class="lineNum">     171 </span>            :                                    owner, group, mode, mode_bits)
+<span class="lineNum">     172 </span>            :                       == 0)
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :                     return true;</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                   if (mkdir_errno == 0</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                       || (mkdir_errno != ENOENT &amp;&amp; make_ancestor</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                           &amp;&amp; errno != ENOTDIR))</span>
+<span class="lineNum">     178 </span>            :                     {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                       error (0, errno,</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                              _(keep_owner</span>
+<span class="lineNum">     181 </span>            :                                ? &quot;cannot change permissions of %s&quot;
+<span class="lineNum">     182 </span>            :                                : &quot;cannot change owner and permissions of %s&quot;),
+<span class="lineNum">     183 </span>            :                              quote (dir));
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                       return false;</span>
+<span class="lineNum">     185 </span>            :                     }
+<span class="lineNum">     186 </span>            :                 }
+<span class="lineNum">     187 </span>            :             }
+<span class="lineNum">     188 </span>            :         }
+<span class="lineNum">     189 </span>            :     }
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :   error (0, mkdir_errno, _(&quot;cannot create directory %s&quot;), quote (dir));</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">     193 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

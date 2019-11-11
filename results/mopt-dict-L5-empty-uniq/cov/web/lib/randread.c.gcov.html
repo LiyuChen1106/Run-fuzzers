@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - trace.lcov_info_final - lib/randread.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - randread.c<span style="font-size: 80%;"> (source / <a href="randread.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">trace.lcov_info_final</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">90</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-11-11 02:29:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* Generate buffers of random data.</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            :    Copyright (C) 2006-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            :    This program is free software: you can redistribute it and/or modify
+<span class="lineNum">       6 </span>            :    it under the terms of the GNU General Public License as published by
+<span class="lineNum">       7 </span>            :    the Free Software Foundation, either version 3 of the License, or
+<span class="lineNum">       8 </span>            :    (at your option) any later version.
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :    This program is distributed in the hope that it will be useful,
+<span class="lineNum">      11 </span>            :    but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      12 </span>            :    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      13 </span>            :    GNU General Public License for more details.
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :    You should have received a copy of the GNU General Public License
+<span class="lineNum">      16 </span>            :    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  */
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* Written by Paul Eggert.  */
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : /* FIXME: Improve performance by adding support for the RDRAND machine
+<span class="lineNum">      21 </span>            :    instruction if available (e.g., Ivy Bridge processors).  */
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : #include &lt;config.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &quot;randread.h&quot;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;error.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;exitfail.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;quotearg.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;stdalign.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;stdbool.h&gt;
+<span class="lineNum">      34 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      35 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      36 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      37 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      38 </span>            : #include &lt;sys/time.h&gt;
+<span class="lineNum">      39 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #include &quot;gettext.h&quot;
+<span class="lineNum">      42 </span>            : #define _(msgid) gettext (msgid)
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : #include &quot;rand-isaac.h&quot;
+<span class="lineNum">      45 </span>            : #include &quot;stdio-safer.h&quot;
+<span class="lineNum">      46 </span>            : #include &quot;unlocked-io.h&quot;
+<span class="lineNum">      47 </span>            : #include &quot;xalloc.h&quot;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #ifndef __attribute__
+<span class="lineNum">      50 </span>            : # if __GNUC__ &lt; 2 || (__GNUC__ == 2 &amp;&amp; __GNUC_MINOR__ &lt; 8)
+<span class="lineNum">      51 </span>            : #  define __attribute__(x) /* empty */
+<span class="lineNum">      52 </span>            : # endif
+<span class="lineNum">      53 </span>            : #endif
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : #ifndef ATTRIBUTE_NORETURN
+<span class="lineNum">      56 </span>            : # define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+<span class="lineNum">      57 </span>            : #endif
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : #ifndef MIN
+<span class="lineNum">      60 </span>            : # define MIN(a, b) ((a) &lt; (b) ? (a) : (b))
+<span class="lineNum">      61 </span>            : #endif
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : #if _STRING_ARCH_unaligned
+<span class="lineNum">      64 </span>            : # define ALIGNED_POINTER(ptr, type) true
+<span class="lineNum">      65 </span>            : #else
+<span class="lineNum">      66 </span>            : # define ALIGNED_POINTER(ptr, type) ((size_t) (ptr) % alignof (type) == 0)
+<span class="lineNum">      67 </span>            : #endif
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : #ifndef NAME_OF_NONCE_DEVICE
+<span class="lineNum">      70 </span>            : # define NAME_OF_NONCE_DEVICE &quot;/dev/urandom&quot;
+<span class="lineNum">      71 </span>            : #endif
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : /* The maximum buffer size used for reads of random data.  Using the
+<span class="lineNum">      74 </span>            :    value 2 * ISAAC_BYTES makes this the largest power of two that
+<span class="lineNum">      75 </span>            :    would not otherwise cause struct randread_source to grow.  */
+<span class="lineNum">      76 </span>            : #define RANDREAD_BUFFER_SIZE (2 * ISAAC_BYTES)
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : /* A source of random data for generating random buffers.  */
+<span class="lineNum">      79 </span>            : struct randread_source
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span>            :   /* Stream to read random bytes from.  If null, the current
+<span class="lineNum">      82 </span>            :      implementation uses an internal PRNG (ISAAC).  */
+<span class="lineNum">      83 </span>            :   FILE *source;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :   /* Function to call, and its argument, if there is an input error or
+<span class="lineNum">      86 </span>            :      end of file when reading from the stream; errno is nonzero if
+<span class="lineNum">      87 </span>            :      there was an error.  If this function returns, it should fix the
+<span class="lineNum">      88 </span>            :      problem before returning.  The default handler assumes that
+<span class="lineNum">      89 </span>            :      handler_arg is the file name of the source.  */
+<span class="lineNum">      90 </span>            :   void (*handler) (void const *);
+<span class="lineNum">      91 </span>            :   void const *handler_arg;
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :   /* The buffer for SOURCE.  It's kept here to simplify storage
+<span class="lineNum">      94 </span>            :      allocation and to make it easier to clear out buffered random
+<span class="lineNum">      95 </span>            :      data.  */
+<span class="lineNum">      96 </span>            :   union
+<span class="lineNum">      97 </span>            :   {
+<span class="lineNum">      98 </span>            :     /* The stream buffer, if SOURCE is not null.  */
+<span class="lineNum">      99 </span>            :     char c[RANDREAD_BUFFER_SIZE];
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     /* The buffered ISAAC pseudorandom buffer, if SOURCE is null.  */
+<span class="lineNum">     102 </span>            :     struct isaac
+<span class="lineNum">     103 </span>            :     {
+<span class="lineNum">     104 </span>            :       /* The number of bytes that are buffered at the end of data.b.  */
+<span class="lineNum">     105 </span>            :       size_t buffered;
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :       /* State of the ISAAC generator.  */
+<span class="lineNum">     108 </span>            :       struct isaac_state state;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :       /* Up to a buffer's worth of pseudorandom data.  */
+<span class="lineNum">     111 </span>            :       union
+<span class="lineNum">     112 </span>            :       {
+<span class="lineNum">     113 </span>            :         isaac_word w[ISAAC_WORDS];
+<span class="lineNum">     114 </span>            :         unsigned char b[ISAAC_BYTES];
+<span class="lineNum">     115 </span>            :       } data;
+<span class="lineNum">     116 </span>            :     } isaac;
+<span class="lineNum">     117 </span>            :   } buf;
+<span class="lineNum">     118 </span>            : };
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : /* The default error handler.  */
+<a name="122"><span class="lineNum">     122 </span>            : </a>
+<span class="lineNum">     123 </span>            : static void ATTRIBUTE_NORETURN
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 : randread_error (void const *file_name)</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :   if (file_name)</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :     error (exit_failure, errno,</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :            errno == 0 ? _(&quot;%s: end of file&quot;) : _(&quot;%s: read error&quot;),</span>
+<span class="lineNum">     129 </span>            :            quotearg_colon (file_name));
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :   abort ();</span>
+<span class="lineNum">     131 </span>            : }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : /* Simply return a new randread_source object with the default error
+<span class="lineNum">     134 </span>            :    handler.  */
+<a name="135"><span class="lineNum">     135 </span>            : </a>
+<span class="lineNum">     136 </span>            : static struct randread_source *
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 : simple_new (FILE *source, void const *handler_arg)</span>
+<span class="lineNum">     138 </span>            : {
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   struct randread_source *s = xmalloc (sizeof *s);</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   s-&gt;source = source;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   s-&gt;handler = randread_error;</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   s-&gt;handler_arg = handler_arg;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :   return s;</span>
+<span class="lineNum">     144 </span>            : }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : /* Put a nonce value into BUFFER, with size BUFSIZE, but do not get
+<span class="lineNum">     147 </span>            :    more than BYTES_BOUND bytes' worth of random information from any
+<span class="lineNum">     148 </span>            :    nonce device.  */
+<a name="149"><span class="lineNum">     149 </span>            : </a>
+<span class="lineNum">     150 </span>            : static void
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 : get_nonce (void *buffer, size_t bufsize, size_t bytes_bound)</span>
+<span class="lineNum">     152 </span>            : {
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   char *buf = buffer;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   ssize_t seeded = 0;</span>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :   /* Get some data from FD if available.  */
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   int fd = open (NAME_OF_NONCE_DEVICE, O_RDONLY | O_BINARY);</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :   if (0 &lt;= fd)</span>
+<span class="lineNum">     159 </span>            :     {
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       seeded = read (fd, buf, MIN (bufsize, bytes_bound));</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       if (seeded &lt; 0)</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         seeded = 0;</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :       close (fd);</span>
+<span class="lineNum">     164 </span>            :     }
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   /* If there's no nonce device, use a poor approximation
+<span class="lineNum">     167 </span>            :      by getting the time of day, etc.  */
+<span class="lineNum">     168 </span>            : #define ISAAC_SEED(type, initialize_v)                      \
+<span class="lineNum">     169 </span>            :   if (seeded &lt; bufsize)                                     \
+<span class="lineNum">     170 </span>            :     {                                                       \
+<span class="lineNum">     171 </span>            :       type v;                                               \
+<span class="lineNum">     172 </span>            :       size_t nbytes = MIN (sizeof v, bufsize - seeded);     \
+<span class="lineNum">     173 </span>            :       initialize_v;                                         \
+<span class="lineNum">     174 </span>            :       memcpy (buf + seeded, &amp;v, nbytes);                    \
+<span class="lineNum">     175 </span>            :       seeded += nbytes;                                     \
+<span class="lineNum">     176 </span>            :     }
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :   ISAAC_SEED (struct timeval, gettimeofday (&amp;v, NULL));</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :   ISAAC_SEED (pid_t, v = getpid ());</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :   ISAAC_SEED (pid_t, v = getppid ());</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   ISAAC_SEED (uid_t, v = getuid ());</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   ISAAC_SEED (uid_t, v = getgid ());</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            : #ifdef lint
+<span class="lineNum">     184 </span>            :   /* Normally we like having the extra randomness from uninitialized
+<span class="lineNum">     185 </span>            :      parts of BUFFER.  However, omit this randomness if we want to
+<span class="lineNum">     186 </span>            :      avoid false-positives from memory-checking debugging tools.  */
+<span class="lineNum">     187 </span>            :   memset (buf + seeded, 0, bufsize - seeded);
+<span class="lineNum">     188 </span>            : #endif
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : /* Create and initialize a random data source from NAME, or use a
+<span class="lineNum">     193 </span>            :    reasonable default source if NAME is null.  BYTES_BOUND is an upper
+<span class="lineNum">     194 </span>            :    bound on the number of bytes that will be needed.  If zero, it is a
+<span class="lineNum">     195 </span>            :    hard bound; otherwise it is just an estimate.
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            :    If NAME is not null, NAME is saved for use as the argument of the
+<span class="lineNum">     198 </span>            :    default handler.  Unless a non-default handler is used, NAME's
+<span class="lineNum">     199 </span>            :    lifetime should be at least that of the returned value.
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :    Return NULL (setting errno) on failure.  */
+<a name="202"><span class="lineNum">     202 </span>            : </a>
+<span class="lineNum">     203 </span>            : struct randread_source *
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 : randread_new (char const *name, size_t bytes_bound)</span>
+<span class="lineNum">     205 </span>            : {
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :   if (bytes_bound == 0)</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :     return simple_new (NULL, NULL);</span>
+<span class="lineNum">     208 </span>            :   else
+<span class="lineNum">     209 </span>            :     {
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :       FILE *source = NULL;</span>
+<span class="lineNum">     211 </span>            :       struct randread_source *s;
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :       if (name)</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :         if (! (source = fopen_safer (name, &quot;rb&quot;)))</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :           return NULL;</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :       s = simple_new (source, name);</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :       if (source)</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :         setvbuf (source, s-&gt;buf.c, _IOFBF, MIN (sizeof s-&gt;buf.c, bytes_bound));</span>
+<span class="lineNum">     221 </span>            :       else
+<span class="lineNum">     222 </span>            :         {
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :           s-&gt;buf.isaac.buffered = 0;</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :           get_nonce (s-&gt;buf.isaac.state.m, sizeof s-&gt;buf.isaac.state.m,</span>
+<span class="lineNum">     225 </span>            :                      bytes_bound);
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :           isaac_seed (&amp;s-&gt;buf.isaac.state);</span>
+<span class="lineNum">     227 </span>            :         }
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :       return s;</span>
+<span class="lineNum">     230 </span>            :     }
+<span class="lineNum">     231 </span>            : }
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            : /* Set S's handler and its argument.  HANDLER (HANDLER_ARG) is called
+<span class="lineNum">     235 </span>            :    when there is a read error or end of file from the random data
+<span class="lineNum">     236 </span>            :    source; errno is nonzero if there was an error.  If HANDLER
+<span class="lineNum">     237 </span>            :    returns, it should fix the problem before returning.  The default
+<span class="lineNum">     238 </span>            :    handler assumes that handler_arg is the file name of the source; it
+<span class="lineNum">     239 </span>            :    does not return.  */
+<a name="240"><span class="lineNum">     240 </span>            : </a>
+<span class="lineNum">     241 </span>            : void
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 : randread_set_handler (struct randread_source *s, void (*handler) (void const *))</span>
+<span class="lineNum">     243 </span>            : {
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :   s-&gt;handler = handler;</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 : }</span>
+<a name="246"><span class="lineNum">     246 </span>            : </a>
+<span class="lineNum">     247 </span>            : void
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 : randread_set_handler_arg (struct randread_source *s, void const *handler_arg)</span>
+<span class="lineNum">     249 </span>            : {
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :   s-&gt;handler_arg = handler_arg;</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            : /* Place SIZE random bytes into the buffer beginning at P, using
+<span class="lineNum">     255 </span>            :    the stream in S.  */
+<a name="256"><span class="lineNum">     256 </span>            : </a>
+<span class="lineNum">     257 </span>            : static void
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 : readsource (struct randread_source *s, unsigned char *p, size_t size)</span>
+<span class="lineNum">     259 </span>            : {
+<span class="lineNum">     260 </span>            :   while (true)
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       size_t inbytes = fread (p, sizeof *p, size, s-&gt;source);</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :       int fread_errno = errno;</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :       p += inbytes;</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :       size -= inbytes;</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       if (size == 0)</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :       errno = (ferror (s-&gt;source) ? fread_errno : 0);</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       s-&gt;handler (s-&gt;handler_arg);</span>
+<span class="lineNum">     270 </span>            :     }
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            : /* Place SIZE pseudorandom bytes into the buffer beginning at P, using
+<span class="lineNum">     275 </span>            :    the buffered ISAAC generator in ISAAC.  */
+<a name="276"><span class="lineNum">     276 </span>            : </a>
+<span class="lineNum">     277 </span>            : static void
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 : readisaac (struct isaac *isaac, void *p, size_t size)</span>
+<span class="lineNum">     279 </span>            : {
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :   size_t inbytes = isaac-&gt;buffered;</span>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            :   while (true)
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :     {</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       char *char_p = p;</span>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :       if (size &lt;= inbytes)</span>
+<span class="lineNum">     287 </span>            :         {
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :           memcpy (p, isaac-&gt;data.b + ISAAC_BYTES - inbytes, size);</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :           isaac-&gt;buffered = inbytes - size;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :           return;</span>
+<span class="lineNum">     291 </span>            :         }
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :       memcpy (p, isaac-&gt;data.b + ISAAC_BYTES - inbytes, inbytes);</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :       p = char_p + inbytes;</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :       size -= inbytes;</span>
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :       /* If P is aligned, write to *P directly to avoid the overhead
+<span class="lineNum">     298 </span>            :          of copying from the buffer.  */
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :       if (ALIGNED_POINTER (p, isaac_word))</span>
+<span class="lineNum">     300 </span>            :         {
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :           isaac_word *wp = p;</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :           while (ISAAC_BYTES &lt;= size)</span>
+<span class="lineNum">     303 </span>            :             {
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :               isaac_refill (&amp;isaac-&gt;state, wp);</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :               wp += ISAAC_WORDS;</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :               size -= ISAAC_BYTES;</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :               if (size == 0)</span>
+<span class="lineNum">     308 </span>            :                 {
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :                   isaac-&gt;buffered = 0;</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                   return;</span>
+<span class="lineNum">     311 </span>            :                 }
+<span class="lineNum">     312 </span>            :             }
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :           p = wp;</span>
+<span class="lineNum">     314 </span>            :         }
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :       isaac_refill (&amp;isaac-&gt;state, isaac-&gt;data.w);</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :       inbytes = ISAAC_BYTES;</span>
+<span class="lineNum">     318 </span>            :     }
+<span class="lineNum">     319 </span>            : }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            : /* Consume random data from *S to generate a random buffer BUF of size
+<span class="lineNum">     323 </span>            :    SIZE.  */
+<a name="324"><span class="lineNum">     324 </span>            : </a>
+<span class="lineNum">     325 </span>            : void
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 : randread (struct randread_source *s, void *buf, size_t size)</span>
+<span class="lineNum">     327 </span>            : {
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :   if (s-&gt;source)</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :     readsource (s, buf, size);</span>
+<span class="lineNum">     330 </span>            :   else
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :     readisaac (&amp;s-&gt;buf.isaac, buf, size);</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            : /* Clear *S so that it no longer contains undelivered random data, and
+<span class="lineNum">     336 </span>            :    deallocate any system resources associated with *S.  Return 0 if
+<span class="lineNum">     337 </span>            :    successful, a negative number (setting errno) if not (this is rare,
+<span class="lineNum">     338 </span>            :    but can occur in theory if there is an input error).  */
+<a name="339"><span class="lineNum">     339 </span>            : </a>
+<span class="lineNum">     340 </span>            : int
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 : randread_free (struct randread_source *s)</span>
+<span class="lineNum">     342 </span>            : {
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :   FILE *source = s-&gt;source;</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :   memset (s, 0, sizeof *s);</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :   free (s);</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :   return (source ? fclose (source) : 0);</span>
+<span class="lineNum">     347 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
